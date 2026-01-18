@@ -1,0 +1,111 @@
+<!--文件夹组件-->
+<view class="folder-container">
+  <view class="folder-label">{{folder.date}}</view>
+  
+  <view class="folder">
+    <view class="folder-header">
+      <view class="folder-title">
+        <text class="folder-icon">📂</text>
+        <text class="folder-text">今日烘焙档案</text>
+      </view>
+      <view class="folder-toggle" bindtap="toggleOpen">
+        <text>{{isOpen ? '▲' : '▼'}}</text>
+      </view>
+    </view>
+
+    <view class="folder-content" wx:if="{{isOpen}}">
+      <!-- AI分析 -->
+      <view class="analysis-card" wx:if="{{folder.analysis}}">
+        <text class="analysis-icon">✨</text>
+        <text class="analysis-text">"{{folder.analysis}}"</text>
+      </view>
+
+      <!-- 四象限可视化 -->
+      <view class="quadrant-visual">
+        <view class="quadrant-container">
+          <!-- 横线 -->
+          <view class="quadrant-line-horizontal"></view>
+          <!-- 竖线 -->
+          <view class="quadrant-line-vertical"></view>
+          
+          <!-- 象限网格 -->
+          <view class="quadrant-grid">
+            <!-- 左上：第二象限 - 重要但不紧急 -->
+            <view class="quadrant-cell quadrant-2">
+              <view class="quadrant-label">第二象限<br/>重要不紧急</view>
+              <view class="quadrant-dots">
+                <view 
+                  wx:for="{{folder.entries}}" 
+                  wx:key="id"
+                  wx:if="{{item.type === 'IMPORTANT_NOT_URGENT'}}"
+                  class="quadrant-dot"
+                  style="background-color: #81C784"
+                ></view>
+              </view>
+            </view>
+            
+            <!-- 右上：第一象限 - 既紧急又重要 -->
+            <view class="quadrant-cell quadrant-1">
+              <view class="quadrant-label">第一象限<br/>既紧急又重要</view>
+              <view class="quadrant-dots">
+                <view 
+                  wx:for="{{folder.entries}}" 
+                  wx:key="id"
+                  wx:if="{{item.type === 'IMPORTANT_URGENT'}}"
+                  class="quadrant-dot"
+                  style="background-color: #FF80AB"
+                ></view>
+              </view>
+            </view>
+            
+            <!-- 左下：第四象限 - 不重要不紧急 -->
+            <view class="quadrant-cell quadrant-4">
+              <view class="quadrant-label">第四象限<br/>不重要不紧急</view>
+              <view class="quadrant-dots">
+                <view 
+                  wx:for="{{folder.entries}}" 
+                  wx:key="id"
+                  wx:if="{{item.type === 'NOT_IMPORTANT_NOT_URGENT'}}"
+                  class="quadrant-dot"
+                  style="background-color: #B39DDB"
+                ></view>
+              </view>
+            </view>
+            
+            <!-- 右下：第三象限 - 紧急但不重要 -->
+            <view class="quadrant-cell quadrant-3">
+              <view class="quadrant-label">第三象限<br/>紧急但不重要</view>
+              <view class="quadrant-dots">
+                <view 
+                  wx:for="{{folder.entries}}" 
+                  wx:key="id"
+                  wx:if="{{item.type === 'URGENT_NOT_IMPORTANT'}}"
+                  class="quadrant-dot"
+                  style="background-color: #FFF176"
+                ></view>
+              </view>
+            </view>
+          </view>
+        </view>
+      </view>
+
+      <!-- 条目列表 -->
+      <view class="entries-list">
+        <view 
+          wx:for="{{folder.entries}}" 
+          wx:key="id"
+          class="entry-item"
+          style="border-left-color: {{getCookieMetadata(item.type).color}}"
+        >
+          <text class="entry-time">{{formatTime(item.timestamp)}}</text>
+          <text class="entry-text">{{item.text}}</text>
+          <text class="entry-icon">{{getCookieMetadata(item.type).icon}}</text>
+        </view>
+        <view class="empty-state" wx:if="{{folder.entries.length === 0}}">
+          <text class="empty-icon">🥣</text>
+          <text class="empty-text">碗里空空的，快去烘焙第一块情绪饼干吧！</text>
+        </view>
+      </view>
+    </view>
+  </view>
+</view>

@@ -1,0 +1,99 @@
+<!--详情页面 - 时间轴布局-->
+<view class="container">
+  <!-- 头部 - 显示日期和时间 -->
+  <view class="header">
+    <view class="header-content">
+      <view class="back-btn" bindtap="goBack">
+        <text class="back-icon">←</text>
+      </view>
+      <view class="header-title-section">
+        <text class="header-date">{{dateLabel}}</text>
+        <text class="header-time">{{currentTime}}</text>
+      </view>
+      <view class="calendar-btn" bindtap="showCalendar">
+        <text class="calendar-icon">📅</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 时间轴容器 -->
+  <view class="timeline-container">
+    <!-- 左侧时间轴 -->
+    <view class="time-axis">
+      <view 
+        wx:for="{{timeSlots}}" 
+        wx:key="hour"
+        class="time-slot"
+        style="top: {{item.top}}rpx;"
+      >
+        <text class="time-slot-label">{{item.label}}</text>
+      </view>
+    </view>
+
+    <!-- 右侧内容区域 -->
+    <view class="content-area">
+      <!-- 全天事件 -->
+      <view class="all-day-section" wx:if="{{allDayEntries.length > 0}}">
+        <view class="all-day-label">全天</view>
+        <view class="all-day-entries">
+          <view 
+            wx:for="{{allDayEntries}}" 
+            wx:key="id"
+            class="entry-card all-day-card"
+            style="background-color: {{entryColors[item.type] || '#E0E0E080'}}"
+          >
+            <view class="entry-header">
+              <text class="entry-icon">{{entryIcons[item.type] || '💭'}}</text>
+              <text class="entry-text">{{item.text}}</text>
+            </view>
+            <image wx:if="{{item.image}}" src="{{item.image}}" class="entry-image" mode="aspectFit"></image>
+          </view>
+        </view>
+      </view>
+
+      <!-- 时间轴事件 -->
+      <view class="timeline-entries">
+        <view 
+          wx:for="{{timelineEntries}}" 
+          wx:key="id"
+          class="timeline-item"
+          style="top: {{item.top}}rpx;"
+        >
+          <view 
+            class="entry-card"
+            style="background-color: {{entryColors[item.type] || '#E0E0E080'}}"
+          >
+            <view class="entry-header">
+              <text class="entry-icon">{{entryIcons[item.type] || '💭'}}</text>
+              <view class="entry-content">
+                <text class="entry-text">{{item.text}}</text>
+                <text class="entry-time">{{formatTime(item.timestamp)}}</text>
+              </view>
+            </view>
+            <image wx:if="{{item.image}}" src="{{item.image}}" class="entry-image" mode="aspectFit"></image>
+          </view>
+        </view>
+      </view>
+
+      <!-- 空状态 -->
+      <view class="empty-state" wx:if="{{entries.length === 0}}">
+        <text class="empty-icon">🥣</text>
+        <text class="empty-text">今天还没有记录任何内容</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 详情页的加号按钮（因为不是tabBar页面，需要单独显示） -->
+  <view class="detail-add-button" bindtap="onAddButtonClick">
+    <view class="add-button-inner">
+      <text class="add-icon">+</text>
+    </view>
+  </view>
+
+  <!-- 输入弹窗 -->
+  <input-modal 
+    show="{{showInputModal}}"
+    bind:close="hideInputModal"
+    bind:confirm="handleInputConfirm"
+  />
+</view>

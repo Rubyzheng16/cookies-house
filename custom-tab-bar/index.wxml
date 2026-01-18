@@ -1,0 +1,49 @@
+<!--自定义tabBar-->
+<view class="custom-tab-bar">
+  <!-- 左侧第一个按钮 -->
+  <view 
+    class="tab-bar-item left-first {{selected === 0 ? 'active' : ''}}"
+    data-index="0"
+    bindtap="switchTab"
+  >
+    <text class="tab-bar-icon">{{list[0].icon}}</text>
+    <text class="tab-bar-text">{{list[0].text}}</text>
+  </view>
+  
+  <!-- 左侧第二个按钮 -->
+  <view 
+    class="tab-bar-item left-second {{selected === 1 ? 'active' : ''}}"
+    data-index="1"
+    bindtap="switchTab"
+  >
+    <text class="tab-bar-icon">{{list[1].icon}}</text>
+    <text class="tab-bar-text">{{list[1].text}}</text>
+  </view>
+  
+  <!-- 中间的加号按钮 -->
+  <view class="tab-bar-add-button" bindtap="onAddClick">
+    <view class="add-button-inner">
+      <text class="add-icon">+</text>
+    </view>
+  </view>
+  
+  <!-- 右侧第一个按钮 -->
+  <view 
+    class="tab-bar-item right-first {{selected === 2 ? 'active' : ''}}"
+    data-index="2"
+    bindtap="switchTab"
+  >
+    <text class="tab-bar-icon">{{list[2].icon}}</text>
+    <text class="tab-bar-text">{{list[2].text}}</text>
+  </view>
+  
+  <!-- 右侧第二个按钮 -->
+  <view 
+    class="tab-bar-item right-second {{selected === 3 ? 'active' : ''}}"
+    data-index="3"
+    bindtap="switchTab"
+  >
+    <text class="tab-bar-icon">{{list[3].icon}}</text>
+    <text class="tab-bar-text">{{list[3].text}}</text>
+  </view>
+</view>

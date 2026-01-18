@@ -1,0 +1,6 @@
+{
+  "navigationBarTitleText": "糖果罐",
+  "usingComponents": {
+    "input-modal": "../../components/input-modal/index"
+  }
+}

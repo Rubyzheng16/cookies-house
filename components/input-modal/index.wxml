@@ -1,0 +1,155 @@
+<!--输入弹窗组件-->
+<view class="modal-overlay" wx:if="{{show}}" bindtap="closeModal">
+  <view class="modal-content" catchtap="stopPropagation">
+    <!-- 烘焙工作台 -->
+    <view class="workbench card">
+      <view class="workbench-top"></view>
+      
+      <view class="input-area">
+        <textarea 
+          class="input-textarea"
+          value="{{inputValue}}"
+          placeholder="丢入任何碎片：灵感、碎碎念、或今日目标..."
+          bindinput="onInputChange"
+          maxlength="500"
+        />
+        <view class="input-icons">
+          <view class="icon-btn" bindtap="chooseImage">
+            <text class="icon">🖼️</text>
+          </view>
+          <view class="icon-btn" bindtap="chooseFile">
+            <text class="icon">📄</text>
+          </view>
+          <view class="icon-btn" bindtap="startRecord">
+            <text class="icon">🎙️</text>
+          </view>
+        </view>
+      </view>
+
+      <!-- 四象限按钮 -->
+      <view class="quadrant-buttons">
+        <button 
+          wx:for="{{quadrantTypes}}" 
+          wx:key="type"
+          wx:for-index="idx"
+          class="quadrant-btn {{selectedType === item.type ? 'selected' : ''}}"
+          style="background-color: {{item.color}}"
+          data-type="{{item.type}}"
+          bindtap="toggleType"
+        >
+          <text class="quadrant-icon">{{item.icon}}</text>
+          <text class="quadrant-label">{{item.label}}</text>
+        </button>
+      </view>
+
+      <view class="ref-toggle">
+        <button class="ref-btn" bindtap="toggleRef">
+          {{showRef ? '收起分类秘籍 ▲' : '象限分类秘籍 ▼'}}
+        </button>
+      </view>
+
+      <view class="ref-content" wx:if="{{showRef}}">
+        <view class="ref-quadrant-visual">
+          <view class="ref-quadrant-container">
+            <!-- 横线 -->
+            <view class="ref-quadrant-line-horizontal"></view>
+            <!-- 竖线 -->
+            <view class="ref-quadrant-line-vertical"></view>
+            
+            <!-- 象限网格 -->
+            <view class="ref-quadrant-grid">
+              <!-- 左上：第二象限 - 重要但不紧急 -->
+              <view class="ref-quadrant-cell ref-quadrant-2">
+                <view class="ref-quadrant-cell-header">
+                  <view class="ref-dot" style="background-color: #81C784;"></view>
+                  <text class="ref-quadrant-cell-title">第二象限<br/>重要但不紧急</text>
+                </view>
+                <view class="ref-quadrant-cell-content">
+                  <view class="ref-detail-item">
+                    <text class="ref-detail-label">事例：</text>
+                    <text class="ref-detail-text">学习新技能、规划未来、健康管理</text>
+                  </view>
+                  <view class="ref-detail-item">
+                    <text class="ref-detail-label">原则：</text>
+                    <text class="ref-detail-text">投入时间，长期收益</text>
+                  </view>
+                </view>
+              </view>
+              
+              <!-- 右上：第一象限 - 既紧急又重要 -->
+              <view class="ref-quadrant-cell ref-quadrant-1">
+                <view class="ref-quadrant-cell-header">
+                  <view class="ref-dot" style="background-color: #FF80AB;"></view>
+                  <text class="ref-quadrant-cell-title">第一象限<br/>既紧急又重要</text>
+                </view>
+                <view class="ref-quadrant-cell-content">
+                  <view class="ref-detail-item">
+                    <text class="ref-detail-label">事例：</text>
+                    <text class="ref-detail-text">紧急会议、截止日期、危机处理</text>
+                  </view>
+                  <view class="ref-detail-item">
+                    <text class="ref-detail-label">原则：</text>
+                    <text class="ref-detail-text">立即处理，优先完成</text>
+                  </view>
+                </view>
+              </view>
+              
+              <!-- 左下：第四象限 - 不重要不紧急 -->
+              <view class="ref-quadrant-cell ref-quadrant-4">
+                <view class="ref-quadrant-cell-header">
+                  <view class="ref-dot" style="background-color: #B39DDB;"></view>
+                  <text class="ref-quadrant-cell-title">第四象限<br/>不重要不紧急</text>
+                </view>
+                <view class="ref-quadrant-cell-content">
+                  <view class="ref-detail-item">
+                    <text class="ref-detail-label">事例：</text>
+                    <text class="ref-detail-text">娱乐活动、闲聊、消遣</text>
+                  </view>
+                  <view class="ref-detail-item">
+                    <text class="ref-detail-label">原则：</text>
+                    <text class="ref-detail-text">适度即可，避免沉迷</text>
+                  </view>
+                </view>
+              </view>
+              
+              <!-- 右下：第三象限 - 紧急但不重要 -->
+              <view class="ref-quadrant-cell ref-quadrant-3">
+                <view class="ref-quadrant-cell-header">
+                  <view class="ref-dot" style="background-color: #FFF176;"></view>
+                  <text class="ref-quadrant-cell-title">第三象限<br/>紧急但不重要</text>
+                </view>
+                <view class="ref-quadrant-cell-content">
+                  <view class="ref-detail-item">
+                    <text class="ref-detail-label">事例：</text>
+                    <text class="ref-detail-text">电话、邮件、临时请求</text>
+                  </view>
+                  <view class="ref-detail-item">
+                    <text class="ref-detail-label">原则：</text>
+                    <text class="ref-detail-text">快速处理，减少干扰</text>
+                  </view>
+                </view>
+              </view>
+            </view>
+          </view>
+        </view>
+      </view>
+
+      <!-- 确认按钮 -->
+      <button 
+        class="confirm-btn {{inputValue && inputValue.trim() ? 'active' : 'disabled'}}"
+        bindtap="handleConfirm"
+        disabled="{{isBaking || !inputValue || !inputValue.trim()}}"
+      >
+        {{selectedType ? '记录目标 🍪' : '丢入烤箱 (碎碎念) ✨'}}
+      </button>
+    </view>
+  </view>
+</view>
+
+<!-- 烘焙中遮罩 -->
+<view class="baking-overlay" wx:if="{{isBaking}}">
+  <view class="baking-modal">
+    <text class="baking-icon">🧁</text>
+    <text class="baking-text">烘焙进行中...</text>
+  </view>
+</view>

@@ -1,0 +1,156 @@
+<!--折叠式未来目标管理页面-->
+<view class="container">
+  <!-- 目标输入区域 -->
+  <view class="card input-section">
+    <text class="section-title">折叠式未来规划</text>
+    <text class="section-subtitle">"将庞大未来封装，只面对最小的一步"</text>
+    
+    <view class="input-group">
+      <input 
+        class="goal-input"
+        value="{{newGoal}}"
+        placeholder="输入你想开启的长期目标..."
+        bindinput="onInputChange"
+        maxlength="100"
+      />
+      <button 
+        class="split-btn"
+        bindtap="generateSteps"
+        disabled="{{isLoading || !newGoal.trim()}}"
+      >
+        {{isLoading ? '拆解中...' : '拆解'}}
+      </button>
+    </view>
+    
+    <!-- 象限选择 -->
+    <view class="quadrant-selector">
+      <text class="selector-label">选择轻重缓急：</text>
+      <view class="quadrant-buttons">
+        <button 
+          wx:for="{{quadrantTypes}}" 
+          wx:key="type"
+          class="quadrant-btn-small {{selectedType === item.type ? 'selected' : ''}}"
+          style="background-color: {{item.color}}; border-color: {{selectedType === item.type ? item.color : 'transparent'}}"
+          data-type="{{item.type}}"
+          bindtap="toggleType"
+        >
+          {{item.label}}
+        </button>
+      </view>
+    </view>
+  </view>
+
+  <!-- 目标列表 -->
+  <view class="goals-list">
+    <view 
+      wx:for="{{goals}}" 
+      wx:key="id"
+      class="goal-card"
+    >
+      <view class="goal-content">
+        <!-- 糖果罐 -->
+        <view class="candy-jar">
+          <view class="jar-top"></view>
+          <view class="jar-body">
+            <view 
+              wx:for="{{item.candyCount}}" 
+              wx:key="*this"
+              wx:for-item="candy"
+              wx:for-index="candyIndex"
+              class="candy"
+              style="background-color: {{['#FF80AB', '#81C784', '#FFF176', '#B39DDB'][candyIndex % 4]}};"
+            ></view>
+          </view>
+        </view>
+
+        <!-- 目标信息 -->
+        <view class="goal-info">
+          <view class="goal-header">
+            <view class="goal-title-wrapper">
+              <view 
+                wx:if="{{item.type}}"
+                class="goal-type-dot"
+                style="background-color: {{getTypeColor(item.type)}};"
+              ></view>
+              <text class="goal-title">{{item.title}}</text>
+            </view>
+            <button 
+              class="expand-btn"
+              data-goal-id="{{item.id}}"
+              bindtap="toggleExpand"
+            >
+              {{expandedGoals.indexOf(item.id) > -1 ? '收起详情 ▲' : '查看全貌 ▼'}}
+            </button>
+          </view>
+
+          <!-- 已完成 -->
+          <view wx:if="{{item.isCompleted}}" class="completed-badge">
+            已封装满载 🍬
+          </view>
+
+          <!-- 未完成 -->
+          <view wx:else class="steps-section">
+            <!-- 展开状态：显示所有步骤 -->
+            <view wx:if="{{expandedGoals.indexOf(item.id) > -1}}" class="all-steps">
+              <view 
+                wx:for="{{item.steps}}" 
+                wx:key="id"
+                class="step-item {{item.completed ? 'completed' : ''}}"
+              >
+                <checkbox 
+                  checked="{{item.completed}}"
+                  disabled="{{item.completed}}"
+                  data-goal-id="{{item.id}}"
+                  data-step-id="{{item.id}}"
+                  bindtap="completeStep"
+                />
+                <text class="step-text">{{item.text}}</text>
+              </view>
+            </view>
+
+            <!-- 折叠状态：只显示下一步 -->
+            <view wx:else class="next-step">
+              <view 
+                wx:for="{{item.steps}}" 
+                wx:key="id"
+                wx:if="{{!item.completed}}"
+                class="next-step-item"
+              >
+                <checkbox 
+                  data-goal-id="{{item.id}}"
+                  data-step-id="{{item.id}}"
+                  bindtap="completeStep"
+                />
+                <view class="next-step-content">
+                  <text class="next-step-label">下一步：</text>
+                  <text class="next-step-text">{{item.text}}</text>
+                </view>
+              </view>
+            </view>
+          </view>
+        </view>
+      </view>
+
+      <!-- 进度条 -->
+      <view class="progress-bar">
+        <view 
+          class="progress-fill"
+          style="width: {{item.progress}}%;"
+        ></view>
+      </view>
+    </view>
+
+    <!-- 空状态 -->
+    <view wx:if="{{goals.length === 0}}" class="empty-state">
+      <text class="empty-icon">🏺</text>
+      <text class="empty-text">糖果罐空空的，输入一个目标来填满它吧</text>
+    </view>
+  </view>
+
+  <!-- 输入弹窗 -->
+  <input-modal 
+    show="{{showInputModal}}"
+    bind:close="hideInputModal"
+    bind:confirm="handleInputConfirm"
+  />
+</view>

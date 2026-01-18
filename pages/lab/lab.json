@@ -1,0 +1,8 @@
+{
+  "navigationBarTitleText": "品鉴室",
+  "usingComponents": {
+    "cookie-chart": "../../components/cookie-chart/index",
+    "fortune-cookie": "../../components/fortune-cookie/index",
+    "input-modal": "../../components/input-modal/index"
+  }
+}

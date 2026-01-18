@@ -1,0 +1,61 @@
+<!--碎片收纳主界面-->
+<view class="container">
+  <!-- 头部 -->
+  <view class="header">
+    <view class="header-content">
+      <view class="calendar-btn" bindtap="showCalendar">
+        <text class="calendar-icon">📅</text>
+      </view>
+      <text class="header-title">情绪饼干屋</text>
+    </view>
+  </view>
+
+  <!-- 日历弹窗 -->
+  <view class="calendar-modal" wx:if="{{showCalendarModal}}" bindtap="hideCalendar">
+    <view class="calendar-content" catchtap="stopPropagation">
+      <view class="calendar-header">
+        <text class="calendar-title">选择日期</text>
+        <text class="calendar-close" bindtap="hideCalendar">✕</text>
+      </view>
+      <view class="calendar-grid">
+        <view class="calendar-month">{{currentMonth}}</view>
+        <view class="calendar-weekdays">
+          <text wx:for="{{['日','一','二','三','四','五','六']}}" wx:key="*this" class="weekday">{{item}}</text>
+        </view>
+        <view class="calendar-days">
+          <view 
+            wx:for="{{calendarDays}}" 
+            wx:key="index"
+            class="calendar-day {{item.isCurrentMonth ? '' : 'other-month'}} {{item.isToday ? 'today' : ''}} {{item.date === selectedDate ? 'selected' : ''}}"
+            bindtap="selectCalendarDate"
+            data-date="{{item.date}}"
+          >
+            <text class="day-number">{{item.day}}</text>
+            <view wx:if="{{item.hasContent}}" class="day-dot"></view>
+          </view>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 文件夹网格 -->
+  <view class="folders-grid">
+    <view 
+      wx:for="{{folders}}" 
+      wx:key="date"
+      class="folder-card"
+      bindtap="openFolder"
+      data-date="{{item.date}}"
+    >
+      <text class="folder-icon">📂</text>
+      <text class="folder-date-label">{{item.date}}</text>
+    </view>
+  </view>
+
+  <!-- 输入弹窗 -->
+  <input-modal 
+    show="{{showInputModal}}"
+    bind:close="hideInputModal"
+    bind:confirm="handleInputConfirm"
+  />
+</view>

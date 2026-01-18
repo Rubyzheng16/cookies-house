@@ -1,0 +1,44 @@
+/* 全局加号按钮样式 - 位于导航栏中间 */
+.global-add-button {
+  position: fixed;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 120rpx;
+  height: 120rpx;
+  z-index: 10001;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: auto;
+  /* tabBar高度通常是98rpx，让按钮一半在tabBar上 */
+  margin-bottom: 0;
+}
+
+.add-button-inner {
+  width: 100rpx;
+  height: 100rpx;
+  background: linear-gradient(135deg, #FFB74D 0%, #FF9800 100%);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 8rpx 32rpx rgba(255, 183, 77, 0.5);
+  transition: all 0.3s;
+  border: 4rpx solid #6D4C41;
+  /* 向上移动50rpx，让按钮一半在tabBar上，一半在内容区域 */
+  position: relative;
+  top: -50rpx;
+}
+
+.add-button-inner:active {
+  transform: scale(0.9);
+  box-shadow: 0 4rpx 16rpx rgba(255, 183, 77, 0.3);
+}
+
+.add-icon {
+  font-size: 60rpx;
+  color: white;
+  font-weight: 300;
+  line-height: 1;
+}

@@ -1,0 +1,220 @@
+/* 可视化状态感知页面样式 */
+.tabs {
+  display: flex;
+  justify-content: center;
+  gap: 32rpx;
+  margin-bottom: 40rpx;
+}
+
+.tab-btn {
+  padding: 24rpx 48rpx;
+  border-radius: 50rpx;
+  font-weight: bold;
+  border: 8rpx solid transparent;
+  background: rgba(255, 255, 255, 0.4);
+  color: #6D4C41;
+  font-size: 28rpx;
+  transform: scale(0.9);
+  transition: all 0.3s;
+}
+
+.tab-btn.active {
+  background: #FFF9C4;
+  border-color: #6D4C41;
+  color: #3E2723;
+  transform: scale(1);
+}
+
+.chart-section {
+  text-align: center;
+}
+
+.section-title {
+  color: #3E2723;
+  font-weight: bold;
+  font-size: 40rpx;
+  margin-bottom: 48rpx;
+  display: block;
+}
+
+.chart-container {
+  display: flex;
+  justify-content: center;
+  padding: 32rpx 0;
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16rpx;
+  margin-top: 48rpx;
+}
+
+.stat-item {
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+  padding: 16rpx;
+  background: rgba(255, 255, 255, 0.4);
+  border-radius: 24rpx;
+}
+
+.stat-icon {
+  font-size: 36rpx;
+}
+
+.stat-text {
+  font-size: 24rpx;
+  color: #3E2723;
+  font-weight: bold;
+}
+
+.analysis-section {
+  background: #FFFDE7;
+  border: 4rpx solid rgba(161, 136, 127, 0.3);
+  position: relative;
+  overflow: hidden;
+}
+
+.analysis-section::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4rpx;
+  background: rgba(109, 76, 65, 0.1);
+}
+
+.analysis-header {
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+  margin-bottom: 32rpx;
+}
+
+.analysis-icon {
+  font-size: 40rpx;
+}
+
+.analysis-title {
+  color: #6D4C41;
+  font-weight: bold;
+  font-size: 32rpx;
+}
+
+.analysis-content {
+  color: #3E2723;
+  line-height: 1.8;
+  font-style: italic;
+  font-size: 28rpx;
+}
+
+.analysis-empty {
+  text-align: center;
+  padding: 32rpx 0;
+}
+
+.empty-text {
+  color: rgba(62, 39, 35, 0.6);
+  font-size: 28rpx;
+  margin-bottom: 32rpx;
+  display: block;
+}
+
+.analyze-btn {
+  background: #FFD700;
+  padding: 16rpx 48rpx;
+  border-radius: 50rpx;
+  font-weight: bold;
+  color: #3E2723;
+  font-size: 28rpx;
+  border: none;
+  box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.1);
+}
+
+.trends-section {
+  text-align: center;
+}
+
+.trends-chart {
+  height: 384rpx;
+  width: 100%;
+  background: rgba(109, 76, 65, 0.05);
+  border-radius: 32rpx;
+  position: relative;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-around;
+  padding: 0 32rpx 64rpx;
+}
+
+.trend-bar {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16rpx;
+}
+
+.bar {
+  width: 32rpx;
+  border-radius: 16rpx;
+  transition: all 0.5s;
+  min-height: 20rpx;
+}
+
+.bar-label {
+  font-size: 16rpx;
+  color: #3E2723;
+  font-weight: bold;
+}
+
+.medals-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 32rpx;
+  margin-top: 40rpx;
+}
+
+.medal-card {
+  background: #FFF9C4;
+  padding: 32rpx;
+  border-radius: 60rpx;
+  text-align: center;
+  border: 8rpx solid white;
+  box-shadow: 0 8rpx 32rpx rgba(0, 0, 0, 0.1);
+}
+
+.medal-icon {
+  font-size: 80rpx;
+  display: block;
+  margin-bottom: 16rpx;
+}
+
+.medal-title {
+  font-size: 24rpx;
+  font-weight: bold;
+  color: #3E2723;
+  display: block;
+  margin-bottom: 8rpx;
+}
+
+.medal-desc {
+  font-size: 20rpx;
+  color: rgba(62, 39, 35, 0.6);
+  display: block;
+}
+
+.fortune-section {
+  margin-top: 64rpx;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 32rpx;
+}
+
+.fortune-title {
+  color: #3E2723;
+  font-size: 28rpx;
+  font-weight: bold;
+}

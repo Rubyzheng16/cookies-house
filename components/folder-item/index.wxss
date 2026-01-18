@@ -1,0 +1,273 @@
+/* 文件夹组件样式 */
+.folder-container {
+  position: relative;
+  padding-top: 48rpx;
+  margin-bottom: 40rpx;
+}
+
+.folder-label {
+  position: absolute;
+  top: -8rpx;
+  left: 32rpx;
+  z-index: 10;
+  background: white;
+  border: 4rpx solid #f44336;
+  color: #f44336;
+  padding: 8rpx 24rpx;
+  font-size: 28rpx;
+  font-weight: bold;
+  border-radius: 8rpx;
+  box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.1);
+  transform: rotate(-2deg);
+}
+
+.folder {
+  background: #BCAAA4;
+  border-radius: 0 80rpx 24rpx 24rpx;
+  box-shadow: 0 16rpx 64rpx rgba(0, 0, 0, 0.2);
+  position: relative;
+  overflow: hidden;
+}
+
+.folder-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 32rpx 48rpx;
+  border-bottom: 2rpx solid rgba(62, 39, 35, 0.1);
+}
+
+.folder-title {
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+}
+
+.folder-icon {
+  font-size: 48rpx;
+}
+
+.folder-text {
+  color: #3E2723;
+  font-weight: bold;
+  font-size: 32rpx;
+}
+
+.folder-toggle {
+  color: #3E2723;
+  font-size: 40rpx;
+  padding: 8rpx;
+}
+
+.folder-content {
+  padding: 48rpx;
+  padding-top: 0;
+}
+
+.analysis-card {
+  background: #FFF9C4;
+  padding: 32rpx;
+  border-radius: 32rpx;
+  border: 4rpx dashed rgba(255, 82, 82, 0.4);
+  margin-bottom: 32rpx;
+  position: relative;
+}
+
+.analysis-icon {
+  position: absolute;
+  top: -24rpx;
+  right: -16rpx;
+  font-size: 60rpx;
+}
+
+.analysis-text {
+  font-size: 28rpx;
+  color: #3E2723;
+  line-height: 1.6;
+  font-style: italic;
+}
+
+.quadrant-visual {
+  position: relative;
+  background: rgba(255, 255, 255, 0.4);
+  padding: 32rpx;
+  border-radius: 24rpx;
+  overflow: hidden;
+  border: 4rpx solid rgba(255, 255, 255, 0.5);
+  margin-bottom: 32rpx;
+  min-height: 400rpx;
+}
+
+.quadrant-container {
+  position: relative;
+  width: 100%;
+  height: 400rpx;
+}
+
+/* 横线 */
+.quadrant-line-horizontal {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  right: 0;
+  height: 2rpx;
+  background: rgba(62, 39, 35, 0.3);
+  z-index: 1;
+  transform: translateY(-50%);
+}
+
+/* 竖线 */
+.quadrant-line-vertical {
+  position: absolute;
+  left: 50%;
+  top: 0;
+  bottom: 0;
+  width: 2rpx;
+  background: rgba(62, 39, 35, 0.3);
+  z-index: 1;
+  transform: translateX(-50%);
+}
+
+.quadrant-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 1fr 1fr;
+  width: 100%;
+  height: 100%;
+  position: relative;
+  z-index: 0;
+}
+
+.quadrant-cell {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  padding: 16rpx;
+  position: relative;
+  border: 1rpx solid rgba(62, 39, 35, 0.1);
+}
+
+.quadrant-1 {
+  background: rgba(255, 128, 171, 0.1);
+  border-top-right-radius: 24rpx;
+}
+
+.quadrant-2 {
+  background: rgba(129, 199, 132, 0.1);
+  border-top-left-radius: 24rpx;
+}
+
+.quadrant-3 {
+  background: rgba(255, 235, 118, 0.1);
+  border-bottom-right-radius: 24rpx;
+}
+
+.quadrant-4 {
+  background: rgba(179, 157, 219, 0.1);
+  border-bottom-left-radius: 24rpx;
+}
+
+.quadrant-label {
+  font-size: 18rpx;
+  color: #3E2723;
+  font-weight: bold;
+  margin-bottom: 12rpx;
+  opacity: 0.7;
+  text-align: center;
+  line-height: 1.4;
+}
+
+.quadrant-dots {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8rpx;
+  justify-content: center;
+  align-items: flex-start;
+  flex: 1;
+  width: 100%;
+}
+
+.quadrant-dot {
+  width: 20rpx;
+  height: 20rpx;
+  border-radius: 50%;
+  box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.15);
+}
+
+/* 坐标轴标签 */
+.quadrant-axis-label {
+  position: absolute;
+  font-size: 20rpx;
+  color: #6D4C41;
+  font-weight: bold;
+  opacity: 0.6;
+  z-index: 2;
+}
+
+.axis-important {
+  top: 8rpx;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.axis-urgent {
+  bottom: 8rpx;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.entries-list {
+  margin-top: 24rpx;
+}
+
+.entry-item {
+  background: #FFFDE7;
+  padding: 24rpx;
+  border-radius: 16rpx;
+  margin-bottom: 24rpx;
+  box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.05);
+  border-left: 8rpx solid;
+  display: flex;
+  align-items: flex-start;
+  gap: 16rpx;
+}
+
+.entry-time {
+  font-size: 24rpx;
+  opacity: 0.4;
+  color: #3E2723;
+  white-space: nowrap;
+}
+
+.entry-text {
+  font-size: 28rpx;
+  color: #3E2723;
+  flex: 1;
+  line-height: 1.5;
+}
+
+.entry-icon {
+  font-size: 20rpx;
+  padding: 4rpx 8rpx;
+  border-radius: 8rpx;
+  background: rgba(255, 255, 255, 0.6);
+  color: #3E2723;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 64rpx 0;
+  opacity: 0.4;
+}
+
+.empty-icon {
+  font-size: 80rpx;
+  display: block;
+  margin-bottom: 16rpx;
+}
+
+.empty-text {
+  font-size: 24rpx;
+  color: #3E2723;
+}

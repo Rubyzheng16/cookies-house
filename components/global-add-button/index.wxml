@@ -1,0 +1,6 @@
+<!--全局加号按钮-->
+<view class="global-add-button" bindtap="onAddClick">
+  <view class="add-button-inner">
+    <text class="add-icon">+</text>
+  </view>
+</view>

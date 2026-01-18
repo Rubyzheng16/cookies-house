@@ -1,0 +1,39 @@
+/* 饼干图表组件样式 */
+.chart-container {
+  position: relative;
+  width: 384rpx;
+  height: 384rpx;
+  margin: 0 auto;
+}
+
+.chart-wrapper {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+.chart-canvas {
+  width: 100%;
+  height: 100%;
+}
+
+.chart-center {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 40%;
+  height: 40%;
+  background: #FFF9C4;
+  border-radius: 50%;
+  box-shadow: inset 0 4rpx 16rpx rgba(0, 0, 0, 0.1);
+  border: 4rpx solid white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+}
+
+.chart-icon {
+  font-size: 40rpx;
+}

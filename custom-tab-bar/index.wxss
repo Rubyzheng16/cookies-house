@@ -1,0 +1,119 @@
+/* 自定义tabBar样式 */
+.custom-tab-bar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 98rpx;
+  background: #6D4C41;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-top: 1rpx solid rgba(255, 255, 255, 0.1);
+  z-index: 10000;
+  padding: 0;
+  box-sizing: border-box;
+  padding-bottom: env(safe-area-inset-bottom);
+  /* 以加号为中心，左右各留出更多空间 */
+  padding-left: 40rpx;
+  padding-right: 40rpx;
+}
+
+.tab-bar-item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  position: relative;
+  /* 每个按钮占据相等的空间，以加号为中心向两边扩散 */
+  min-width: 0;
+}
+
+/* 左侧第一个按钮（饼干屋），距离加号最远 */
+.tab-bar-item.left-first {
+  margin-right: 60rpx;
+}
+
+/* 左侧第二个按钮（品鉴室），距离加号更远，增加间距 */
+.tab-bar-item.left-second {
+  margin-right: 80rpx;
+}
+
+/* 右侧第一个按钮（糖果罐），距离加号更远，增加间距 */
+.tab-bar-item.right-first {
+  margin-left: 110rpx;
+}
+
+/* 右侧第二个按钮（我的），距离加号最远 */
+.tab-bar-item.right-second {
+  margin-left: 50rpx;
+}
+
+.tab-bar-item.active .tab-bar-text {
+  color: #FFF9C4;
+  font-weight: bold;
+}
+
+.tab-bar-item.active .tab-bar-icon {
+  transform: scale(1.1);
+}
+
+.tab-bar-item:not(.active) .tab-bar-text {
+  color: #8F8F8F;
+}
+
+.tab-bar-icon {
+  font-size: 36rpx;
+  line-height: 1;
+  margin-bottom: 4rpx;
+  transition: transform 0.2s;
+}
+
+.tab-bar-text {
+  font-size: 22rpx;
+  line-height: 1;
+}
+
+/* 中间的加号按钮 */
+.tab-bar-add-button {
+  position: absolute;
+  left: 50%;
+  top: 0;
+  transform: translateX(-50%);
+  width: 120rpx;
+  height: 120rpx;
+  z-index: 10001;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  /* 让按钮一半在tabBar上，一半在内容区域，视觉上在导航栏中间 */
+  margin-top: -50rpx;
+  pointer-events: auto;
+}
+
+.add-button-inner {
+  width: 100rpx;
+  height: 100rpx;
+  background: linear-gradient(135deg, #FFB74D 0%, #FF9800 100%);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 8rpx 32rpx rgba(255, 183, 77, 0.5);
+  transition: all 0.3s;
+  border: 4rpx solid #6D4C41;
+}
+
+.add-button-inner:active {
+  transform: scale(0.9);
+  box-shadow: 0 4rpx 16rpx rgba(255, 183, 77, 0.3);
+}
+
+.add-icon {
+  font-size: 60rpx;
+  color: white;
+  font-weight: 300;
+  line-height: 1;
+}

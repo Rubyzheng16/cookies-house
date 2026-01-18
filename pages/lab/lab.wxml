@@ -1,0 +1,108 @@
+<!--可视化状态感知页面-->
+<view class="container">
+  <!-- 标签切换 -->
+  <view class="tabs">
+    <button 
+      class="tab-btn {{tab === 'daily' ? 'active' : ''}}"
+      data-tab="daily"
+      bindtap="switchTab"
+    >
+      今日新鲜出炉
+    </button>
+    <button 
+      class="tab-btn {{tab === 'trends' ? 'active' : ''}}"
+      data-tab="trends"
+      bindtap="switchTab"
+    >
+      陈年秘方
+    </button>
+  </view>
+
+  <!-- 今日分析 -->
+  <view class="tab-content" wx:if="{{tab === 'daily'}}">
+    <!-- 成分分析表 -->
+    <view class="card chart-section">
+      <text class="section-title">今日成分分析表</text>
+      <view class="chart-container">
+        <cookie-chart entries="{{todayFolder.entries || []}}" />
+      </view>
+      <view class="stats-grid">
+        <view 
+          wx:for="{{cookieTypes}}" 
+          wx:key="type"
+          class="stat-item"
+        >
+          <text class="stat-icon">{{item.icon}}</text>
+          <text class="stat-text">{{item.label}}: {{getCount(item.type)}}块</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- AI分析 -->
+    <view class="card analysis-section">
+      <view class="analysis-header">
+        <text class="analysis-icon">🖋️</text>
+        <text class="analysis-title">烘焙师的密语</text>
+      </view>
+      <view wx:if="{{todayFolder && todayFolder.analysis}}">
+        <text class="analysis-content">{{todayFolder.analysis}}</text>
+      </view>
+      <view wx:else class="analysis-empty">
+        <text class="empty-text">今天的配方还没总结呢...</text>
+        <button class="analyze-btn" bindtap="analyzeToday">
+          ✨ 开启品鉴
+        </button>
+      </view>
+    </view>
+  </view>
+
+  <!-- 趋势分析 -->
+  <view class="tab-content" wx:if="{{tab === 'trends'}}">
+    <!-- 趋势图 -->
+    <view class="card trends-section">
+      <text class="section-title">我的饼干架 (7日趋势)</text>
+      <view class="trends-chart">
+        <view 
+          wx:for="{{folders}}" 
+          wx:key="date"
+          wx:for-item="folder"
+          wx:if="{{index < 7}}"
+          class="trend-bar"
+        >
+          <view 
+            class="bar"
+            style="height: {{getBarHeight(folder)}}%; background: linear-gradient(to top, #6D4C41, #FF80AB);"
+          ></view>
+          <text class="bar-label">{{getShortDate(folder.date)}}</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- 勋章 -->
+    <view class="medals-grid">
+      <view class="medal-card">
+        <text class="medal-icon">🏆</text>
+        <text class="medal-title">效率之王</text>
+        <text class="medal-desc">本周完成了12个树莓目标</text>
+      </view>
+      <view class="medal-card">
+        <text class="medal-icon">👑</text>
+        <text class="medal-title">成长勋章</text>
+        <text class="medal-desc">抹茶成分增加了20%</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 幸运饼干 -->
+  <view class="fortune-section">
+    <text class="fortune-title">幸运饼干时刻</text>
+    <fortune-cookie />
+  </view>
+
+  <!-- 输入弹窗 -->
+  <input-modal 
+    show="{{showInputModal}}"
+    bind:close="hideInputModal"
+    bind:confirm="handleInputConfirm"
+  />
+</view>

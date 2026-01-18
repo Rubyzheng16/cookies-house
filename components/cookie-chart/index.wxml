@@ -1,0 +1,13 @@
+<!--饼干图表组件-->
+<view class="chart-container">
+  <view class="chart-wrapper">
+    <canvas 
+      canvas-id="cookieChart"
+      class="chart-canvas"
+      disable-scroll="true"
+    ></canvas>
+    <view class="chart-center">
+      <text class="chart-icon">🍪</text>
+    </view>
+  </view>
+</view>
