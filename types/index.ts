@@ -12,6 +12,8 @@ export interface CookieEntry {
   text: string;
   type: CookieType;
   timestamp: number;
+  image?: string; // 单张图片（兼容旧数据）
+  images?: string[]; // 多张图片
 }
 
 export interface DayFolder {

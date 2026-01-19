@@ -1,6 +1,7 @@
 {
   "pages": [
     "pages/index/index",
+    "pages/detail/detail",
     "pages/lab/lab",
     "pages/future/future",
     "pages/profile/profile"

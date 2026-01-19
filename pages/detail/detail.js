@@ -1,29 +1,29 @@
 // 详情页面
-import { DayFolder, CookieEntry, CookieType } from '../../types';
-import { fragmentService } from '../../services/fragment';
-import { dateUtils } from '../../utils/date';
-import { COOKIE_METADATA } from '../../constants';
+const { fragmentService } = require('../../services/fragment.js');
+const { dateUtils } = require('../../utils/date.js');
+const { COOKIE_METADATA } = require('../../constants/index.js');
+const { CookieType } = require('../../types/index.js');
 
 Page({
   data: {
     date: '',
     dateLabel: '',
     currentTime: '',
-    entries: [] as CookieEntry[],
-    allDayEntries: [] as CookieEntry[],
-    timelineEntries: [] as any[],
-    timeSlots: [] as any[],
-    entryColors: {} as Record<CookieType, string>,
-    entryIcons: {} as Record<CookieType, string>,
+    entries: [],
+    allDayEntries: [],
+    timelineEntries: [],
+    timeSlots: [],
+    entryColors: {},
+    entryIcons: {},
     showInputModal: false,
-    previewImages: [] as string[],
+    previewImages: [],
     previewIndex: 0,
     showImagePreview: false
   },
 
-  onLoad(options: any) {
+  onLoad(options) {
     const date = options.date || dateUtils.getTodayString();
-    this.setData({ date });
+    this.setData({ date: date });
     this.loadData();
   },
 
@@ -35,17 +35,11 @@ Page({
     const folders = fragmentService.getFolders();
     const folder = folders.find(f => f.date === this.data.date);
     
-    // 如果没有找到文件夹，创建一个空的
+    // 如果没有找到文件夹，创建一个空的用于显示
     if (!folder) {
-      // 不显示错误提示，直接创建空文件夹
-      const emptyFolder: DayFolder = {
-        date: this.data.date,
-        entries: []
-      };
-      // 不保存空文件夹，只是用于显示
       this.setData({
-        dateLabel: this.data.date,
-        currentTime: '',
+        dateLabel: this.data.date || '今天',
+        currentTime: this.getCurrentTime(),
         entries: [],
         allDayEntries: [],
         timelineEntries: [],
@@ -76,31 +70,28 @@ Page({
                         month === today.getMonth() + 1 && 
                         day === today.getDate();
         
-        dateLabel = isToday ? '今天' : `周${weekday} ${month}月${day}日`;
+        dateLabel = isToday ? '今天' : '周' + weekday + ' ' + month + '月' + day + '日';
       } else {
         dateLabel = this.data.date || '今天';
       }
       
-      // 获取当前时间（显示当前时间，不是条目的时间）
-      const now = new Date();
-      currentTime = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+      // 获取当前时间
+      currentTime = this.getCurrentTime();
     } catch (error) {
       console.error('日期格式化错误:', error);
       dateLabel = '今天';
-      const now = new Date();
-      currentTime = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+      currentTime = this.getCurrentTime();
     }
 
     // 分离全天事件和有时间的事件
-    const allDayEntries: CookieEntry[] = [];
-    const timeEntries: CookieEntry[] = [];
+    const allDayEntries = [];
+    const timeEntries = [];
 
     folder.entries.forEach(entry => {
       // 兼容旧数据：如果没有timestamp，使用当前时间
       if (!entry.timestamp) {
         entry.timestamp = Date.now();
       }
-      // 这里可以根据需要判断是否为全天事件
       // 暂时将所有事件都按时间排列
       timeEntries.push(entry);
     });
@@ -114,13 +105,13 @@ Page({
     const endHour = 24;
     for (let hour = startHour; hour <= endHour; hour++) {
       timeSlots.push({
-        hour,
-        label: `${String(hour).padStart(2, '0')}:00`,
+        hour: hour,
+        label: String(hour).padStart(2, '0') + ':00',
         top: (hour - startHour) * 120 // 每个小时120rpx
       });
     }
 
-    // 计算每个事件的位置（从早上6点开始，使用上面定义的startHour）
+    // 计算每个事件的位置（从早上6点开始）
     const timelineEntries = timeEntries.map(entry => {
       // 兼容旧数据：如果没有timestamp，使用当前时间
       const timestamp = entry.timestamp || Date.now();
@@ -139,8 +130,8 @@ Page({
     });
 
     // 生成颜色和图标映射
-    const entryColors: Record<CookieType, string> = {} as any;
-    const entryIcons: Record<CookieType, string> = {} as any;
+    const entryColors = {};
+    const entryIcons = {};
     Object.values(CookieType).forEach(type => {
       const metadata = COOKIE_METADATA[type];
       entryColors[type] = metadata ? metadata.color + '80' : '#E0E0E080';
@@ -148,22 +139,29 @@ Page({
     });
 
     this.setData({
-      dateLabel,
-      currentTime,
+      dateLabel: dateLabel,
+      currentTime: currentTime,
       entries: folder.entries,
-      allDayEntries,
-      timelineEntries,
-      timeSlots,
-      entryColors,
-      entryIcons
+      allDayEntries: allDayEntries,
+      timelineEntries: timelineEntries,
+      timeSlots: timeSlots,
+      entryColors: entryColors,
+      entryIcons: entryIcons
     });
   },
 
-  // 格式化时间
-  formatTime(timestamp: number): string {
-    return dateUtils.formatTime(timestamp);
+  // 获取当前时间
+  getCurrentTime() {
+    const now = new Date();
+    const hours = String(now.getHours()).padStart(2, '0');
+    const minutes = String(now.getMinutes()).padStart(2, '0');
+    return hours + ':' + minutes;
   },
 
+  // 格式化时间
+  formatTime(timestamp) {
+    return dateUtils.formatTime(timestamp);
+  },
 
   // 显示日历
   showCalendar() {
@@ -181,7 +179,7 @@ Page({
   },
 
   // 处理输入确认
-  handleInputConfirm(e: any) {
+  handleInputConfirm(e) {
     const { text, type } = e.detail;
     
     if (!text || !text.trim()) {
@@ -230,7 +228,7 @@ Page({
   },
 
   // 预览图片
-  previewImage(e: any) {
+  previewImage(e) {
     const { images, index } = e.currentTarget.dataset;
     if (!images || images.length === 0) {
       return;

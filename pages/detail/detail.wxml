@@ -46,7 +46,28 @@
               <text class="entry-icon">{{entryIcons[item.type] || '💭'}}</text>
               <text class="entry-text">{{item.text}}</text>
             </view>
-            <image wx:if="{{item.image}}" src="{{item.image}}" class="entry-image" mode="aspectFit"></image>
+            <!-- 多图显示 -->
+            <view wx:if="{{item.images && item.images.length > 0}}" class="entry-images-container">
+              <view class="images-grid">
+                <image 
+                  wx:for="{{item.images.length > 4 ? item.images.slice(0, 4) : item.images}}" 
+                  wx:key="*this"
+                  wx:for-item="img"
+                  wx:for-index="imgIndex"
+                  src="{{img}}" 
+                  class="entry-image-thumbnail"
+                  mode="aspectFill"
+                  bindtap="previewImage"
+                  data-images="{{item.images}}"
+                  data-index="{{imgIndex}}"
+                />
+                <view wx:if="{{item.images.length > 4}}" class="more-images-overlay" bindtap="previewImage" data-images="{{item.images}}" data-index="3">
+                  <text class="more-images-text">+{{item.images.length - 4}}</text>
+                </view>
+              </view>
+            </view>
+            <!-- 单图显示（兼容旧数据） -->
+            <image wx:elif="{{item.image}}" src="{{item.image}}" class="entry-image" mode="aspectFit" bindtap="previewImage" data-images="{{[item.image]}}" data-index="0"></image>
           </view>
         </view>
       </view>
@@ -70,7 +91,28 @@
                 <text class="entry-time">{{formatTime(item.timestamp)}}</text>
               </view>
             </view>
-            <image wx:if="{{item.image}}" src="{{item.image}}" class="entry-image" mode="aspectFit"></image>
+            <!-- 多图显示 -->
+            <view wx:if="{{item.images && item.images.length > 0}}" class="entry-images-container">
+              <view class="images-grid">
+                <image 
+                  wx:for="{{item.images.length > 4 ? item.images.slice(0, 4) : item.images}}" 
+                  wx:key="*this"
+                  wx:for-item="img"
+                  wx:for-index="imgIndex"
+                  src="{{img}}" 
+                  class="entry-image-thumbnail"
+                  mode="aspectFill"
+                  bindtap="previewImage"
+                  data-images="{{item.images}}"
+                  data-index="{{imgIndex}}"
+                />
+                <view wx:if="{{item.images.length > 4}}" class="more-images-overlay" bindtap="previewImage" data-images="{{item.images}}" data-index="3">
+                  <text class="more-images-text">+{{item.images.length - 4}}</text>
+                </view>
+              </view>
+            </view>
+            <!-- 单图显示（兼容旧数据） -->
+            <image wx:elif="{{item.image}}" src="{{item.image}}" class="entry-image" mode="aspectFit" bindtap="previewImage" data-images="{{[item.image]}}" data-index="0"></image>
           </view>
         </view>
       </view>
