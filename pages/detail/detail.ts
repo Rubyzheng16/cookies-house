@@ -62,13 +62,17 @@ Page({
     const timeEntries: CookieEntry[] = [];
 
     folder.entries.forEach(entry => {
+      // 兼容旧数据：如果没有timestamp，使用当前时间
+      if (!entry.timestamp) {
+        entry.timestamp = Date.now();
+      }
       // 这里可以根据需要判断是否为全天事件
       // 暂时将所有事件都按时间排列
       timeEntries.push(entry);
     });
 
     // 按时间排序
-    timeEntries.sort((a, b) => a.timestamp - b.timestamp);
+    timeEntries.sort((a, b) => (a.timestamp || 0) - (b.timestamp || 0));
 
     // 生成时间轴刻度（从早上6点到晚上24点）
     const timeSlots = [];
@@ -82,20 +86,22 @@ Page({
       });
     }
 
-    // 计算每个事件的位置（从早上6点开始）
-    const startHour = 6;
+    // 计算每个事件的位置（从早上6点开始，使用上面定义的startHour）
     const timelineEntries = timeEntries.map(entry => {
-      const date = new Date(entry.timestamp);
+      // 兼容旧数据：如果没有timestamp，使用当前时间
+      const timestamp = entry.timestamp || Date.now();
+      const date = new Date(timestamp);
       const hours = date.getHours();
       const minutes = date.getMinutes();
       // 如果时间早于6点，放在6点位置
       const adjustedHours = hours < startHour ? startHour : hours;
       const top = (adjustedHours - startHour) * 120 + (minutes / 60) * 120;
       
-      return {
-        ...entry,
-        top
-      };
+      // 避免使用对象展开语法，改用Object.assign
+      return Object.assign({}, entry, {
+        timestamp: timestamp, // 确保timestamp存在
+        top: top
+      });
     });
 
     // 生成颜色和图标映射

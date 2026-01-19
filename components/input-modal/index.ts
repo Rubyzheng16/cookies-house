@@ -18,9 +18,15 @@ Component({
           inputValue: '',
           selectedType: null,
           showRef: false,
-          isBaking: false
+          isBaking: false,
+          canConfirm: false
         });
       }
+    },
+    'inputValue': function(newVal: string) {
+      const that = this as any;
+      const canConfirm = newVal && newVal.trim().length > 0;
+      that.setData({ canConfirm });
     }
   },
 
@@ -29,6 +35,7 @@ Component({
     selectedType: null as CookieType | null,
     showRef: false,
     isBaking: false,
+    canConfirm: false,
     quadrantTypes: [
       { type: CookieType.IMPORTANT_URGENT, color: '#FF80AB', icon: '🍓', label: '重要紧急' },
       { type: CookieType.IMPORTANT_NOT_URGENT, color: '#81C784', icon: '🍵', label: '重要不紧急' },
@@ -40,7 +47,12 @@ Component({
   methods: {
     // 输入框内容变化
     onInputChange(e: any) {
-      this.setData({ inputValue: e.detail.value });
+      const value = e.detail.value || '';
+      const canConfirm = value.trim().length > 0;
+      this.setData({ 
+        inputValue: value,
+        canConfirm: canConfirm
+      });
     },
 
     // 切换分类类型
@@ -63,7 +75,8 @@ Component({
         inputValue: '',
         selectedType: null,
         showRef: false,
-        isBaking: false
+        isBaking: false,
+        canConfirm: false
       });
       this.triggerEvent('close');
     },

@@ -34,10 +34,9 @@ Page({
       const progress = goal.steps.length > 0 
         ? Math.round((completedCount / goal.steps.length) * 100) 
         : 0;
-      return {
-        ...goal,
-        progress
-      };
+      return Object.assign({}, goal, {
+        progress: progress
+      });
     });
     this.setData({ goals: goalsWithProgress });
   },
@@ -86,10 +85,9 @@ Page({
           const progress = g.steps.length > 0 
             ? Math.round((completedCount / g.steps.length) * 100) 
             : 0;
-          return {
-            ...g,
-            progress
-          };
+          return Object.assign({}, g, {
+            progress: progress
+          });
         });
         this.setData({
           goals: goalsWithProgress,
@@ -130,10 +128,9 @@ Page({
         const progress = goal.steps.length > 0 
           ? Math.round((completedCount / goal.steps.length) * 100) 
           : 0;
-        return {
-          ...goal,
-          progress
-        };
+        return Object.assign({}, goal, {
+          progress: progress
+        });
       });
       this.setData({ goals: goalsWithProgress });
       

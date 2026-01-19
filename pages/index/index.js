@@ -399,6 +399,37 @@ Page({
     });
   },
 
+  // 删除文件夹
+  deleteFolder(e) {
+    const date = e.currentTarget.dataset.date;
+    if (!date) {
+      return;
+    }
+    
+    wx.showModal({
+      title: '确认删除',
+      content: `确定要删除 ${date} 的数据吗？`,
+      success: (res) => {
+        if (res.confirm) {
+          try {
+            const folders = fragmentService.deleteFolder(date);
+            this.setData({ folders });
+            wx.showToast({
+              title: '已删除',
+              icon: 'success'
+            });
+          } catch (error) {
+            console.error('删除失败:', error);
+            wx.showToast({
+              title: '删除失败',
+              icon: 'none'
+            });
+          }
+        }
+      }
+    });
+  },
+
   // 加号按钮点击事件
   onAddButtonClick() {
     this.setData({ showInputModal: true });
@@ -412,13 +443,65 @@ Page({
   // 处理输入确认
   handleInputConfirm(e) {
     const { text, type } = e.detail;
-    const folders = fragmentService.addEntry(text, type);
     
-    this.setData({ folders });
+    if (!text || !text.trim()) {
+      wx.showToast({
+        title: '请输入内容',
+        icon: 'none'
+      });
+      return;
+    }
     
-    wx.showToast({
-      title: '已记录',
-      icon: 'success'
+    try {
+      const folders = fragmentService.addEntry(text.trim(), type);
+      
+      // 关闭输入弹窗
+      this.setData({ 
+        folders,
+        showInputModal: false
+      });
+      
+      wx.showToast({
+        title: '已记录',
+        icon: 'success'
+      });
+    } catch (error) {
+      console.error('保存失败:', error);
+      wx.showToast({
+        title: '保存失败，请重试',
+        icon: 'none'
+      });
+    }
+  },
+
+  // 删除文件夹
+  deleteFolder(e) {
+    const date = e.currentTarget.dataset.date;
+    if (!date) {
+      return;
+    }
+    
+    wx.showModal({
+      title: '确认删除',
+      content: `确定要删除 ${date} 的数据吗？`,
+      success: (res) => {
+        if (res.confirm) {
+          try {
+            const folders = fragmentService.deleteFolder(date);
+            this.setData({ folders });
+            wx.showToast({
+              title: '已删除',
+              icon: 'success'
+            });
+          } catch (error) {
+            console.error('删除失败:', error);
+            wx.showToast({
+              title: '删除失败',
+              icon: 'none'
+            });
+          }
+        }
+      }
     });
   }
 });

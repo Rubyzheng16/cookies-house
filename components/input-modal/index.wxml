@@ -6,13 +6,13 @@
       <view class="workbench-top"></view>
       
       <view class="input-area">
-        <textarea 
-          class="input-textarea"
-          value="{{inputValue}}"
-          placeholder="丢入任何碎片：灵感、碎碎念、或今日目标..."
-          bindinput="onInputChange"
-          maxlength="500"
-        />
+      <textarea 
+        class="input-textarea"
+        value="{{inputValue}}"
+        placeholder="丢入任何碎片：灵感、碎碎念、或今日目标..."
+        bindinput="onInputChange"
+        maxlength="500"
+      />
         <view class="input-icons">
           <view class="icon-btn" bindtap="chooseImage">
             <text class="icon">🖼️</text>
@@ -136,9 +136,9 @@
 
       <!-- 确认按钮 -->
       <button 
-        class="confirm-btn {{inputValue && inputValue.trim() ? 'active' : 'disabled'}}"
+        class="confirm-btn {{canConfirm ? 'active' : 'disabled'}}"
         bindtap="handleConfirm"
-        disabled="{{isBaking || !inputValue || !inputValue.trim()}}"
+        disabled="{{isBaking || !canConfirm}}"
       >
         {{selectedType ? '记录目标 🍪' : '丢入烤箱 (碎碎念) ✨'}}
       </button>

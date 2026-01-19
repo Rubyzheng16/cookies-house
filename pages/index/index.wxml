@@ -44,11 +44,14 @@
       wx:for="{{folders}}" 
       wx:key="date"
       class="folder-card"
-      bindtap="openFolder"
-      data-date="{{item.date}}"
     >
-      <text class="folder-icon">📂</text>
-      <text class="folder-date-label">{{item.date}}</text>
+      <view class="folder-content" bindtap="openFolder" data-date="{{item.date}}">
+        <text class="folder-icon">📂</text>
+        <text class="folder-date-label">{{item.date}}</text>
+      </view>
+      <view class="folder-delete-btn" catchtap="deleteFolder" data-date="{{item.date}}">
+        <text class="delete-icon">×</text>
+      </view>
     </view>
   </view>
 

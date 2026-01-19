@@ -139,6 +139,26 @@ Page({
     });
   },
 
+  // 删除文件夹
+  deleteFolder(e: any) {
+    const date = e.currentTarget.dataset.date;
+    
+    wx.showModal({
+      title: '确认删除',
+      content: `确定要删除 ${date} 的数据吗？`,
+      success: (res) => {
+        if (res.confirm) {
+          const folders = fragmentService.deleteFolder(date);
+          this.setData({ folders });
+          wx.showToast({
+            title: '已删除',
+            icon: 'success'
+          });
+        }
+      }
+    });
+  },
+
   // 格式化日期显示
   formatDateLabel(date: string): string {
     const dateParts = date.split('/');
@@ -168,17 +188,37 @@ Page({
   // 处理输入确认
   handleInputConfirm(e: any) {
     const { text, type } = e.detail;
-    const folders = fragmentService.addEntry(text, type);
     
-    // 触发动画效果
-    this.playAddAnimation();
+    if (!text || !text.trim()) {
+      wx.showToast({
+        title: '请输入内容',
+        icon: 'none'
+      });
+      return;
+    }
     
-    this.setData({ folders });
-    
-    wx.showToast({
-      title: '已记录',
-      icon: 'success'
-    });
+    try {
+      const folders = fragmentService.addEntry(text.trim(), type);
+      
+      // 触发动画效果
+      this.playAddAnimation();
+      
+      this.setData({ folders });
+      
+      // 关闭输入弹窗
+      this.setData({ showInputModal: false });
+      
+      wx.showToast({
+        title: '已记录',
+        icon: 'success'
+      });
+    } catch (error) {
+      console.error('保存失败:', error);
+      wx.showToast({
+        title: '保存失败，请重试',
+        icon: 'none'
+      });
+    }
   },
 
   // 播放添加动画

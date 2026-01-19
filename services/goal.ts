@@ -26,7 +26,7 @@ export const goalService = {
     const goals = this.getGoals();
     const index = goals.findIndex(g => g.id === goalId);
     if (index > -1) {
-      goals[index] = { ...goals[index], ...updates };
+      goals[index] = Object.assign({}, goals[index], updates);
       this.saveGoals(goals);
     }
     return goals;
