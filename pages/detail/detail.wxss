@@ -1,6 +1,6 @@
 /* 详情页面样式 - 时间轴布局 */
 page {
-  background-color: #F5F5F5;
+  background-color: #FCE4EC;
   min-height: 100vh;
 }
 
@@ -12,7 +12,7 @@ page {
 .header {
   padding: 20rpx 30rpx;
   margin-bottom: 20rpx;
-  background: #F5F5F5;
+  background: #FCE4EC;
 }
 
 .header-content {
@@ -105,42 +105,61 @@ page {
 /* 时间轴容器 */
 .timeline-container {
   position: relative;
+  padding: 20rpx 30rpx 60rpx 30rpx;
+  background-color: #FCE4EC;
+}
+
+/* 小时分组整体 */
+.hour-groups {
   display: flex;
-  min-height: calc(18 * 120rpx); /* 18个小时 * 120rpx */
-  background-color: #F5F5F5;
+  flex-direction: column;
+  gap: 32rpx;
 }
 
-/* 左侧时间轴 */
-.time-axis {
-  position: relative;
-  width: 120rpx;
-  flex-shrink: 0;
-  padding-top: 20rpx;
-}
-
-.time-slot {
-  position: absolute;
-  left: 0;
-  width: 100%;
-  height: 120rpx;
+.hour-group {
   display: flex;
   align-items: flex-start;
+}
+
+.hour-label-wrapper {
+  width: 120rpx;
+  padding-top: 8rpx;
+  display: flex;
+  justify-content: center;
+}
+
+.hour-badge {
+  padding: 6rpx 12rpx;
+  border-radius: 12rpx;
+  background-color: #CFD8DC;
+}
+
+.hour-label-text {
+  font-size: 22rpx;
+  color: #333;
+}
+
+.hour-content {
+  flex: 1;
+  position: relative;
   padding-left: 20rpx;
 }
 
-.time-slot-label {
-  color: rgba(0, 0, 0, 0.4);
-  font-size: 22rpx;
-  font-weight: 500;
+.hour-line {
+  position: absolute;
+  left: 10rpx;
+  top: 0;
+  bottom: 0;
+  width: 2rpx;
+  background-color: #4CAF50;
 }
 
 /* 右侧内容区域 */
 .content-area {
   flex: 1;
   position: relative;
-  padding-left: 20rpx;
-  padding-top: 20rpx;
-  border-left: 2rpx solid #4CAF50;
+  padding-left: 30rpx;
+  padding-top: 0;
 }
 
 /* 全天事件区域 */
@@ -166,15 +185,45 @@ page {
 
 /* 时间轴条目 */
 .timeline-entries {
-  position: relative;
-  min-height: calc(18 * 120rpx); /* 18个小时 * 120rpx */
+  display: none;
 }
 
-.timeline-item {
-  position: absolute;
-  left: 0;
-  right: 20rpx;
-  width: calc(100% - 20rpx);
+/* 分钟分组容器 */
+.minute-groups {
+  margin-top: 4rpx;
+}
+
+.minute-group {
+  display: flex;
+  align-items: flex-start;
+  margin-bottom: 24rpx;
+}
+
+.minute-time-wrapper {
+  width: 120rpx;
+  padding-top: 4rpx;
+  display: flex;
+  justify-content: center;
+}
+
+.minute-time-badge {
+  padding: 6rpx 12rpx;
+  border-radius: 12rpx;
+  background-color: #CFD8DC;
+}
+
+.minute-time-text {
+  font-size: 22rpx;
+  color: #333;
+}
+
+.minute-group-entries {
+  flex: 1;
+  padding-left: 20rpx;
+}
+
+.minute-group-entries .timeline-item {
+  margin-bottom: 12rpx;
 }
 
 /* 条目卡片 */

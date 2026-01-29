@@ -13,6 +13,8 @@ Page({
     allDayEntries: [],
     timelineEntries: [],
     timeSlots: [],
+    minuteGroups: [],
+    hourGroups: [],
     entryColors: {},
     entryIcons: {},
     showInputModal: false,
@@ -83,7 +85,7 @@ Page({
       currentTime = this.getCurrentTime();
     }
 
-    // 分离全天事件和有时间的事件
+    // 分离全天事件和有时间的事件（目前全部按时间分组展示）
     const allDayEntries = [];
     const timeEntries = [];
 
@@ -92,42 +94,48 @@ Page({
       if (!entry.timestamp) {
         entry.timestamp = Date.now();
       }
-      // 暂时将所有事件都按时间排列
       timeEntries.push(entry);
     });
 
-    // 按时间排序
+    // 按时间排序（先后输入顺序由时间决定）
     timeEntries.sort((a, b) => (a.timestamp || 0) - (b.timestamp || 0));
 
-    // 生成时间轴刻度（从早上6点到晚上24点）
-    const timeSlots = [];
-    const startHour = 6;
-    const endHour = 24;
-    for (let hour = startHour; hour <= endHour; hour++) {
-      timeSlots.push({
-        hour: hour,
-        label: String(hour).padStart(2, '0') + ':00',
-        top: (hour - startHour) * 120 // 每个小时120rpx
+    // 按分钟分组：同一分钟内的事件放在同一个时间块中
+    const minuteGroupMap = {};
+    timeEntries.forEach(entry => {
+      const timestamp = entry.timestamp || Date.now();
+      const dateObj = new Date(timestamp);
+      const hourStr = String(dateObj.getHours()).padStart(2, '0');
+      const minuteStr = String(dateObj.getMinutes()).padStart(2, '0');
+      const key = hourStr + ':' + minuteStr;
+
+      if (!minuteGroupMap[key]) {
+        minuteGroupMap[key] = [];
+      }
+
+      // 避免使用对象展开语法，改用 Object.assign
+      const entryWithTime = Object.assign({}, entry, {
+        timestamp: timestamp
+      });
+      minuteGroupMap[key].push(entryWithTime);
+    });
+
+    // 将分组结果转换为有序数组，按时间从早到晚排列（分钟级）
+    const sortedKeys = Object.keys(minuteGroupMap).sort();
+    const minuteGroups = sortedKeys.map(timeLabel => ({
+      timeLabel: timeLabel,
+      entries: minuteGroupMap[timeLabel]
+    }));
+
+    // 生成按小时分组的数据：每个小时下面挂该小时内的分钟块
+    const hourGroups = [];
+    for (let hour = 0; hour < 24; hour++) {
+      const hourStr = String(hour).padStart(2, '0');
+      hourGroups.push({
+        hourLabel: hourStr + ':00',
+        minutes: minuteGroups.filter(group => group.timeLabel.startsWith(hourStr + ':'))
       });
     }
-
-    // 计算每个事件的位置（从早上6点开始）
-    const timelineEntries = timeEntries.map(entry => {
-      // 兼容旧数据：如果没有timestamp，使用当前时间
-      const timestamp = entry.timestamp || Date.now();
-      const date = new Date(timestamp);
-      const hours = date.getHours();
-      const minutes = date.getMinutes();
-      // 如果时间早于6点，放在6点位置
-      const adjustedHours = hours < startHour ? startHour : hours;
-      const top = (adjustedHours - startHour) * 120 + (minutes / 60) * 120;
-      
-      // 避免使用对象展开语法，改用Object.assign
-      return Object.assign({}, entry, {
-        timestamp: timestamp, // 确保timestamp存在
-        top: top
-      });
-    });
 
     // 生成颜色和图标映射
     const entryColors = {};
@@ -143,8 +151,10 @@ Page({
       currentTime: currentTime,
       entries: folder.entries,
       allDayEntries: allDayEntries,
-      timelineEntries: timelineEntries,
-      timeSlots: timeSlots,
+      timelineEntries: [],
+      timeSlots: [],
+      minuteGroups: minuteGroups,
+      hourGroups: hourGroups,
       entryColors: entryColors,
       entryIcons: entryIcons
     });

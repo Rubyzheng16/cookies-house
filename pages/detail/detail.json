@@ -1,7 +1,7 @@
 {
   "navigationBarTitleText": "详情",
-  "navigationBarBackgroundColor": "#000000",
-  "navigationBarTextStyle": "white",
+  "navigationBarBackgroundColor": "#FCE4EC",
+  "navigationBarTextStyle": "black",
   "usingComponents": {
     "input-modal": "../../components/input-modal/index"
   }

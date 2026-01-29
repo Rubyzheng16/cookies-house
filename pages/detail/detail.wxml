@@ -18,20 +18,27 @@
 
   <!-- 时间轴容器 -->
   <view class="timeline-container">
-    <!-- 左侧时间轴 -->
-    <view class="time-axis">
+    <!-- 整体按小时分组 -->
+    <view class="hour-groups">
       <view 
-        wx:for="{{timeSlots}}" 
-        wx:key="hour"
-        class="time-slot"
-        style="top: {{item.top}}rpx;"
+        wx:for="{{hourGroups}}" 
+        wx:key="hourLabel"
+        wx:if="{{item.minutes && item.minutes.length > 0}}"
+        class="hour-group"
       >
-        <text class="time-slot-label">{{item.label}}</text>
-      </view>
-    </view>
+        <!-- 最左侧整点刻度 -->
+        <view class="hour-label-wrapper">
+          <view class="hour-badge">
+            <text class="hour-label-text">{{item.hourLabel}}</text>
+          </view>
+        </view>
 
-    <!-- 右侧内容区域 -->
-    <view class="content-area">
+        <!-- 中间竖线 + 这一小时内的分钟事件 -->
+        <view class="hour-content">
+          <view class="hour-line"></view>
+
+          <!-- 右侧内容区域 -->
+          <view class="content-area">
       <!-- 全天事件 -->
       <view class="all-day-section" wx:if="{{allDayEntries.length > 0}}">
         <view class="all-day-label">全天</view>
@@ -72,56 +79,77 @@
         </view>
       </view>
 
-      <!-- 时间轴事件 -->
-      <view class="timeline-entries">
-        <view 
-          wx:for="{{timelineEntries}}" 
-          wx:key="id"
-          class="timeline-item"
-          style="top: {{item.top}}rpx;"
-        >
-          <view 
-            class="entry-card"
-            style="background-color: {{entryColors[item.type] || '#E0E0E080'}}"
-          >
-            <view class="entry-header">
-              <text class="entry-icon">{{entryIcons[item.type] || '💭'}}</text>
-              <view class="entry-content">
-                <text class="entry-text">{{item.text}}</text>
-                <text class="entry-time">{{formatTime(item.timestamp)}}</text>
+          <!-- 按分钟分组的时间块（该小时内） -->
+          <view class="minute-groups">
+            <view 
+              wx:for="{{item.minutes}}" 
+              wx:for-item="minute"
+              wx:key="timeLabel"
+              class="minute-group"
+            >
+              <!-- 左侧分钟标签 -->
+              <view class="minute-time-wrapper">
+                <view class="minute-time-badge">
+                  <text class="minute-time-text">{{minute.timeLabel}}</text>
+                </view>
               </view>
-            </view>
-            <!-- 多图显示 -->
-            <view wx:if="{{item.images && item.images.length > 0}}" class="entry-images-container">
-              <view class="images-grid">
-                <image 
-                  wx:for="{{item.images.length > 4 ? item.images.slice(0, 4) : item.images}}" 
-                  wx:key="*this"
-                  wx:for-item="img"
-                  wx:for-index="imgIndex"
-                  src="{{img}}" 
-                  class="entry-image-thumbnail"
-                  mode="aspectFill"
-                  bindtap="previewImage"
-                  data-images="{{item.images}}"
-                  data-index="{{imgIndex}}"
-                />
-                <view wx:if="{{item.images.length > 4}}" class="more-images-overlay" bindtap="previewImage" data-images="{{item.images}}" data-index="3">
-                  <text class="more-images-text">+{{item.images.length - 4}}</text>
+
+              <!-- 右侧该分钟内的所有事件 -->
+              <view class="minute-group-entries">
+                <view 
+                  wx:for="{{minute.entries}}" 
+                  wx:for-item="entry"
+                  wx:key="id"
+                  class="timeline-item"
+                >
+                  <view 
+                    class="entry-card"
+                    style="background-color: {{entryColors[entry.type] || '#E0E0E080'}}"
+                  >
+                    <view class="entry-header">
+                      <text class="entry-icon">{{entryIcons[entry.type] || '💭'}}</text>
+                      <view class="entry-content">
+                        <text class="entry-text">{{entry.text}}</text>
+                        <text class="entry-time">{{formatTime(entry.timestamp)}}</text>
+                      </view>
+                    </view>
+                    <!-- 多图显示 -->
+                    <view wx:if="{{entry.images && entry.images.length > 0}}" class="entry-images-container">
+                      <view class="images-grid">
+                        <image 
+                          wx:for="{{entry.images.length > 4 ? entry.images.slice(0, 4) : entry.images}}" 
+                          wx:key="*this"
+                          wx:for-item="img"
+                          wx:for-index="imgIndex"
+                          src="{{img}}" 
+                          class="entry-image-thumbnail"
+                          mode="aspectFill"
+                          bindtap="previewImage"
+                          data-images="{{entry.images}}"
+                          data-index="{{imgIndex}}"
+                        />
+                        <view wx:if="{{entry.images.length > 4}}" class="more-images-overlay" bindtap="previewImage" data-images="{{entry.images}}" data-index="3">
+                          <text class="more-images-text">+{{entry.images.length - 4}}</text>
+                        </view>
+                      </view>
+                    </view>
+                    <!-- 单图显示（兼容旧数据） -->
+                    <image wx:elif="{{entry.image}}" src="{{entry.image}}" class="entry-image" mode="aspectFit" bindtap="previewImage" data-images="{{[entry.image]}}" data-index="0"></image>
+                  </view>
                 </view>
               </view>
             </view>
-            <!-- 单图显示（兼容旧数据） -->
-            <image wx:elif="{{item.image}}" src="{{item.image}}" class="entry-image" mode="aspectFit" bindtap="previewImage" data-images="{{[item.image]}}" data-index="0"></image>
           </view>
-        </view>
-      </view>
 
-      <!-- 空状态 -->
-      <view class="empty-state" wx:if="{{entries.length === 0}}">
-        <text class="empty-icon">🥣</text>
-        <text class="empty-text">今天还没有记录任何内容</text>
-      </view>
+          </view> <!-- content-area -->
+        </view> <!-- hour-content -->
+      </view> <!-- hour-group -->
+    </view> <!-- hour-groups -->
+
+    <!-- 空状态 -->
+    <view class="empty-state" wx:if="{{entries.length === 0}}">
+      <text class="empty-icon">🥣</text>
+      <text class="empty-text">今天还没有记录任何内容</text>
     </view>
   </view>
 
