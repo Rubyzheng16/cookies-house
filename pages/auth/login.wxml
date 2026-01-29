@@ -1,0 +1,35 @@
+<!-- 登录 / 注册页面 -->
+<view class="login-container">
+  <view class="logo-card">
+    <view class="logo-circle">🍪</view>
+    <text class="logo-title">情绪饼干屋</text>
+    <text class="logo-subtitle">用一块小饼干，托住今天的情绪</text>
+  </view>
+
+  <view class="login-card">
+    <text class="login-title">欢迎回到你的情绪烘焙坊</text>
+    <text class="login-desc">
+      · 使用微信一键登录，创建你的专属烘焙师账号
+      · 默认仅在本机保存数据，后续可开通云端 VIP 同步
+    </text>
+
+    <button
+      class="login-button"
+      bindtap="handleLogin"
+      loading="{{loading}}"
+      disabled="{{loading}}"
+    >
+      <text class="login-button-icon">📲</text>
+      <text class="login-button-text">
+        {{loading ? '登录中...' : '使用微信一键登录'}}
+      </text>
+    </button>
+  </view>
+
+  <view class="login-footer">
+    <text class="login-tip">
+      登录即视为你已阅读并同意「隐私说明」，我们尽量只保存最少必要的信息。
+    </text>
+  </view>
+</view>
+

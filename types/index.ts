@@ -37,3 +37,14 @@ export interface Goal {
 }
 
 export type AppView = 'workbench' | 'lab' | 'future' | 'profile';
+
+/** 后端返回的用户信息（与 README users 表一致） */
+export interface User {
+  id: number;
+  wxOpenId: string;
+  phone?: string;
+  vipLevel: 'free' | 'vip';
+  settings: Record<string, unknown>;
+  createdAt: string;
+  updatedAt: string;
+}
