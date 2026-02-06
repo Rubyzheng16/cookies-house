@@ -330,12 +330,20 @@
   margin-top: 16rpx;
 }
 
-/* 展开后：思维导图区域，展示所有子目标 */
+/* 展开后：思维导图区域，展示所有子目标（含已完成，可当历史记录查看） */
 .mindmap-section {
   margin-top: 24rpx;
   padding: 24rpx 0 0;
   border-top: 2rpx dashed rgba(109, 76, 65, 0.2);
   min-height: 80rpx;
+}
+
+.history-label {
+  font-size: 24rpx;
+  color: #6D4C41;
+  opacity: 0.85;
+  margin-bottom: 16rpx;
+  padding-left: 8rpx;
 }
 
 .mindmap-node {

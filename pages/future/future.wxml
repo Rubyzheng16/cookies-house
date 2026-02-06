@@ -126,8 +126,10 @@
         </view>
       </view>
 
-      <!-- 展开状态：思维导图形式展示所有子目标 -->
-      <view wx:if="{{item.isExpanded && !item.isCompleted}}" class="mindmap-section">
+      <!-- 展开状态：展示全部步骤（含已完成，像历史记录）已完成目标也可展开查看 -->
+      <view wx:if="{{item.isExpanded}}" class="mindmap-section">
+        <!-- 已有完成步骤时，顶部显示历史记录说明 -->
+        <view wx:if="{{item.progress > 0}}" class="history-label">已完成 · 历史记录</view>
         <block wx:for="{{item.stepGroups}}" wx:key="title" wx:for-item="group">
           <view class="mindmap-node">
             <view class="mindmap-branch"></view>
