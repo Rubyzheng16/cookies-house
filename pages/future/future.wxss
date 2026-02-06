@@ -173,6 +173,26 @@
   border-radius: 50%;
 }
 
+/* 掉落动画的糖果 */
+.candy-drop {
+  position: absolute;
+  top: -40rpx;
+  left: 50%;
+  transform: translateX(-50%);
+  animation: candy-fall 600ms ease-out forwards;
+}
+
+@keyframes candy-fall {
+  0% {
+    transform: translate(-50%, -40rpx);
+    opacity: 0;
+  }
+  100% {
+    transform: translate(-50%, 120rpx);
+    opacity: 1;
+  }
+}
+
 .goal-info {
   flex: 1;
 }
@@ -190,12 +210,31 @@
   color: #3E2723;
 }
 
+.goal-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 12rpx;
+}
+
 .expand-btn {
   font-size: 24rpx;
   color: #6D4C41;
   background: rgba(255, 255, 255, 0.5);
   padding: 8rpx 16rpx;
   border-radius: 50rpx;
+  border: none;
+}
+
+.delete-btn {
+  font-size: 22rpx;
+  color: #B71C1C;
+  background: transparent;
+  padding: 4rpx 8rpx;
+  border-radius: 32rpx;
+  border: 2rpx solid rgba(183, 28, 28, 0.3);
+}
+
+.delete-btn::after {
   border: none;
 }
 

@@ -16,27 +16,10 @@
       <button 
         class="split-btn"
         bindtap="generateSteps"
-        disabled="{{isLoading || !newGoal.trim()}}"
+        disabled="{{isLoading || !newGoal}}"
       >
         {{isLoading ? '拆解中...' : '拆解'}}
       </button>
-    </view>
-    
-    <!-- 象限选择 -->
-    <view class="quadrant-selector">
-      <text class="selector-label">选择轻重缓急：</text>
-      <view class="quadrant-buttons">
-        <button 
-          wx:for="{{quadrantTypes}}" 
-          wx:key="type"
-          class="quadrant-btn-small {{selectedType === item.type ? 'selected' : ''}}"
-          style="background-color: {{item.color}}; border-color: {{selectedType === item.type ? item.color : 'transparent'}}"
-          data-type="{{item.type}}"
-          bindtap="toggleType"
-        >
-          {{item.label}}
-        </button>
-      </view>
     </view>
   </view>
 
@@ -61,6 +44,11 @@
               style="background-color: {{['#FF80AB', '#81C784', '#FFF176', '#B39DDB'][candyIndex % 4]}};"
             ></view>
           </view>
+          <!-- 掉落动画糖果 -->
+          <view 
+            wx:if="{{droppingGoalId === item.id}}"
+            class="candy candy-drop"
+          ></view>
         </view>
 
         <!-- 目标信息 -->
@@ -74,13 +62,22 @@
               ></view>
               <text class="goal-title">{{item.title}}</text>
             </view>
-            <button 
-              class="expand-btn"
-              data-goal-id="{{item.id}}"
-              bindtap="toggleExpand"
-            >
-              {{expandedGoals.indexOf(item.id) > -1 ? '收起详情 ▲' : '查看全貌 ▼'}}
-            </button>
+            <view class="goal-header-actions">
+              <button 
+                class="expand-btn"
+                data-goal-id="{{item.id}}"
+                bindtap="toggleExpand"
+              >
+                {{expandedGoals.indexOf(item.id) > -1 ? '收起详情 ▲' : '查看全貌 ▼'}}
+              </button>
+              <button 
+                class="delete-btn"
+                data-goal-id="{{item.id}}"
+                bindtap="deleteGoal"
+              >
+                删除
+              </button>
+            </view>
           </view>
 
           <!-- 已完成 -->
@@ -95,35 +92,50 @@
               <view 
                 wx:for="{{item.steps}}" 
                 wx:key="id"
-                class="step-item {{item.completed ? 'completed' : ''}}"
+                wx:for-item="step"
+                class="step-item {{step.completed ? 'completed' : ''}}"
+                data-goal-id="{{item.id}}"
+                data-step-id="{{step.id}}"
+                data-text="{{step.text}}"
+                bindlongpress="editStep"
               >
                 <checkbox 
-                  checked="{{item.completed}}"
-                  disabled="{{item.completed}}"
+                  checked="{{step.completed}}"
+                  disabled="{{step.completed}}"
                   data-goal-id="{{item.id}}"
-                  data-step-id="{{item.id}}"
+                  data-step-id="{{step.id}}"
                   bindtap="completeStep"
                 />
-                <text class="step-text">{{item.text}}</text>
+                <text class="step-text">{{step.text}}</text>
               </view>
             </view>
 
             <!-- 折叠状态：只显示下一步 -->
             <view wx:else class="next-step">
               <view 
-                wx:for="{{item.steps}}" 
-                wx:key="id"
-                wx:if="{{!item.completed}}"
+                wx:if="{{item.nextStep}}"
                 class="next-step-item"
+                data-goal-id="{{item.id}}"
+                data-step-id="{{item.nextStep.id}}"
+                data-text="{{item.nextStep.text}}"
+                bindlongpress="editStep"
               >
                 <checkbox 
+                  checked="{{item.nextStep.completed}}"
+                  disabled="{{item.nextStep.completed}}"
                   data-goal-id="{{item.id}}"
-                  data-step-id="{{item.id}}"
+                  data-step-id="{{item.nextStep.id}}"
                   bindtap="completeStep"
                 />
                 <view class="next-step-content">
                   <text class="next-step-label">下一步：</text>
-                  <text class="next-step-text">{{item.text}}</text>
+                  <text class="next-step-text">{{item.nextStep.text}}</text>
+                </view>
+              </view>
+              <view wx:else class="next-step-item">
+                <view class="next-step-content">
+                  <text class="next-step-label">下一步：</text>
+                  <text class="next-step-text">所有步骤都完成啦 🎉</text>
                 </view>
               </view>
             </view>

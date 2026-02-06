@@ -1,0 +1,44 @@
+<view class="container">
+  <view class="card">
+    <text class="title">AI 助手密钥</text>
+    <text class="desc">
+      请前往你选择的 AI 官网（如 OpenAI、DeepSeek、Moonshot 等）创建 API Key，
+      然后粘贴到下面。密钥仅保存在本机，不会上传到服务器。
+    </text>
+
+    <view class="field">
+      <text class="field-label">API Key</text>
+      <input 
+        class="field-input"
+        password="{{!showKey}}"
+        value="{{keyInput}}"
+        placeholder="粘贴你的 API Key..."
+        bindinput="onKeyInput"
+      />
+      <view class="hint">
+        <text>{{showKey ? '当前为明文显示，注意周围环境。' : '已做遮挡显示，防止他人偷看。'}}</text>
+      </view>
+    </view>
+
+    <view class="actions">
+      <button class="btn secondary" bindtap="toggleShowKey">
+        {{showKey ? '隐藏密钥' : '显示密钥'}}
+      </button>
+      <button class="btn primary" bindtap="saveKey">保存</button>
+    </view>
+
+    <button class="btn link" bindtap="clearKey" wx:if="{{hasKey}}">
+      清除已保存的密钥
+    </button>
+  </view>
+
+  <view class="card tips-card">
+    <text class="tips-title">使用说明</text>
+    <text class="tips-text">
+      · 密钥只会保存在你的小程序本地存储中，需要调用 AI 功能时才会携带到对应官网接口。\n
+      · 建议为情绪饼干屋单独创建一个 API Key，方便额度与权限管理。\n
+      · 如果之后更换服务商，只需在这里更新为新的 Key 即可。
+    </text>
+  </view>
+</view>
+

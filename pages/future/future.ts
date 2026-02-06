@@ -2,6 +2,7 @@
 import { Goal, GoalStep } from '../../types';
 import { goalService } from '../../services/goal';
 import { aiService } from '../../utils/ai';
+import { fragmentService } from '../../services/fragment';
 
 Page({
   data: {
@@ -9,7 +10,8 @@ Page({
     newGoal: '',
     isLoading: false,
     expandedGoals: [] as string[],
-    showInputModal: false
+    showInputModal: false,
+    droppingGoalId: '' as string | null
   },
 
   onLoad() {
@@ -28,17 +30,8 @@ Page({
 
   loadGoals() {
     const goals = goalService.getGoals();
-    // 计算每个目标的进度百分比
-    const goalsWithProgress = goals.map(goal => {
-      const completedCount = goal.steps.filter(s => s.completed).length;
-      const progress = goal.steps.length > 0 
-        ? Math.round((completedCount / goal.steps.length) * 100) 
-        : 0;
-      return Object.assign({}, goal, {
-        progress: progress
-      });
-    });
-    this.setData({ goals: goalsWithProgress });
+    const goalsWithUi = this.withUiFields(goals);
+    this.setData({ goals: goalsWithUi });
   },
 
   // 输入框变化
@@ -78,16 +71,7 @@ Page({
         };
 
         const goals = goalService.addGoal(goal);
-        // 计算进度
-        const goalsWithProgress = goals.map(g => {
-          const completedCount = g.steps.filter(s => s.completed).length;
-          const progress = g.steps.length > 0 
-            ? Math.round((completedCount / g.steps.length) * 100) 
-            : 0;
-          return Object.assign({}, g, {
-            progress: progress
-          });
-        });
+        const goalsWithProgress = this.withUiFields(goals);
         this.setData({
           goals: goalsWithProgress,
           newGoal: ''
@@ -117,20 +101,13 @@ Page({
   // 完成步骤
   completeStep(e: any) {
     const { goalId, stepId } = e.currentTarget.dataset;
-    
+    // 触发糖果掉落动画
+    this.setData({ droppingGoalId: goalId as string });
+
     setTimeout(() => {
       const goals = goalService.completeStep(goalId, stepId);
-      // 重新计算进度
-      const goalsWithProgress = goals.map(goal => {
-        const completedCount = goal.steps.filter(s => s.completed).length;
-        const progress = goal.steps.length > 0 
-          ? Math.round((completedCount / goal.steps.length) * 100) 
-          : 0;
-        return Object.assign({}, goal, {
-          progress: progress
-        });
-      });
-      this.setData({ goals: goalsWithProgress });
+      const goalsWithProgress = this.withUiFields(goals);
+      this.setData({ goals: goalsWithProgress, droppingGoalId: null });
       
       wx.showToast({
         title: '完成一步！',
@@ -140,19 +117,79 @@ Page({
     }, 400);
   },
 
+  // 编辑步骤内容（长按步骤）
+  editStep(e: any) {
+    const { goalId, stepId, text } = e.currentTarget.dataset;
+    wx.showModal({
+      title: '编辑步骤',
+      editable: true,
+      content: text || '',
+      success: (res) => {
+        const newText = (res as any).content as string | undefined;
+        if (!res.confirm || !newText || !newText.trim()) {
+          return;
+        }
+        const goals = goalService.updateStepText(goalId, stepId, newText.trim());
+        const goalsWithProgress = this.withUiFields(goals);
+        this.setData({ goals: goalsWithProgress });
+        wx.showToast({
+          title: '已更新步骤',
+          icon: 'success',
+          duration: 800
+        });
+      }
+    });
+  },
+
+  // 为每个目标补充 UI 需要的字段：progress、nextStep
+  withUiFields(goals: Goal[]): Array<Goal & { progress: number; nextStep: GoalStep | null }> {
+    return goals.map(goal => {
+      const completedCount = goal.steps.filter(s => s.completed).length;
+      const progress = goal.steps.length > 0 
+        ? Math.round((completedCount / goal.steps.length) * 100) 
+        : 0;
+      const nextStep = goal.steps.find(s => !s.completed) || null;
+      return Object.assign({}, goal, {
+        progress,
+        nextStep
+      });
+    });
+  },
+
   // 切换展开/收起
   toggleExpand(e: any) {
     const goalId = e.currentTarget.dataset.goalId;
-    const expanded = this.data.expandedGoals;
-    const index = expanded.indexOf(goalId);
+    const expanded = [...this.data.expandedGoals];
+    const index = expanded.indexOf(goalId as string);
     
     if (index > -1) {
       expanded.splice(index, 1);
     } else {
-      expanded.push(goalId);
+      expanded.push(goalId as string);
     }
     
     this.setData({ expandedGoals: expanded });
+  },
+
+  // 删除整个目标
+  deleteGoal(e: any) {
+    const goalId = e.currentTarget.dataset.goalId as string;
+    wx.showModal({
+      title: '删除目标',
+      content: '确定要删除这个目标和它的所有步骤吗？',
+      success: (res) => {
+        if (!res.confirm) return;
+        const goals = goalService.deleteGoal(goalId);
+        const goalsWithUi = this.withUiFields(goals);
+        const expanded = this.data.expandedGoals.filter(id => id !== goalId);
+        this.setData({ goals: goalsWithUi, expandedGoals: expanded });
+        wx.showToast({
+          title: '已删除目标',
+          icon: 'success',
+          duration: 800
+        });
+      }
+    });
   },
 
   // 加号按钮点击事件
@@ -168,7 +205,6 @@ Page({
   // 处理输入确认
   handleInputConfirm(e: any) {
     const { text, type } = e.detail;
-    const fragmentService = require('../../services/fragment').fragmentService;
     fragmentService.addEntry(text, type);
     
     wx.showToast({

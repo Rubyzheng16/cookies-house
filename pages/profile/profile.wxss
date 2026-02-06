@@ -20,6 +20,16 @@
   height: 100%;
 }
 
+.avatar-placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 80rpx;
+  background: linear-gradient(135deg, #FFF9C4 0%, #FFECB3 100%);
+}
+
 .user-name {
   font-size: 48rpx;
   font-weight: bold;
@@ -178,6 +188,7 @@
 
 .settings-card {
   background: rgba(255, 255, 255, 0.4);
+  overflow: hidden;
 }
 
 .settings-header {
@@ -207,6 +218,7 @@
 
 .settings-item {
   width: 100%;
+  box-sizing: border-box;
   text-align: left;
   background: rgba(255, 255, 255, 0.8);
   padding: 32rpx;
@@ -216,4 +228,32 @@
   font-size: 28rpx;
   border: none;
   box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.05);
+}
+
+.settings-item-link {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.settings-item-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.05);
+  min-width: 0;
+}
+
+.settings-row-label {
+  flex: 1;
+  min-width: 0;
+}
+
+.settings-switch {
+  flex-shrink: 0;
+}
+
+.settings-arrow {
+  font-size: 36rpx;
+  color: #999;
 }

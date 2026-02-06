@@ -1,0 +1,33 @@
+<view class="container">
+  <view class="card avatar-card">
+    <view class="avatar-wrap">
+      <image 
+        wx:if="{{avatarUrl}}"
+        class="avatar-preview"
+        src="{{avatarUrl}}"
+        mode="aspectFill"
+      />
+      <view wx:else class="avatar-preview avatar-placeholder">🍪</view>
+    </view>
+    <button class="edit-btn" bindtap="changeAvatar">更换头像</button>
+  </view>
+
+  <view class="card nickname-card">
+    <view class="nickname-row">
+      <text class="label">昵称</text>
+      <text class="value">{{nickName || '首席烘焙师'}}</text>
+    </view>
+    <view wx:if="{{showNicknameInput}}" class="nickname-edit">
+      <input class="nickname-input" value="{{nickNameInput}}" placeholder="请输入新昵称" bindinput="onNicknameInput" focus="{{showNicknameInput}}"/>
+      <view class="nickname-actions">
+        <button class="edit-btn small" bindtap="cancelNickname">取消</button>
+        <button class="edit-btn small primary" bindtap="saveNickname">保存</button>
+      </view>
+    </view>
+    <button wx:else class="edit-btn" bindtap="changeNickname">更换昵称</button>
+  </view>
+
+  <view class="card logout-card">
+    <button class="logout-btn" bindtap="logout">退出登录</button>
+  </view>
+</view>

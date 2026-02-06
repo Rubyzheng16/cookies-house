@@ -1,66 +1,57 @@
-// pages/auth/login.js
+// 登录 / 注册页：使用微信一键登录，对接后端 /api/auth/login
+import * as auth from '../../services/auth.js';
+
+const app = getApp();
+
 Page({
-
-  /**
-   * 页面的初始数据
-   */
   data: {
-
+    loading: false,
   },
 
-  /**
-   * 生命周期函数--监听页面加载
-   */
-  onLoad(options) {
-
+  onLoad() {
+    // 如果已经有 token，直接跳转到首页/个人中心
+    if (auth.isLoggedIn()) {
+      this.goToProfile();
+    }
   },
 
-  /**
-   * 生命周期函数--监听页面初次渲染完成
-   */
-  onReady() {
+  // 一键登录按钮
+  handleLogin() {
+    if (this.data.loading) return;
+    this.setData({ loading: true });
 
+    wx.login({
+      success: (res) => {
+        if (!res.code) {
+          wx.showToast({ title: '登录失败，请重试', icon: 'none' });
+          this.setData({ loading: false });
+          return;
+        }
+
+        auth
+          .login(res.code)
+          .then((user) => {
+            if (app && app.globalData) {
+              app.globalData.userInfo = user;
+            }
+            this.goToProfile();
+          })
+          .catch(() => {
+            wx.showToast({ title: '登录失败，请稍后再试', icon: 'none' });
+          })
+          .finally(() => {
+            this.setData({ loading: false });
+          });
+      },
+      fail: () => {
+        wx.showToast({ title: '微信登录失败', icon: 'none' });
+        this.setData({ loading: false });
+      },
+    });
   },
 
-  /**
-   * 生命周期函数--监听页面显示
-   */
-  onShow() {
-
+  goToProfile() {
+    // 登录完成后进入 tabBar 的“我的”页
+    wx.switchTab({ url: '/pages/profile/profile' });
   },
-
-  /**
-   * 生命周期函数--监听页面隐藏
-   */
-  onHide() {
-
-  },
-
-  /**
-   * 生命周期函数--监听页面卸载
-   */
-  onUnload() {
-
-  },
-
-  /**
-   * 页面相关事件处理函数--监听用户下拉动作
-   */
-  onPullDownRefresh() {
-
-  },
-
-  /**
-   * 页面上拉触底事件的处理函数
-   */
-  onReachBottom() {
-
-  },
-
-  /**
-   * 用户点击右上角分享
-   */
-  onShareAppMessage() {
-
-  }
-})
+});

@@ -44,13 +44,15 @@
         <text class="analysis-icon">🖋️</text>
         <text class="analysis-title">烘焙师的密语</text>
       </view>
-      <view wx:if="{{todayFolder && todayFolder.analysis}}">
-        <text class="analysis-content">{{todayFolder.analysis}}</text>
-      </view>
-      <view wx:else class="analysis-empty">
-        <text class="empty-text">今天的配方还没总结呢...</text>
+      <view class="analysis-body">
+        <view wx:if="{{todayFolder && todayFolder.analysis}}">
+          <text class="analysis-content">{{todayFolder.analysis}}</text>
+        </view>
+        <view wx:else class="analysis-empty">
+          <text class="empty-text">今天的配方还没总结呢...</text>
+        </view>
         <button class="analyze-btn" bindtap="analyzeToday">
-          ✨ 开启品鉴
+          {{todayFolder && todayFolder.analysis ? '重新品鉴 ✨' : '✨ 开启品鉴'}}
         </button>
       </view>
     </view>

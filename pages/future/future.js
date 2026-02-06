@@ -1,7 +1,6 @@
 // 折叠式未来目标管理页面
 import { goalService } from '../../services/goal.js';
 import { aiService } from '../../utils/ai.js';
-import { CookieType } from '../../types/index.js';
 
 Page({
   data: {
@@ -9,13 +8,7 @@ Page({
     newGoal: '',
     isLoading: false,
     expandedGoals: [],
-    selectedType: null,
-    quadrantTypes: [
-      { type: CookieType.IMPORTANT_URGENT, color: '#FF80AB', label: '紧急重要', order: 1 },
-      { type: CookieType.IMPORTANT_NOT_URGENT, color: '#81C784', label: '重要不紧急', order: 2 },
-      { type: CookieType.URGENT_NOT_IMPORTANT, color: '#FFF176', label: '紧急不重要', order: 3 },
-      { type: CookieType.NOT_IMPORTANT_NOT_URGENT, color: '#B39DDB', label: '不重要不紧急', order: 4 }
-    ]
+    droppingGoalId: '',
   },
 
   onLoad() {
@@ -28,17 +21,8 @@ Page({
 
   loadGoals() {
     const goals = goalService.getGoals();
-    // 计算每个目标的进度百分比
-    const goalsWithProgress = goals.map(goal => {
-      const completedCount = goal.steps.filter(s => s.completed).length;
-      const progress = goal.steps.length > 0 
-        ? Math.round((completedCount / goal.steps.length) * 100) 
-        : 0;
-      return Object.assign({}, goal, {
-        progress: progress
-      });
-    });
-    this.setData({ goals: goalsWithProgress });
+    const goalsWithUi = this.withUiFields(goals);
+    this.setData({ goals: goalsWithUi });
   },
 
   // 输入框变化
@@ -75,24 +59,14 @@ Page({
           steps: goalSteps,
           candyCount: 0,
           isCompleted: false,
-          type: this.data.selectedType || null
+          type: null
         };
 
         const goals = goalService.addGoal(goal);
-        // 计算进度
-        const goalsWithProgress = goals.map(g => {
-          const completedCount = g.steps.filter(s => s.completed).length;
-          const progress = g.steps.length > 0 
-            ? Math.round((completedCount / g.steps.length) * 100) 
-            : 0;
-          return Object.assign({}, g, {
-            progress: progress
-          });
-        });
+        const goalsWithProgress = this.withUiFields(goals);
         this.setData({
           goals: goalsWithProgress,
-          newGoal: '',
-          selectedType: null
+          newGoal: ''
         });
 
         wx.showToast({
@@ -119,20 +93,13 @@ Page({
   // 完成步骤
   completeStep(e) {
     const { goalId, stepId } = e.currentTarget.dataset;
-    
+    // 触发糖果掉落动画
+    this.setData({ droppingGoalId: goalId });
+
     setTimeout(() => {
       const goals = goalService.completeStep(goalId, stepId);
-      // 重新计算进度
-      const goalsWithProgress = goals.map(goal => {
-        const completedCount = goal.steps.filter(s => s.completed).length;
-        const progress = goal.steps.length > 0 
-          ? Math.round((completedCount / goal.steps.length) * 100) 
-          : 0;
-        return Object.assign({}, goal, {
-          progress: progress
-        });
-      });
-      this.setData({ goals: goalsWithProgress });
+      const goalsWithProgress = this.withUiFields(goals);
+      this.setData({ goals: goalsWithProgress, droppingGoalId: '' });
       
       wx.showToast({
         title: '完成一步！',
@@ -140,6 +107,45 @@ Page({
         duration: 1000
       });
     }, 400);
+  },
+
+  // 编辑步骤内容（长按步骤）
+  editStep(e) {
+    const { goalId, stepId, text } = e.currentTarget.dataset;
+    wx.showModal({
+      title: '编辑步骤',
+      editable: true,
+      content: text || '',
+      success: (res) => {
+        const newText = res.content;
+        if (!res.confirm || !newText || !newText.trim()) {
+          return;
+        }
+        const goals = goalService.updateStepText(goalId, stepId, newText.trim());
+        const goalsWithProgress = this.withUiFields(goals);
+        this.setData({ goals: goalsWithProgress });
+        wx.showToast({
+          title: '已更新步骤',
+          icon: 'success',
+          duration: 800
+        });
+      }
+    });
+  },
+
+  // 为每个目标补充 UI 需要的字段：progress、nextStep
+  withUiFields(goals) {
+    return goals.map(goal => {
+      const completedCount = goal.steps.filter(s => s.completed).length;
+      const progress = goal.steps.length > 0 
+        ? Math.round((completedCount / goal.steps.length) * 100) 
+        : 0;
+      const nextStep = goal.steps.find(s => !s.completed) || null;
+      return Object.assign({}, goal, {
+        progress,
+        nextStep
+      });
+    });
   },
 
   // 切换展开/收起
