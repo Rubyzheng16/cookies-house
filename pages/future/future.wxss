@@ -170,7 +170,7 @@
 
 .goal-card {
   background: rgba(255, 255, 255, 0.6);
-  padding: 48rpx;
+  padding: 40rpx 36rpx 48rpx;
   padding-top: 56rpx;
   border-radius: 64rpx;
   border: 8rpx solid white;
@@ -183,23 +183,23 @@
 
 .goal-content {
   display: flex;
-  align-items: stretch;
-  gap: 32rpx;
+  align-items: center;
+  gap: 24rpx;
   min-width: 0;
 }
 
-/* 糖果罐：高度从标题到第一个目标展现结束（与右侧内容同高） */
+/* 糖果罐：固定宽高，不随外框变化；上下缩小后垂直居中，完成前后大小一致 */
 .candy-jar {
-  width: 88rpx;
-  min-height: 200rpx;
-  align-self: stretch;
+  width: 136rpx;
+  height: 200rpx;
+  flex-shrink: 0;
+  align-self: center;
   background: rgba(255, 255, 255, 0.4);
   border: 4rpx solid white;
   border-radius: 0 0 32rpx 32rpx;
   border-top-left-radius: 16rpx;
   border-top-right-radius: 16rpx;
   position: relative;
-  flex-shrink: 0;
   display: flex;
   flex-direction: column;
   overflow: visible;
@@ -216,20 +216,20 @@
 
 .jar-body {
   flex: 1;
-  min-height: 80rpx;
+  min-height: 0;
   display: flex;
   flex-direction: row;
   flex-wrap: wrap;
-  gap: 6rpx;
-  padding: 8rpx;
+  gap: 8rpx;
+  padding: 10rpx;
   align-items: flex-end;
   align-content: flex-end;
   overflow: hidden;
 }
 
 .candy {
-  width: 20rpx;
-  height: 20rpx;
+  width: 24rpx;
+  height: 24rpx;
   border-radius: 50%;
   flex-shrink: 0;
 }
@@ -414,6 +414,7 @@
   flex: 1;
   min-width: 0;
   overflow: hidden;
+  padding-right: 8rpx;
 }
 
 .next-step-label {
