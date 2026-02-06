@@ -108,8 +108,24 @@
 .goal-title-wrapper {
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 12rpx;
   flex: 1;
+  min-width: 0;
+  width: 100%;
+}
+
+/* 标题居中、横向排列，且不溢出 */
+.goal-title {
+  writing-mode: horizontal-tb;
+  display: inline-block;
+  white-space: normal;
+  word-break: break-all;
+  font-size: 36rpx;
+  font-weight: bold;
+  color: #3E2723;
+  max-width: 100%;
+  overflow-wrap: break-word;
 }
 
 .goal-type-dot {
@@ -120,29 +136,63 @@
   box-shadow: 0 2rpx 4rpx rgba(0, 0, 0, 0.2);
 }
 
+/* 板块最右上角的小×删除（贴边） */
+.goal-delete-x {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 72rpx;
+  height: 72rpx;
+  padding: 0;
+  margin: 0;
+  line-height: 72rpx;
+  font-size: 44rpx;
+  color: #999;
+  background: transparent;
+  border: none;
+  border-radius: 0 56rpx 0 24rpx;
+  z-index: 10;
+}
+
+.goal-delete-x::after {
+  border: none;
+}
+
+.goal-delete-x:active {
+  color: #B71C1C;
+  background: rgba(183, 28, 28, 0.1);
+}
+
 .goals-list {
   margin-top: 40rpx;
+  overflow: visible;
 }
 
 .goal-card {
   background: rgba(255, 255, 255, 0.6);
   padding: 48rpx;
+  padding-top: 56rpx;
   border-radius: 64rpx;
   border: 8rpx solid white;
   box-shadow: 0 8rpx 32rpx rgba(0, 0, 0, 0.1);
   margin-bottom: 48rpx;
   position: relative;
   overflow: hidden;
+  box-sizing: border-box;
 }
 
 .goal-content {
   display: flex;
+  align-items: stretch;
   gap: 32rpx;
+  min-width: 0;
 }
 
+/* 糖果罐：高度从标题到第一个目标展现结束（与右侧内容同高） */
 .candy-jar {
-  width: 128rpx;
-  height: 192rpx;
+  width: 88rpx;
+  min-height: 200rpx;
+  align-self: stretch;
   background: rgba(255, 255, 255, 0.4);
   border: 4rpx solid white;
   border-radius: 0 0 32rpx 32rpx;
@@ -151,11 +201,8 @@
   position: relative;
   flex-shrink: 0;
   display: flex;
-  flex-wrap: wrap-reverse;
-  gap: 8rpx;
-  padding: 8rpx;
-  align-content: flex-start;
-  overflow: hidden;
+  flex-direction: column;
+  overflow: visible;
 }
 
 .jar-top {
@@ -167,61 +214,82 @@
   background: rgba(255, 255, 255, 0.6);
 }
 
-.candy {
-  width: 24rpx;
-  height: 24rpx;
-  border-radius: 50%;
+.jar-body {
+  flex: 1;
+  min-height: 80rpx;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 6rpx;
+  padding: 8rpx;
+  align-items: flex-end;
+  align-content: flex-end;
+  overflow: hidden;
 }
 
-/* 掉落动画的糖果 */
+.candy {
+  width: 20rpx;
+  height: 20rpx;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+/* 掉落动画：从上往下落进罐底 */
 .candy-drop {
   position: absolute;
-  top: -40rpx;
+  bottom: 8rpx;
   left: 50%;
   transform: translateX(-50%);
-  animation: candy-fall 600ms ease-out forwards;
+  animation: candy-fall 650ms cubic-bezier(0.25, 0.1, 0.5, 1) forwards;
 }
 
 @keyframes candy-fall {
   0% {
-    transform: translate(-50%, -40rpx);
-    opacity: 0;
+    transform: translate(-50%, -200rpx);
+    opacity: 0.4;
+  }
+  25% {
+    transform: translate(-50%, -80rpx);
+    opacity: 1;
   }
   100% {
-    transform: translate(-50%, 120rpx);
+    transform: translate(-50%, 0);
     opacity: 1;
   }
 }
 
 .goal-info {
   flex: 1;
+  min-width: 0;
+  overflow: hidden;
 }
 
+/* 标题行：名称居中，右侧为×留空 */
 .goal-header {
   display: flex;
-  justify-content: space-between;
+  justify-content: center;
   align-items: center;
   margin-bottom: 16rpx;
+  padding-right: 72rpx;
+  min-width: 0;
 }
 
-.goal-title {
-  font-size: 36rpx;
-  font-weight: bold;
-  color: #3E2723;
-}
-
-.goal-header-actions {
-  display: flex;
-  align-items: center;
-  gap: 12rpx;
+.expand-section {
+  margin-top: 24rpx;
+  width: 100%;
 }
 
 .expand-btn {
   font-size: 24rpx;
   color: #6D4C41;
   background: rgba(255, 255, 255, 0.5);
-  padding: 8rpx 16rpx;
+  padding: 12rpx 24rpx;
   border-radius: 50rpx;
+  border: none;
+  width: 100%;
+}
+
+.expand-btn::after {
   border: none;
 }
 
@@ -258,39 +326,75 @@
   }
 }
 
-.steps-section {
+.next-step-preview {
+  margin-top: 16rpx;
+}
+
+/* 展开后：思维导图区域，展示所有子目标 */
+.mindmap-section {
   margin-top: 24rpx;
+  padding: 24rpx 0 0;
+  border-top: 2rpx dashed rgba(109, 76, 65, 0.2);
+  min-height: 80rpx;
 }
 
-.all-steps {
-  display: flex;
-  flex-direction: column;
-  gap: 16rpx;
+.mindmap-node {
+  margin-bottom: 32rpx;
+  position: relative;
 }
 
-.step-item {
+.mindmap-branch {
+  width: 4rpx;
+  height: 24rpx;
+  background: linear-gradient(to bottom, #FF80AB, #B39DDB);
+  margin-bottom: 8rpx;
+  border-radius: 2rpx;
+}
+
+.mindmap-subtitle {
+  font-size: 26rpx;
+  font-weight: bold;
+  color: #6D4C41;
+  display: block;
+  margin-bottom: 16rpx;
+  padding-left: 16rpx;
+}
+
+.mindmap-step {
   display: flex;
   align-items: center;
   gap: 16rpx;
-  padding: 16rpx;
-  border-radius: 24rpx;
-  border: 2rpx solid #FFF176;
+  padding: 16rpx 16rpx 16rpx 32rpx;
+  margin-left: 16rpx;
+  border-left: 4rpx solid #FFF176;
+  border-radius: 0 24rpx 24rpx 0;
   background: #FFFDE7;
+  margin-bottom: 12rpx;
   font-size: 24rpx;
-  font-weight: bold;
 }
 
-.step-item.completed {
+.mindmap-step.completed {
   background: #F5F5F5;
-  opacity: 0.5;
+  opacity: 0.6;
   text-decoration: line-through;
   font-style: italic;
-  border-color: transparent;
+  border-left-color: #C8E6C9;
 }
 
-.step-text {
-  color: #3E2723;
+.mindmap-connector {
+  width: 12rpx;
+  height: 12rpx;
+  border-radius: 50%;
+  background: #FF80AB;
+  flex-shrink: 0;
+}
+
+.mindmap-step .step-text {
   flex: 1;
+  min-width: 0;
+  word-break: break-all;
+  overflow-wrap: break-word;
+  color: #3E2723;
 }
 
 .next-step-item {
@@ -302,10 +406,14 @@
   display: flex;
   align-items: center;
   gap: 24rpx;
+  min-width: 0;
+  overflow: hidden;
 }
 
 .next-step-content {
   flex: 1;
+  min-width: 0;
+  overflow: hidden;
 }
 
 .next-step-label {
@@ -321,10 +429,17 @@
   color: #3E2723;
   font-weight: bold;
   display: block;
+  min-width: 0;
+  word-break: break-all;
+  overflow-wrap: break-word;
+}
+
+.goal-info .progress-bar {
+  margin-top: 20rpx;
+  margin-bottom: 4rpx;
 }
 
 .progress-bar {
-  margin-top: 32rpx;
   height: 12rpx;
   background: rgba(255, 255, 255, 0.5);
   border-radius: 12rpx;

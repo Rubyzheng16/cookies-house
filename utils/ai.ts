@@ -67,7 +67,7 @@ export const aiService = {
       return [];
     }
 
-    return new Promise((resolve) => {
+    return new Promise((resolve, reject) => {
       wx.request({
         url: `${AI_BASE_URL}/api/goals/split`,
         method: 'POST',
@@ -86,9 +86,14 @@ export const aiService = {
             resolve([]);
           }
         },
-        fail: (error) => {
+        fail: (error: any) => {
           console.error('目标拆解失败', error);
-          resolve([]);
+          const msg = (error && error.errMsg) || '';
+          if (msg.indexOf('fail') !== -1) {
+            reject(new Error('NETWORK_ERROR'));
+          } else {
+            resolve([]);
+          }
         },
       });
     });

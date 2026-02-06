@@ -21,7 +21,8 @@ Page({
 
   loadGoals() {
     const goals = goalService.getGoals();
-    const goalsWithUi = this.withUiFields(goals);
+    const expanded = this.data.expandedGoals || [];
+    const goalsWithUi = this.withUiFields(goals, expanded);
     this.setData({ goals: goalsWithUi });
   },
 
@@ -63,7 +64,7 @@ Page({
         };
 
         const goals = goalService.addGoal(goal);
-        const goalsWithProgress = this.withUiFields(goals);
+        const goalsWithProgress = this.withUiFields(goals, this.data.expandedGoals || []);
         this.setData({
           goals: goalsWithProgress,
           newGoal: ''
@@ -80,9 +81,11 @@ Page({
         });
       }
     } catch (error) {
+      const isNetwork = error && error.message === 'NETWORK_ERROR';
       wx.showToast({
-        title: '拆解失败',
-        icon: 'none'
+        title: isNetwork ? '无法连接服务器，请先启动后端' : '拆解失败，请重试',
+        icon: 'none',
+        duration: isNetwork ? 2800 : 2000
       });
     } finally {
       this.setData({ isLoading: false });
@@ -90,23 +93,22 @@ Page({
     }
   },
 
-  // 完成步骤
+  // 完成步骤（先播糖果掉落动画，动画结束后再更新数据）
   completeStep(e) {
     const { goalId, stepId } = e.currentTarget.dataset;
-    // 触发糖果掉落动画
     this.setData({ droppingGoalId: goalId });
 
+    // 等掉落动画播完（约 700ms）再更新列表，这样能看到糖果从上往下落
     setTimeout(() => {
       const goals = goalService.completeStep(goalId, stepId);
-      const goalsWithProgress = this.withUiFields(goals);
+      const goalsWithProgress = this.withUiFields(goals, this.data.expandedGoals || []);
       this.setData({ goals: goalsWithProgress, droppingGoalId: '' });
-      
       wx.showToast({
         title: '完成一步！',
         icon: 'success',
         duration: 1000
       });
-    }, 400);
+    }, 720);
   },
 
   // 编辑步骤内容（长按步骤）
@@ -122,7 +124,7 @@ Page({
           return;
         }
         const goals = goalService.updateStepText(goalId, stepId, newText.trim());
-        const goalsWithProgress = this.withUiFields(goals);
+        const goalsWithProgress = this.withUiFields(goals, this.data.expandedGoals || []);
         this.setData({ goals: goalsWithProgress });
         wx.showToast({
           title: '已更新步骤',
@@ -133,33 +135,74 @@ Page({
     });
   },
 
-  // 为每个目标补充 UI 需要的字段：progress、nextStep
-  withUiFields(goals) {
+  // 为每个目标补充 UI 需要的字段：progress、nextStep、stepGroups、isExpanded
+  withUiFields(goals, expandedGoals) {
+    const expanded = expandedGoals || [];
     return goals.map(goal => {
-      const completedCount = goal.steps.filter(s => s.completed).length;
-      const progress = goal.steps.length > 0 
-        ? Math.round((completedCount / goal.steps.length) * 100) 
+      const steps = goal.steps || [];
+      const completedCount = steps.filter(s => s.completed).length;
+      const progress = steps.length > 0 
+        ? Math.round((completedCount / steps.length) * 100) 
         : 0;
-      const nextStep = goal.steps.find(s => !s.completed) || null;
+      const nextStep = steps.find(s => !s.completed) || null;
+      const stepGroups = (goal.stepGroups && goal.stepGroups.length > 0)
+        ? goal.stepGroups
+        : chunkSteps(steps, 3);
+      const typeColors = { 1: '#FF80AB', 2: '#81C784', 3: '#FFF176', 4: '#B39DDB' };
+      const id = goal.id != null ? String(goal.id) : '';
       return Object.assign({}, goal, {
         progress,
-        nextStep
+        nextStep,
+        stepGroups,
+        typeColor: (goal.type && typeColors[goal.type]) ? typeColors[goal.type] : '#FF80AB',
+        isExpanded: expanded.indexOf(id) > -1
       });
     });
   },
 
-  // 切换展开/收起
+  // 切换展开/收起，并同步更新每个目标的 isExpanded 以便视图正确显示
   toggleExpand(e) {
-    const goalId = e.currentTarget.dataset.goalId;
-    const expanded = this.data.expandedGoals;
+    const goalId = e.currentTarget.dataset.goalId != null ? String(e.currentTarget.dataset.goalId) : '';
+    const expanded = (this.data.expandedGoals || []).slice();
     const index = expanded.indexOf(goalId);
-    
     if (index > -1) {
       expanded.splice(index, 1);
     } else {
       expanded.push(goalId);
     }
-    
-    this.setData({ expandedGoals: expanded });
+    const goals = this.withUiFields(this.data.goals || [], expanded);
+    this.setData({ expandedGoals: expanded, goals });
+  },
+
+  // 删除目标
+  deleteGoal(e) {
+    const goalId = e.currentTarget.dataset.goalId;
+    wx.showModal({
+      title: '确认删除',
+      content: '删除后无法恢复，确定要删除该目标吗？',
+      success: (res) => {
+        if (!res.confirm) return;
+        const goals = goalService.deleteGoal(goalId);
+        const expanded = this.data.expandedGoals.filter(id => id !== goalId);
+        const goalsWithProgress = this.withUiFields(goals, expanded);
+        this.setData({ goals: goalsWithProgress, expandedGoals: expanded });
+        wx.showToast({ title: '已删除', icon: 'none' });
+      }
+    });
   }
 });
+
+// 将 steps 按每组 size 个拆成多组，每组有 title + steps
+function chunkSteps(steps, size) {
+  if (!steps || steps.length === 0) return [];
+  const groups = [];
+  for (let i = 0; i < steps.length; i += size) {
+    const chunk = steps.slice(i, i + size);
+    const n = groups.length + 1;
+    groups.push({
+      title: n === 1 ? '子目标' : '阶段' + n,
+      steps: chunk
+    });
+  }
+  return groups;
+}
