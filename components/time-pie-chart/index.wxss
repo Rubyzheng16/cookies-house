@@ -1,0 +1,84 @@
+/* 时间消耗饼图 */
+.time-chart-container {
+  padding: 24rpx 0;
+}
+
+.chart-wrap {
+  margin-bottom: 24rpx;
+}
+
+.pie-wrapper {
+  position: relative;
+  width: 520rpx;
+  height: 520rpx;
+  margin: 0 auto 24rpx;
+}
+
+.pie-canvas {
+  width: 520rpx;
+  height: 520rpx;
+}
+
+.pie-center {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+  pointer-events: none;
+}
+
+.pie-center-value {
+  display: block;
+  font-size: 36rpx;
+  font-weight: bold;
+  color: #3E2723;
+}
+
+.pie-center-label {
+  display: block;
+  font-size: 22rpx;
+  color: rgba(62, 39, 35, 0.6);
+  margin-top: 4rpx;
+}
+
+.empty-chart {
+  height: 120rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.empty-text {
+  font-size: 24rpx;
+  color: rgba(62, 39, 35, 0.4);
+}
+
+.legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 24rpx 32rpx;
+  justify-content: center;
+  margin-top: 24rpx;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 8rpx;
+}
+
+.legend-icon {
+  font-size: 24rpx;
+}
+
+.legend-dot {
+  width: 16rpx;
+  height: 16rpx;
+  border-radius: 50%;
+}
+
+.legend-label {
+  font-size: 22rpx;
+  color: #3E2723;
+}

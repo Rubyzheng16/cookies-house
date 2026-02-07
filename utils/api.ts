@@ -1,5 +1,8 @@
-// API请求封装
-const API_BASE_URL = 'https://your-api-domain.com/api'; // 需要替换为实际的后端地址
+// API 请求封装（与后端 REST 风格一致，带登录态时自动加 Authorization）
+import { API_BASE_URL } from '../config';
+import { getToken } from '../services/auth';
+
+const BASE = `${API_BASE_URL}/api`;
 
 interface RequestOptions {
   url: string;
@@ -9,15 +12,16 @@ interface RequestOptions {
 }
 
 export const api = {
-  // 通用请求方法
   request<T = any>(options: RequestOptions): Promise<T> {
+    const token = getToken();
     return new Promise((resolve, reject) => {
       wx.request({
-        url: `${API_BASE_URL}${options.url}`,
+        url: `${BASE}${options.url}`,
         method: options.method || 'GET',
         data: options.data,
         header: {
           'Content-Type': 'application/json',
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
           ...options.header
         },
         success: (res) => {

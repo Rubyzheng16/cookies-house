@@ -12,8 +12,13 @@ export interface CookieEntry {
   text: string;
   type: CookieType;
   timestamp: number;
+  /** 任务开始时间 HH:mm，仅任务类型可选填写 */
+  startTime?: string;
+  /** 任务结束时间 HH:mm，仅任务类型可选填写 */
+  endTime?: string;
   image?: string; // 单张图片（兼容旧数据）
   images?: string[]; // 多张图片
+  voicePath?: string; // 语音文件本地路径
 }
 
 export interface DayFolder {
@@ -37,3 +42,14 @@ export interface Goal {
 }
 
 export type AppView = 'workbench' | 'lab' | 'future' | 'profile';
+
+/** 后端返回的用户信息（与 README users 表一致） */
+export interface User {
+  id: number;
+  wxOpenId: string;
+  phone?: string;
+  vipLevel: 'free' | 'vip';
+  settings: Record<string, unknown>;
+  createdAt: string;
+  updatedAt: string;
+}

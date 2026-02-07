@@ -1,47 +1,227 @@
-// AI接口调用（临时使用，后续会迁移到后端）
-// 注意：小程序中不应该直接调用AI API，应该通过后端服务
+// AI 接口调用：使用用户在「基本设置 → AI 助手密钥」中配置的 Key
+// 密钥只保存在本机本地存储中，需要调用 AI 时才会读取并随请求发给你的后端 / AI 网关。
+
+import { API_BASE_URL } from '../config/index.js';
+import { storage } from '../utils/storage.js';
+
+const AI_KEY_STORAGE = 'ai_api_key';
+// 直接复用后端 API 地址，本地为 http://localhost:3000
+const AI_BASE_URL = API_BASE_URL;
+
+function getLocalApiKey() {
+  const key = wx.getStorageSync(AI_KEY_STORAGE);
+  if (!key) {
+    wx.showToast({
+      title: '请先在「我的-基本设置-AI 助手密钥」中配置 API Key',
+      icon: 'none',
+    });
+    return null;
+  }
+  return key;
+}
 
 export const aiService = {
-  // 分析今日内容（通过后端API）
+  // 分析今日内容
   async analyzeToday(entries) {
-    try {
-      const response = await wx.request({
-        url: 'https://your-api-domain.com/api/analysis/daily',
+    const apiKey = getLocalApiKey();
+    if (!apiKey) {
+      return '尚未配置 AI 密钥';
+    }
+
+    return new Promise((resolve) => {
+      wx.request({
+        url: `${AI_BASE_URL}/api/analysis/daily`,
         method: 'POST',
         data: {
+          apiKey,
           entries: entries.map(e => ({
             text: e.text,
-            type: e.type
-          }))
-        }
+            type: e.type,
+          })),
+        },
+        success: (response) => {
+          const data = response.data;
+          if (
+            response.statusCode === 200 &&
+            data &&
+            data.code === 0 &&
+            data.data &&
+            typeof data.data.analysis === 'string'
+          ) {
+            resolve(data.data.analysis);
+          } else {
+            resolve((data && data.message) || '分析失败，请稍后再试');
+          }
+        },
+        fail: (error) => {
+          console.error('AI分析失败', error);
+          resolve('分析失败，请稍后再试');
+        },
       });
-      
-      if (response.statusCode === 200) {
-        return response.data.analysis || '哎呀，烤箱好像出了一点小状况。';
-      }
-      return '分析失败，请稍后再试';
-    } catch (error) {
-      console.error('AI分析失败', error);
-      return '分析失败，请稍后再试';
-    }
+    });
   },
 
-  // 拆解目标（通过后端API）
+  // 拆解目标
   async splitGoal(goalTitle) {
-    try {
-      const response = await wx.request({
-        url: 'https://your-api-domain.com/api/goals/split',
-        method: 'POST',
-        data: { title: goalTitle }
-      });
-      
-      if (response.statusCode === 200) {
-        return response.data.steps || [];
-      }
-      return [];
-    } catch (error) {
-      console.error('目标拆解失败', error);
+    const apiKey = getLocalApiKey();
+    if (!apiKey) {
       return [];
     }
-  }
+
+    return new Promise((resolve, reject) => {
+      wx.request({
+        url: `${AI_BASE_URL}/api/goals/split`,
+        method: 'POST',
+        data: { title: goalTitle, apiKey },
+        success: (response) => {
+          const data = response.data;
+          if (
+            response.statusCode === 200 &&
+            data &&
+            data.code === 0 &&
+            data.data &&
+            Array.isArray(data.data.steps)
+          ) {
+            resolve(data.data.steps);
+          } else {
+            resolve([]);
+          }
+        },
+        fail: (error) => {
+          console.error('目标拆解失败', error);
+          const msg = (error && error.errMsg) || '';
+          if (msg.indexOf('fail') !== -1) {
+            reject(new Error('NETWORK_ERROR'));
+          } else {
+            resolve([]);
+          }
+        },
+      });
+    });
+  },
+
+  // 生成日记（完整日记 + 要点 + 洞察与建议）
+  // 若有自定义指令则使用，否则用默认
+  async generateDiary(entries) {
+    const apiKey = getLocalApiKey();
+    if (!apiKey) {
+      return null;
+    }
+
+    const customPrompt = storage.getDiaryPrompt ? storage.getDiaryPrompt() : '';
+    const data = {
+      apiKey,
+      entries: entries.map(e => ({
+        text: e.text,
+        type: e.type,
+        timestamp: e.timestamp
+      }))
+    };
+    if (customPrompt && customPrompt.trim()) {
+      data.customPrompt = customPrompt.trim();
+    }
+
+    return new Promise((resolve) => {
+      wx.request({
+        url: `${AI_BASE_URL}/api/analysis/diary`,
+        method: 'POST',
+        data,
+        success: (response) => {
+          const data = response.data;
+          if (
+            response.statusCode === 200 &&
+            data &&
+            data.code === 0 &&
+            data.data
+          ) {
+            resolve(data.data);
+          } else {
+            resolve(null);
+          }
+        },
+        fail: (error) => {
+          console.error('日记生成失败', error);
+          resolve(null);
+        }
+      });
+    });
+  },
+
+  // 生成心理日记（根据所有输入数据，心理咨询师视角）
+  async generateCounselorDiary(folders) {
+    const apiKey = getLocalApiKey();
+    if (!apiKey) {
+      return null;
+    }
+
+    const foldersData = folders.map((f) => ({
+      date: f.date,
+      entries: (f.entries || []).map((e) => ({
+        text: e.text,
+        type: e.type,
+        timestamp: e.timestamp
+      }))
+    }));
+
+    return new Promise((resolve) => {
+      wx.request({
+        url: `${AI_BASE_URL}/api/analysis/counselor-diary`,
+        method: 'POST',
+        data: { apiKey, folders: foldersData },
+        success: (response) => {
+          const data = response.data;
+          if (
+            response.statusCode === 200 &&
+            data &&
+            data.code === 0 &&
+            data.data &&
+            data.data.diary
+          ) {
+            resolve(data.data.diary);
+          } else {
+            resolve(null);
+          }
+        },
+        fail: (error) => {
+          console.error('心理日记生成失败', error);
+          resolve(null);
+        }
+      });
+    });
+  },
+
+  // 生成幸运饼干（丰荣板块任务）
+  async generateFortune(category) {
+    const apiKey = getLocalApiKey();
+    if (!apiKey) {
+      return null;
+    }
+
+    return new Promise((resolve) => {
+      wx.request({
+        url: `${AI_BASE_URL}/api/fortune/generate`,
+        method: 'POST',
+        data: { apiKey, category: category || undefined },
+        success: (response) => {
+          const data = response.data;
+          if (
+            response.statusCode === 200 &&
+            data &&
+            data.code === 0 &&
+            data.data &&
+            data.data.content
+          ) {
+            resolve({ content: data.data.content, category: data.data.category });
+          } else {
+            resolve(null);
+          }
+        },
+        fail: (error) => {
+          console.error('幸运饼干生成失败', error);
+          resolve(null);
+        },
+      });
+    });
+  },
 };
+

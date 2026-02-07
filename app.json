@@ -1,14 +1,17 @@
 {
   "pages": [
+    "pages/auth/login",
     "pages/index/index",
     "pages/detail/detail",
     "pages/lab/lab",
     "pages/future/future",
-    "pages/profile/profile"
+    "pages/profile/profile",
+    "pages/profile/edit/edit",
+    "pages/profile/ai/ai","pages/enrichment-detail/enrichment-detail"
   ],
   "window": {
     "navigationBarTextStyle": "white",
-    "navigationBarTitleText": "情绪饼干屋",
+    "navigationBarTitleText": "饼干记",
     "navigationBarBackgroundColor": "#6D4C41",
     "backgroundColor": "#FCE4EC"
   },
@@ -19,22 +22,10 @@
     "backgroundColor": "#6D4C41",
     "borderStyle": "white",
     "list": [
-      {
-        "pagePath": "pages/index/index",
-        "text": "饼干屋"
-      },
-      {
-        "pagePath": "pages/lab/lab",
-        "text": "品鉴室"
-      },
-      {
-        "pagePath": "pages/future/future",
-        "text": "糖果罐"
-      },
-      {
-        "pagePath": "pages/profile/profile",
-        "text": "我的"
-      }
+      {"pagePath": "pages/index/index", "text": "饼干屋"},
+      {"pagePath": "pages/lab/lab", "text": "品鉴室"},
+      {"pagePath": "pages/future/future", "text": "糖果罐"},
+      {"pagePath": "pages/profile/profile", "text": "我的"}
     ]
   },
   "style": "v2",

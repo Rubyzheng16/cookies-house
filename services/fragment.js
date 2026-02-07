@@ -31,25 +31,50 @@ export const fragmentService = {
   },
 
   // 添加碎片
-  addEntry(text, type) {
+  // options: { startTime?, endTime?, date?, images?, voicePath? }
+  addEntry(text, type, options = {}) {
     const folders = this.getFolders();
-    const todayStr = dateUtils.getTodayString();
+    const targetDate = options.date || dateUtils.getTodayString();
     
     const newEntry = {
       id: Math.random().toString(36).substr(2, 9),
-      text,
+      text: text || '',
       type,
       timestamp: Date.now()
     };
 
-    const existingFolderIndex = folders.findIndex(f => f.date === todayStr);
+    if (options.startTime && options.endTime) {
+      newEntry.startTime = options.startTime;
+      newEntry.endTime = options.endTime;
+    }
+    if (options.images && options.images.length > 0) {
+      newEntry.images = options.images;
+    }
+    if (options.voicePath) {
+      newEntry.voicePath = options.voicePath;
+    }
+
+    const existingFolderIndex = folders.findIndex(f => f.date === targetDate);
     
     if (existingFolderIndex > -1) {
       folders[existingFolderIndex].entries.unshift(newEntry);
     } else {
-      folders.unshift({ date: todayStr, entries: [newEntry] });
+      folders.unshift({ date: targetDate, entries: [newEntry] });
     }
 
+    this.saveFolders(folders);
+    return folders;
+  },
+
+  // 更新条目的时间范围
+  updateEntryTime(date, entryId, startTime, endTime) {
+    const folders = this.getFolders();
+    const folder = folders.find(f => f.date === date);
+    if (!folder) return folders;
+    const entry = folder.entries.find(e => e.id === entryId);
+    if (!entry) return folders;
+    entry.startTime = startTime;
+    entry.endTime = endTime;
     this.saveFolders(folders);
     return folders;
   },
@@ -60,6 +85,17 @@ export const fragmentService = {
     const folder = folders.find(f => f.date === date);
     if (folder) {
       folder.analysis = analysis;
+      this.saveFolders(folders);
+    }
+    return folders;
+  },
+
+  // 更新日记分析（diary, keyPoints, insights）
+  updateDiaryAnalysis(date, diaryAnalysis) {
+    const folders = this.getFolders();
+    const folder = folders.find(f => f.date === date);
+    if (folder) {
+      folder.diaryAnalysis = diaryAnalysis;
       this.saveFolders(folders);
     }
     return folders;

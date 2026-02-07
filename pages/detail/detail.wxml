@@ -10,13 +10,47 @@
         <text class="header-date">{{dateLabel}}</text>
         <text class="header-time">{{currentTime}}</text>
       </view>
-      <view class="calendar-btn" bindtap="showCalendar">
-        <text class="calendar-icon">📅</text>
+      <view class="header-spacer"></view>
+    </view>
+  </view>
+
+  <!-- 四象限图 -->
+  <view class="quadrant-section">
+    <view class="quadrant-chart">
+      <view class="quadrant-grid">
+        <!-- 左上：第二象限 重要不紧急 -->
+        <view class="quadrant-cell quadrant-2">
+          <view class="quadrant-label">重要不紧急</view>
+          <view class="quadrant-dots">
+            <view wx:for="{{quadrantDots[1]}}" wx:key="index" class="quadrant-dot" style="background-color: #81C784;"></view>
+          </view>
+        </view>
+        <!-- 右上：第一象限 紧急重要 -->
+        <view class="quadrant-cell quadrant-1">
+          <view class="quadrant-label">紧急重要</view>
+          <view class="quadrant-dots">
+            <view wx:for="{{quadrantDots[0]}}" wx:key="index" class="quadrant-dot" style="background-color: #FF80AB;"></view>
+          </view>
+        </view>
+        <!-- 左下：第四象限 不重要不紧急 -->
+        <view class="quadrant-cell quadrant-4">
+          <view class="quadrant-label">不重要不紧急</view>
+          <view class="quadrant-dots">
+            <view wx:for="{{quadrantDots[3]}}" wx:key="index" class="quadrant-dot" style="background-color: #B39DDB;"></view>
+          </view>
+        </view>
+        <!-- 右下：第三象限 紧急不重要 -->
+        <view class="quadrant-cell quadrant-3">
+          <view class="quadrant-label">紧急不重要</view>
+          <view class="quadrant-dots">
+            <view wx:for="{{quadrantDots[2]}}" wx:key="index" class="quadrant-dot" style="background-color: #FFF176;"></view>
+          </view>
+        </view>
       </view>
     </view>
   </view>
 
-  <!-- 时间轴容器 -->
+  <!-- 时间轴容器：所有条目按记录时间显示 -->
   <view class="timeline-container">
     <!-- 整体按小时分组 -->
     <view class="hour-groups">
@@ -75,6 +109,11 @@
             </view>
             <!-- 单图显示（兼容旧数据） -->
             <image wx:elif="{{item.image}}" src="{{item.image}}" class="entry-image" mode="aspectFit" bindtap="previewImage" data-images="{{[item.image]}}" data-index="0"></image>
+            <!-- 语音播放 -->
+            <view wx:if="{{item.voicePath}}" class="voice-player" bindtap="playVoice" data-path="{{item.voicePath}}">
+              <text class="voice-icon">{{playingVoice === item.voicePath ? '⏸️' : '▶️'}}</text>
+              <text class="voice-text">{{playingVoice === item.voicePath ? '暂停' : '播放语音'}}</text>
+            </view>
           </view>
         </view>
       </view>
@@ -110,7 +149,19 @@
                       <text class="entry-icon">{{entryIcons[entry.type] || '💭'}}</text>
                       <view class="entry-content">
                         <text class="entry-text">{{entry.text}}</text>
-                        <text class="entry-time">{{formatTime(entry.timestamp)}}</text>
+                        <text class="entry-time">{{entry.timeStr || ''}}</text>
+                        <view wx:if="{{entry.startTime && entry.endTime}}" class="entry-completion-row">
+                          <text class="entry-completion-time">{{entry.startTime}} - {{entry.endTime}}</text>
+                          <text class="entry-duration">{{entry.durationStr}}</text>
+                        </view>
+                        <view 
+                          wx:if="{{entry.type !== 'MUMBLING' && !entry.startTime}}" 
+                          class="add-time-btn"
+                          bindtap="showAddTimeModal"
+                          data-id="{{entry.id}}"
+                        >
+                          <text class="add-time-text">+ 添加时间</text>
+                        </view>
                       </view>
                     </view>
                     <!-- 多图显示 -->
@@ -135,6 +186,11 @@
                     </view>
                     <!-- 单图显示（兼容旧数据） -->
                     <image wx:elif="{{entry.image}}" src="{{entry.image}}" class="entry-image" mode="aspectFit" bindtap="previewImage" data-images="{{[entry.image]}}" data-index="0"></image>
+                    <!-- 语音播放 -->
+                    <view wx:if="{{entry.voicePath}}" class="voice-player" bindtap="playVoice" data-path="{{entry.voicePath}}">
+                      <text class="voice-icon">{{playingVoice === entry.voicePath ? '⏸️' : '▶️'}}</text>
+                      <text class="voice-text">{{playingVoice === entry.voicePath ? '暂停' : '播放语音'}}</text>
+                    </view>
                   </view>
                 </view>
               </view>
@@ -151,11 +207,31 @@
       <text class="empty-icon">🥣</text>
       <text class="empty-text">今天还没有记录任何内容</text>
     </view>
+
+    <!-- 当日 AI 日记（文件夹最下方，以最新为准） -->
+    <view wx:if="{{diaryAnalysis}}" class="diary-at-bottom">
+      <view class="diary-bottom-header">
+        <text class="diary-bottom-icon">📔</text>
+        <text class="diary-bottom-title">当日日记</text>
+      </view>
+      <view class="diary-bottom-body">
+        <text class="diary-bottom-content">{{diaryAnalysis.diary}}</text>
+        <view wx:if="{{diaryAnalysis.keyPoints}}" class="diary-bottom-block">
+          <text class="diary-bottom-label">关键要点</text>
+          <text class="diary-bottom-text">{{diaryAnalysis.keyPoints}}</text>
+        </view>
+        <view wx:if="{{diaryAnalysis.insights}}" class="diary-bottom-block">
+          <text class="diary-bottom-label">洞察与建议</text>
+          <text class="diary-bottom-text insight">{{diaryAnalysis.insights}}</text>
+        </view>
+      </view>
+    </view>
   </view>
 
   <!-- 详情页的加号按钮（因为不是tabBar页面，需要单独显示） -->
   <view class="detail-add-button" bindtap="onAddButtonClick">
-    <view class="add-button-inner">
+    <image wx:if="{{addBtnImage}}" class="add-btn-full-image" src="{{addBtnImage}}" mode="aspectFit" />
+    <view wx:else class="add-button-inner">
       <text class="add-icon">+</text>
     </view>
   </view>
@@ -166,4 +242,37 @@
     bind:close="hideInputModal"
     bind:confirm="handleInputConfirm"
   />
+
+  <!-- 添加时间弹窗：使用 picker-view 替代 picker，解决弹窗内无法选择的问题 -->
+  <view class="time-modal-overlay" wx:if="{{showTimeModal}}" bindtap="hideAddTimeModal">
+    <view class="time-modal" catchtap="">
+      <view class="time-modal-title">添加时间范围</view>
+      <view class="time-picker-section">
+        <view class="time-picker-label">开始</view>
+        <picker-view value="{{startPickerValue}}" bindchange="onStartPickerChange" class="time-picker-view">
+          <picker-view-column>
+            <view wx:for="{{hourList}}" wx:key="*this" class="picker-item">{{item}}</view>
+          </picker-view-column>
+          <picker-view-column>
+            <view wx:for="{{minuteList}}" wx:key="*this" class="picker-item">{{item}}</view>
+          </picker-view-column>
+        </picker-view>
+      </view>
+      <view class="time-picker-section">
+        <view class="time-picker-label">结束</view>
+        <picker-view value="{{endPickerValue}}" bindchange="onEndPickerChange" class="time-picker-view">
+          <picker-view-column>
+            <view wx:for="{{hourList}}" wx:key="*this" class="picker-item">{{item}}</view>
+          </picker-view-column>
+          <picker-view-column>
+            <view wx:for="{{minuteList}}" wx:key="*this" class="picker-item">{{item}}</view>
+          </picker-view-column>
+        </picker-view>
+      </view>
+      <view class="time-modal-btns">
+        <view class="time-modal-btn cancel" bindtap="hideAddTimeModal">取消</view>
+        <view class="time-modal-btn confirm" bindtap="saveEntryTime">确定</view>
+      </view>
+    </view>
+  </view>
 </view>

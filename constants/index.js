@@ -1,5 +1,23 @@
 // 常量定义
 import { CookieType } from '../types/index.js';
+import { CDN_FOLDER_IMAGES, CDN_ADD_BTN } from '../config/cdn.js';
+
+const LOCAL_FOLDER_IMAGES = [
+  '/assets/images/folders/folder-1.png',
+  '/assets/images/folders/folder-2.png',
+  '/assets/images/folders/folder-3.png',
+  '/assets/images/folders/folder-4.png',
+  '/assets/images/folders/folder-5.png',
+  '/assets/images/folders/folder-6.png'
+];
+
+/** 文件夹图片路径（6款），优先用 CDN，否则用本地 */
+export const FOLDER_IMAGES = LOCAL_FOLDER_IMAGES.map((local, i) =>
+  (CDN_FOLDER_IMAGES[i] || '').trim() || local
+);
+
+/** 底部加号按钮图片路径，优先用 CDN */
+export const ADD_BTN_IMAGE = (CDN_ADD_BTN || '').trim() || '/assets/images/add-btn.png';
 
 export const COLORS = {
   base: '#FCE4EC',

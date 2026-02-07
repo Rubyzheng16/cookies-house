@@ -1,7 +1,1 @@
-{
-  "navigationBarTitleText": "饼干屋",
-  "usingComponents": {
-    "folder-item": "../../components/folder-item/index",
-    "input-modal": "../../components/input-modal/index"
-  }
-}
+{"navigationBarTitleText":"饼干屋","usingComponents":{"input-modal":"../../components/input-modal/index"}}

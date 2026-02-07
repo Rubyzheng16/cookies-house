@@ -5,18 +5,20 @@
     bindtap="breakCookie"
   >
     <view wx:if="{{!isBroken}}" class="cookie-whole">
-      <!-- 完整的饼干SVG可以用canvas或图片替代 -->
       <text class="cookie-icon">🍪</text>
     </view>
     <view wx:else class="cookie-broken">
       <view class="cookie-half left"></view>
       <view class="cookie-half right"></view>
       <view class="fortune-paper">
-        <text class="fortune-text">{{fortune}}</text>
+        <text class="fortune-text">{{todayFortune.content}}</text>
       </view>
     </view>
   </view>
   <text class="fortune-hint">
     {{isBroken ? '合上碎片' : loading ? '正在揉面...' : '点击咔嚓一声，领个小任务'}}
   </text>
+  <view wx:if="{{isBroken && todayFortune && todayFortune.content && !todayFortune.completed}}" class="complete-wrap">
+    <button class="complete-btn" bindtap="onComplete">我完成了 ✨</button>
+  </view>
 </view>

@@ -1,7 +1,6 @@
 // 折叠式未来目标管理页面
 import { goalService } from '../../services/goal.js';
 import { aiService } from '../../utils/ai.js';
-import { CookieType } from '../../types/index.js';
 
 Page({
   data: {
@@ -9,13 +8,9 @@ Page({
     newGoal: '',
     isLoading: false,
     expandedGoals: [],
-    selectedType: null,
-    quadrantTypes: [
-      { type: CookieType.IMPORTANT_URGENT, color: '#FF80AB', label: '紧急重要', order: 1 },
-      { type: CookieType.IMPORTANT_NOT_URGENT, color: '#81C784', label: '重要不紧急', order: 2 },
-      { type: CookieType.URGENT_NOT_IMPORTANT, color: '#FFF176', label: '紧急不重要', order: 3 },
-      { type: CookieType.NOT_IMPORTANT_NOT_URGENT, color: '#B39DDB', label: '不重要不紧急', order: 4 }
-    ]
+    droppingGoalId: '',      // 正在掉落动画的目标 id
+    droppingCandyOffset: 0, // 掉落糖果的随机水平偏移 (rpx)
+    droppingCandyColor: '#FF80AB',
   },
 
   onLoad() {
@@ -28,17 +23,9 @@ Page({
 
   loadGoals() {
     const goals = goalService.getGoals();
-    // 计算每个目标的进度百分比
-    const goalsWithProgress = goals.map(goal => {
-      const completedCount = goal.steps.filter(s => s.completed).length;
-      const progress = goal.steps.length > 0 
-        ? Math.round((completedCount / goal.steps.length) * 100) 
-        : 0;
-      return Object.assign({}, goal, {
-        progress: progress
-      });
-    });
-    this.setData({ goals: goalsWithProgress });
+    const expanded = this.data.expandedGoals || [];
+    const goalsWithUi = this.withUiFields(goals, expanded);
+    this.setData({ goals: goalsWithUi });
   },
 
   // 输入框变化
@@ -75,24 +62,14 @@ Page({
           steps: goalSteps,
           candyCount: 0,
           isCompleted: false,
-          type: this.data.selectedType || null
+          type: null
         };
 
         const goals = goalService.addGoal(goal);
-        // 计算进度
-        const goalsWithProgress = goals.map(g => {
-          const completedCount = g.steps.filter(s => s.completed).length;
-          const progress = g.steps.length > 0 
-            ? Math.round((completedCount / g.steps.length) * 100) 
-            : 0;
-          return Object.assign({}, g, {
-            progress: progress
-          });
-        });
+        const goalsWithProgress = this.withUiFields(goals, this.data.expandedGoals || []);
         this.setData({
           goals: goalsWithProgress,
-          newGoal: '',
-          selectedType: null
+          newGoal: ''
         });
 
         wx.showToast({
@@ -106,9 +83,11 @@ Page({
         });
       }
     } catch (error) {
+      const isNetwork = error && error.message === 'NETWORK_ERROR';
       wx.showToast({
-        title: '拆解失败',
-        icon: 'none'
+        title: isNetwork ? '无法连接服务器，请先启动后端' : '拆解失败，请重试',
+        icon: 'none',
+        duration: isNetwork ? 2800 : 2000
       });
     } finally {
       this.setData({ isLoading: false });
@@ -116,44 +95,135 @@ Page({
     }
   },
 
-  // 完成步骤
+  // 切换步骤完成状态（打勾=完成+糖果掉落，取消=还原+糖果消失）
   completeStep(e) {
     const { goalId, stepId } = e.currentTarget.dataset;
-    
-    setTimeout(() => {
-      const goals = goalService.completeStep(goalId, stepId);
-      // 重新计算进度
-      const goalsWithProgress = goals.map(goal => {
-        const completedCount = goal.steps.filter(s => s.completed).length;
-        const progress = goal.steps.length > 0 
-          ? Math.round((completedCount / goal.steps.length) * 100) 
-          : 0;
-        return Object.assign({}, goal, {
-          progress: progress
-        });
-      });
+    const goal = (this.data.goals || []).find(g => g.id === goalId);
+    const step = goal && (goal.steps || []).find(s => s.id === stepId);
+    const isUncomplete = step && step.completed;
+
+    if (isUncomplete) {
+      // 取消勾选：直接更新，糖果消失
+      const goals = goalService.toggleStep(goalId, stepId);
+      const goalsWithProgress = this.withUiFields(goals, this.data.expandedGoals || []);
       this.setData({ goals: goalsWithProgress });
-      
-      wx.showToast({
-        title: '完成一步！',
-        icon: 'success',
-        duration: 1000
+      wx.showToast({ title: '已取消', icon: 'none', duration: 800 });
+    } else {
+      // 打勾完成：播糖果掉落动画后更新
+      const colors = ['#FF80AB', '#81C784', '#FFF176', '#B39DDB'];
+      const nextCount = (goal ? (goal.candyCount || 0) + 1 : 1);
+      const color = colors[(nextCount - 1) % 4];
+      const offset = Math.round((Math.random() - 0.5) * 80);
+      this.setData({
+        droppingGoalId: goalId,
+        droppingCandyOffset: offset,
+        droppingCandyColor: color
       });
-    }, 400);
+      setTimeout(() => {
+        const goals = goalService.toggleStep(goalId, stepId);
+        const goalsWithProgress = this.withUiFields(goals, this.data.expandedGoals || []);
+        this.setData({
+          goals: goalsWithProgress,
+          droppingGoalId: '',
+          droppingCandyOffset: 0
+        });
+        wx.showToast({ title: '完成一步！', icon: 'success', duration: 1000 });
+      }, 920);
+    }
   },
 
-  // 切换展开/收起
+  // 编辑步骤内容（长按步骤）
+  editStep(e) {
+    const { goalId, stepId, text } = e.currentTarget.dataset;
+    wx.showModal({
+      title: '编辑步骤',
+      editable: true,
+      content: text || '',
+      success: (res) => {
+        const newText = res.content;
+        if (!res.confirm || !newText || !newText.trim()) {
+          return;
+        }
+        const goals = goalService.updateStepText(goalId, stepId, newText.trim());
+        const goalsWithProgress = this.withUiFields(goals, this.data.expandedGoals || []);
+        this.setData({ goals: goalsWithProgress });
+        wx.showToast({
+          title: '已更新步骤',
+          icon: 'success',
+          duration: 800
+        });
+      }
+    });
+  },
+
+  // 为每个目标补充 UI 需要的字段：progress、nextStep、stepGroups、isExpanded
+  withUiFields(goals, expandedGoals) {
+    const expanded = expandedGoals || [];
+    return goals.map(goal => {
+      const steps = goal.steps || [];
+      const completedCount = steps.filter(s => s.completed).length;
+      const progress = steps.length > 0 
+        ? Math.round((completedCount / steps.length) * 100) 
+        : 0;
+      const nextStep = steps.find(s => !s.completed) || null;
+      const stepGroups = (goal.stepGroups && goal.stepGroups.length > 0)
+        ? goal.stepGroups
+        : chunkSteps(steps, 3);
+      const typeColors = { 1: '#FF80AB', 2: '#81C784', 3: '#FFF176', 4: '#B39DDB' };
+      const id = goal.id != null ? String(goal.id) : '';
+      return Object.assign({}, goal, {
+        progress,
+        nextStep,
+        stepGroups,
+        typeColor: (goal.type && typeColors[goal.type]) ? typeColors[goal.type] : '#FF80AB',
+        isExpanded: expanded.indexOf(id) > -1
+      });
+    });
+  },
+
+  // 切换展开/收起，并同步更新每个目标的 isExpanded 以便视图正确显示
   toggleExpand(e) {
-    const goalId = e.currentTarget.dataset.goalId;
-    const expanded = this.data.expandedGoals;
+    const goalId = e.currentTarget.dataset.goalId != null ? String(e.currentTarget.dataset.goalId) : '';
+    const expanded = (this.data.expandedGoals || []).slice();
     const index = expanded.indexOf(goalId);
-    
     if (index > -1) {
       expanded.splice(index, 1);
     } else {
       expanded.push(goalId);
     }
-    
-    this.setData({ expandedGoals: expanded });
+    const goals = this.withUiFields(this.data.goals || [], expanded);
+    this.setData({ expandedGoals: expanded, goals });
+  },
+
+  // 删除目标
+  deleteGoal(e) {
+    const goalId = e.currentTarget.dataset.goalId;
+    wx.showModal({
+      title: '确认删除',
+      content: '删除后无法恢复，确定要删除该目标吗？',
+      success: (res) => {
+        if (!res.confirm) return;
+        const goals = goalService.deleteGoal(goalId);
+        const expanded = this.data.expandedGoals.filter(id => id !== goalId);
+        const goalsWithProgress = this.withUiFields(goals, expanded);
+        this.setData({ goals: goalsWithProgress, expandedGoals: expanded });
+        wx.showToast({ title: '已删除', icon: 'none' });
+      }
+    });
   }
 });
+
+// 将 steps 按每组 size 个拆成多组，每组有 title + steps
+function chunkSteps(steps, size) {
+  if (!steps || steps.length === 0) return [];
+  const groups = [];
+  for (let i = 0; i < steps.length; i += size) {
+    const chunk = steps.slice(i, i + size);
+    const n = groups.length + 1;
+    groups.push({
+      title: n === 1 ? '子目标' : '阶段' + n,
+      steps: chunk
+    });
+  }
+  return groups;
+}

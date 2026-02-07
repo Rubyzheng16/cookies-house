@@ -6,6 +6,7 @@ import { fragmentService } from '../../services/fragment.js';
 import { dateUtils } from '../../utils/date.js';
 import { aiService } from '../../utils/ai.js';
 import { CookieType } from '../../types/index.js';
+import { FOLDER_IMAGES } from '../../constants/index.js';
 
 Page({
   data: {
@@ -20,6 +21,9 @@ Page({
     searchDate: '',
     calendarDays: [],
     currentMonth: '',
+    calendarYear: 0,
+    calendarMonth: 0,
+    isEditMode: false,
     showInputModal: false,
     quadrantTypes: [
       { type: CookieType.IMPORTANT_URGENT, color: '#FF80AB', icon: '🍓', label: '紧急重要', order: 1 },
@@ -69,18 +73,38 @@ Page({
 
   onLoad() {
     this.loadFolders();
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = now.getMonth();
+    this.setData({
+      currentMonth: `${year}年${month + 1}月`,
+      selectedDate: dateUtils.getTodayString(),
+      calendarYear: year,
+      calendarMonth: month
+    });
+    this.generateCalendar(year, month);
   },
 
   onShow() {
     this.loadFolders();
   },
 
+  _addFolderImages(rawFolders) {
+    return rawFolders.map((f, index) => ({
+      ...f,
+      folderImage: FOLDER_IMAGES[index % FOLDER_IMAGES.length]
+    }));
+  },
+
   loadFolders() {
-    const folders = fragmentService.getFolders();
+    const rawFolders = fragmentService.getFolders();
+    const folders = this._addFolderImages(rawFolders);
     this.setData({ folders });
     // 如果日历已打开，更新日历显示
     if (this.data.showCalendarModal) {
-      this.generateCalendar();
+      const year = this.data.calendarYear || new Date().getFullYear();
+      const month = this.data.calendarMonth ?? new Date().getMonth();
+      this.generateCalendar(year, month);
     }
   },
 
@@ -120,7 +144,8 @@ Page({
 
     setTimeout(() => {
       const type = this.data.selectedType || CookieType.MUMBLING;
-      const folders = fragmentService.addEntry(this.data.inputValue, type);
+      const rawFolders = fragmentService.addEntry(this.data.inputValue, type);
+      const folders = this._addFolderImages(rawFolders);
       
       this.setData({
         folders,
@@ -214,25 +239,90 @@ Page({
 
   // 显示日历
   showCalendar() {
-    this.generateCalendar();
-    this.setData({ showCalendarModal: true });
+    const year = this.data.calendarYear || new Date().getFullYear();
+    const month = this.data.calendarMonth ?? new Date().getMonth();
+    this.generateCalendar(year, month);
+    this.setData({
+      showCalendarModal: true,
+      currentMonth: `${year}年${month + 1}月`
+    });
+  },
+
+  // 上个月
+  prevMonth() {
+    let { calendarYear, calendarMonth } = this.data;
+    if (calendarMonth === 0) {
+      calendarYear--;
+      calendarMonth = 11;
+    } else {
+      calendarMonth--;
+    }
+    this.setData({
+      calendarYear,
+      calendarMonth,
+      currentMonth: `${calendarYear}年${calendarMonth + 1}月`
+    });
+    this.generateCalendar(calendarYear, calendarMonth);
+  },
+
+  // 下个月
+  nextMonth() {
+    let { calendarYear, calendarMonth } = this.data;
+    if (calendarMonth === 11) {
+      calendarYear++;
+      calendarMonth = 0;
+    } else {
+      calendarMonth++;
+    }
+    this.setData({
+      calendarYear,
+      calendarMonth,
+      currentMonth: `${calendarYear}年${calendarMonth + 1}月`
+    });
+    this.generateCalendar(calendarYear, calendarMonth);
+  },
+
+  // 上一年
+  prevYear() {
+    const calendarYear = this.data.calendarYear - 1;
+    const calendarMonth = this.data.calendarMonth;
+    this.setData({
+      calendarYear,
+      currentMonth: `${calendarYear}年${calendarMonth + 1}月`
+    });
+    this.generateCalendar(calendarYear, calendarMonth);
+  },
+
+  // 下一年
+  nextYear() {
+    const calendarYear = this.data.calendarYear + 1;
+    const calendarMonth = this.data.calendarMonth;
+    this.setData({
+      calendarYear,
+      currentMonth: `${calendarYear}年${calendarMonth + 1}月`
+    });
+    this.generateCalendar(calendarYear, calendarMonth);
+  },
+
+  // 切换编辑模式
+  toggleEditMode() {
+    this.setData({ isEditMode: !this.data.isEditMode });
   },
 
   // 生成日历
-  generateCalendar() {
-    const now = new Date();
-    const year = now.getFullYear();
-    const month = now.getMonth();
+  generateCalendar(year, month) {
+    const y = year ?? new Date().getFullYear();
+    const m = month ?? new Date().getMonth();
     
     // 获取当月第一天是星期几
-    const firstDay = new Date(year, month, 1);
+    const firstDay = new Date(y, m, 1);
     const firstDayWeek = firstDay.getDay();
     
     // 获取当月天数
-    const daysInMonth = new Date(year, month + 1, 0).getDate();
+    const daysInMonth = new Date(y, m + 1, 0).getDate();
     
     // 获取上个月最后几天
-    const prevMonthDays = new Date(year, month, 0).getDate();
+    const prevMonthDays = new Date(y, m, 0).getDate();
     
     const days = [];
     const todayStr = dateUtils.getTodayString();
@@ -240,7 +330,7 @@ Page({
     // 添加上个月的最后几天
     for (let i = firstDayWeek - 1; i >= 0; i--) {
       const day = prevMonthDays - i;
-      const date = new Date(year, month - 1, day);
+      const date = new Date(y, m - 1, day);
       const dateStr = dateUtils.formatDate(date);
       const folder = this.data.folders.find(f => f.date === dateStr);
       const entryCount = folder ? folder.entries.length : 0;
@@ -251,13 +341,14 @@ Page({
         isCurrentMonth: false,
         isToday: false,
         hasContent: entryCount > 0,
-        bgColor: this.getDateColor(entryCount)
+        bgColor: this.getDateColor(entryCount),
+        isDark: entryCount > 8
       });
     }
     
     // 添加当月的天数
     for (let day = 1; day <= daysInMonth; day++) {
-      const date = new Date(year, month, day);
+      const date = new Date(y, m, day);
       const dateStr = dateUtils.formatDate(date);
       const folder = this.data.folders.find(f => f.date === dateStr);
       const entryCount = folder ? folder.entries.length : 0;
@@ -269,14 +360,15 @@ Page({
         isCurrentMonth: true,
         isToday: isToday,
         hasContent: entryCount > 0,
-        bgColor: this.getDateColor(entryCount)
+        bgColor: this.getDateColor(entryCount),
+        isDark: entryCount > 8
       });
     }
     
     // 补充下个月的前几天，使日历完整
     const remainingDays = 42 - days.length; // 6行 x 7天 = 42
     for (let day = 1; day <= remainingDays; day++) {
-      const date = new Date(year, month + 1, day);
+      const date = new Date(y, m + 1, day);
       const dateStr = dateUtils.formatDate(date);
       const folder = this.data.folders.find(f => f.date === dateStr);
       const entryCount = folder ? folder.entries.length : 0;
@@ -287,35 +379,44 @@ Page({
         isCurrentMonth: false,
         isToday: false,
         hasContent: entryCount > 0,
-        bgColor: this.getDateColor(entryCount)
+        bgColor: this.getDateColor(entryCount),
+        isDark: entryCount > 8
       });
     }
     
     this.setData({ 
       calendarDays: days,
-      currentMonth: `${year}年${month + 1}月`
+      currentMonth: `${y}年${m + 1}月`
     });
   },
 
-  // 根据记录数量获取日期背景色
+  // 根据记录数量获取日期背景色，数量越多颜色越深
   getDateColor(entryCount) {
     if (entryCount === 0) {
-      return 'white';
+      return '#FFFFFF';
+    } else if (entryCount === 1) {
+      return '#FFE8F0'; // 极淡粉
     } else if (entryCount <= 3) {
-      return '#FFE1F0'; // 淡粉色
-    } else if (entryCount <= 6) {
-      return '#FFB3D9'; // 中粉色
+      return '#FFD1E3'; // 淡粉
+    } else if (entryCount <= 5) {
+      return '#FFB3D9'; // 中淡粉
+    } else if (entryCount <= 8) {
+      return '#FF94CF'; // 中粉
+    } else if (entryCount <= 12) {
+      return '#FF80AB'; // 深粉
     } else {
-      return '#FF80AB'; // 深粉色
+      return '#E91E63'; // 最深粉
     }
   },
 
-  // 选择日历日期
+  // 选择日历日期 - 直接进入详情页
   selectCalendarDate(e) {
     const date = e.currentTarget.dataset.date;
     this.setData({ selectedDate: date });
-    // 自动搜索选中的日期
-    this.searchByDate();
+    this.hideCalendar();
+    wx.navigateTo({
+      url: `/pages/detail/detail?date=${date}`
+    });
   },
 
   // 隐藏日历
@@ -379,7 +480,8 @@ Page({
 
     try {
       const analysis = await aiService.analyzeToday(folder.entries);
-      const folders = fragmentService.updateAnalysis(date, analysis);
+      const rawFolders = fragmentService.updateAnalysis(date, analysis);
+      const folders = this._addFolderImages(rawFolders);
       this.setData({ folders });
     } catch (error) {
       wx.showToast({
@@ -393,6 +495,7 @@ Page({
 
   // 打开文件夹
   openFolder(e) {
+    if (this.data.isEditMode) return;
     const date = e.currentTarget.dataset.date;
     wx.navigateTo({
       url: `/pages/detail/detail?date=${date}`
@@ -412,7 +515,8 @@ Page({
       success: (res) => {
         if (res.confirm) {
           try {
-            const folders = fragmentService.deleteFolder(date);
+            const rawFolders = fragmentService.deleteFolder(date);
+            const folders = this._addFolderImages(rawFolders);
             this.setData({ folders });
             wx.showToast({
               title: '已删除',
@@ -442,18 +546,21 @@ Page({
 
   // 处理输入确认
   handleInputConfirm(e) {
-    const { text, type } = e.detail;
+    const { text, type, images, voicePath } = e.detail;
+    const hasContent = (text && text.trim()) || (images && images.length > 0) || voicePath;
     
-    if (!text || !text.trim()) {
+    if (!hasContent) {
       wx.showToast({
-        title: '请输入内容',
+        title: '请输入内容、选择图片或录制语音',
         icon: 'none'
       });
       return;
     }
     
     try {
-      const folders = fragmentService.addEntry(text.trim(), type);
+      const options = { images, voicePath };
+      const rawFolders = fragmentService.addEntry((text || '').trim() || '[图片/语音]', type, options);
+      const folders = this._addFolderImages(rawFolders);
       
       // 关闭输入弹窗
       this.setData({ 
@@ -472,36 +579,5 @@ Page({
         icon: 'none'
       });
     }
-  },
-
-  // 删除文件夹
-  deleteFolder(e) {
-    const date = e.currentTarget.dataset.date;
-    if (!date) {
-      return;
-    }
-    
-    wx.showModal({
-      title: '确认删除',
-      content: `确定要删除 ${date} 的数据吗？`,
-      success: (res) => {
-        if (res.confirm) {
-          try {
-            const folders = fragmentService.deleteFolder(date);
-            this.setData({ folders });
-            wx.showToast({
-              title: '已删除',
-              icon: 'success'
-            });
-          } catch (error) {
-            console.error('删除失败:', error);
-            wx.showToast({
-              title: '删除失败',
-              icon: 'none'
-            });
-          }
-        }
-      }
-    });
   }
 });

@@ -1,0 +1,80 @@
+/* 丰荣板块详情 */
+.container {
+  min-height: 100vh;
+  background: #FCE4EC;
+  padding: 32rpx;
+}
+
+.header {
+  text-align: center;
+  padding: 48rpx 0;
+  background: #FFF9C4;
+  border-radius: 32rpx;
+  margin-bottom: 32rpx;
+  border: 4rpx solid #6D4C41;
+}
+
+.header-icon {
+  font-size: 80rpx;
+  display: block;
+  margin-bottom: 16rpx;
+}
+
+.header-title {
+  font-size: 36rpx;
+  font-weight: bold;
+  color: #3E2723;
+  display: block;
+}
+
+.header-desc {
+  font-size: 24rpx;
+  color: rgba(62, 39, 35, 0.6);
+  margin-top: 8rpx;
+  display: block;
+}
+
+.history-list {
+  display: flex;
+  flex-direction: column;
+  gap: 24rpx;
+}
+
+.history-item {
+  background: white;
+  padding: 32rpx;
+  border-radius: 24rpx;
+  box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.06);
+  border-left: 8rpx solid #6D4C41;
+}
+
+.history-date {
+  font-size: 22rpx;
+  color: rgba(62, 39, 35, 0.5);
+  display: block;
+  margin-bottom: 12rpx;
+}
+
+.history-content {
+  font-size: 28rpx;
+  color: #3E2723;
+  line-height: 1.6;
+}
+
+.empty {
+  text-align: center;
+  padding: 80rpx 32rpx;
+}
+
+.empty-text {
+  font-size: 28rpx;
+  color: rgba(62, 39, 35, 0.6);
+  display: block;
+}
+
+.empty-hint {
+  font-size: 24rpx;
+  color: rgba(62, 39, 35, 0.4);
+  margin-top: 16rpx;
+  display: block;
+}

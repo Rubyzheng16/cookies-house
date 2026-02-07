@@ -21,20 +21,25 @@
 
 .input-group {
   display: flex;
+  flex-direction: column;
   gap: 16rpx;
 }
 
 .goal-input {
-  flex: 1;
+  width: 100%;
+  box-sizing: border-box;
+  min-height: 88rpx;
   background: rgba(255, 249, 196, 0.5);
   border: 4rpx solid white;
   border-radius: 32rpx;
   padding: 24rpx;
   color: #3E2723;
   font-size: 28rpx;
+  line-height: 1.5;
 }
 
 .split-btn {
+  width: 100%;
   background: #6D4C41;
   color: white;
   padding: 24rpx 48rpx;
@@ -108,8 +113,24 @@
 .goal-title-wrapper {
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 12rpx;
   flex: 1;
+  min-width: 0;
+  width: 100%;
+}
+
+/* 标题居中、横向排列，且不溢出 */
+.goal-title {
+  writing-mode: horizontal-tb;
+  display: inline-block;
+  white-space: normal;
+  word-break: break-all;
+  font-size: 36rpx;
+  font-weight: bold;
+  color: #3E2723;
+  max-width: 100%;
+  overflow-wrap: break-word;
 }
 
 .goal-type-dot {
@@ -120,42 +141,73 @@
   box-shadow: 0 2rpx 4rpx rgba(0, 0, 0, 0.2);
 }
 
+/* 板块最右上角的小×删除（贴边） */
+.goal-delete-x {
+  position: absolute;
+  top: 0;
+  right: -100rpx;
+  width: 72rpx;
+  height: 72rpx;
+  padding: 0;
+  margin: 0;
+  line-height: 72rpx;
+  font-size: 44rpx;
+  color: #999;
+  background: transparent;
+  border: none;
+  border-radius: 0 56rpx 0 24rpx;
+  z-index: 10;
+}
+
+.goal-delete-x::after {
+  border: none;
+}
+
+.goal-delete-x:active {
+  color: #B71C1C;
+  background: rgba(183, 28, 28, 0.1);
+}
+
 .goals-list {
   margin-top: 40rpx;
+  overflow: visible;
 }
 
 .goal-card {
   background: rgba(255, 255, 255, 0.6);
-  padding: 48rpx;
+  padding: 40rpx 36rpx 48rpx;
+  padding-top: 56rpx;
   border-radius: 64rpx;
   border: 8rpx solid white;
   box-shadow: 0 8rpx 32rpx rgba(0, 0, 0, 0.1);
   margin-bottom: 48rpx;
   position: relative;
   overflow: hidden;
+  box-sizing: border-box;
 }
 
 .goal-content {
   display: flex;
-  gap: 32rpx;
+  align-items: center;
+  gap: 24rpx;
+  min-width: 0;
 }
 
+/* 糖果罐：固定宽高，不随外框变化；上下缩小后垂直居中，完成前后大小一致 */
 .candy-jar {
-  width: 128rpx;
-  height: 192rpx;
+  width: 136rpx;
+  height: 200rpx;
+  flex-shrink: 0;
+  align-self: center;
   background: rgba(255, 255, 255, 0.4);
   border: 4rpx solid white;
   border-radius: 0 0 32rpx 32rpx;
   border-top-left-radius: 16rpx;
   border-top-right-radius: 16rpx;
   position: relative;
-  flex-shrink: 0;
   display: flex;
-  flex-wrap: wrap-reverse;
-  gap: 8rpx;
-  padding: 8rpx;
-  align-content: flex-start;
-  overflow: hidden;
+  flex-direction: column;
+  overflow: visible;
 }
 
 .jar-top {
@@ -167,35 +219,108 @@
   background: rgba(255, 255, 255, 0.6);
 }
 
+.jar-body {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 4rpx;
+  padding: 10rpx;
+  align-items: flex-end;
+  align-content: flex-end;
+  overflow: hidden;
+}
+
 .candy {
   width: 24rpx;
   height: 24rpx;
   border-radius: 50%;
+  flex-shrink: 0;
+}
+
+/* 堆叠糖果：轻微阴影增强层次感 */
+.candy-stack {
+  box-shadow: 0 2rpx 6rpx rgba(0, 0, 0, 0.15);
+}
+
+/* 掉落动画：从上方落下，带重力加速 + 落地碰撞 bounce */
+.candy-drop {
+  position: absolute;
+  bottom: 8rpx;
+  left: 50%;
+  transform: translateX(-50%);
+  box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.2);
+  animation: candy-fall 880ms cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+@keyframes candy-fall {
+  0% {
+    transform: translate(-50%, -220rpx) scale(0.8);
+    opacity: 0;
+  }
+  8% {
+    opacity: 1;
+  }
+  70% {
+    /* 重力加速：落至糖果层顶部，不超出罐底 */
+    transform: translate(-50%, 0) scale(1);
+  }
+  85% {
+    /* 碰撞 bounce：落地后反弹一点（向上） */
+    transform: translate(-50%, -16rpx) scale(1.05);
+  }
+  100% {
+    transform: translate(-50%, 0) scale(1);
+    opacity: 1;
+  }
 }
 
 .goal-info {
   flex: 1;
+  min-width: 0;
+  overflow: hidden;
 }
 
+/* 标题行：名称居中，右侧为×留空 */
 .goal-header {
   display: flex;
-  justify-content: space-between;
+  justify-content: center;
   align-items: center;
   margin-bottom: 16rpx;
+  padding-right: 72rpx;
+  min-width: 0;
 }
 
-.goal-title {
-  font-size: 36rpx;
-  font-weight: bold;
-  color: #3E2723;
+.expand-section {
+  margin-top: 24rpx;
+  width: 100%;
 }
 
 .expand-btn {
   font-size: 24rpx;
   color: #6D4C41;
   background: rgba(255, 255, 255, 0.5);
-  padding: 8rpx 16rpx;
+  padding: 12rpx 24rpx;
   border-radius: 50rpx;
+  border: none;
+  width: 100%;
+}
+
+.expand-btn::after {
+  border: none;
+}
+
+.delete-btn {
+  font-size: 22rpx;
+  color: #B71C1C;
+  background: transparent;
+  padding: 4rpx 8rpx;
+  border-radius: 32rpx;
+  border: 2rpx solid rgba(183, 28, 28, 0.3);
+}
+
+.delete-btn::after {
   border: none;
 }
 
@@ -219,39 +344,83 @@
   }
 }
 
-.steps-section {
+.next-step-preview {
+  margin-top: 16rpx;
+}
+
+/* 展开后：思维导图区域，展示所有子目标（含已完成，可当历史记录查看） */
+.mindmap-section {
   margin-top: 24rpx;
+  padding: 24rpx 0 0;
+  border-top: 2rpx dashed rgba(109, 76, 65, 0.2);
+  min-height: 80rpx;
 }
 
-.all-steps {
-  display: flex;
-  flex-direction: column;
-  gap: 16rpx;
+.history-label {
+  font-size: 24rpx;
+  color: #6D4C41;
+  opacity: 0.85;
+  margin-bottom: 16rpx;
+  padding-left: 8rpx;
 }
 
-.step-item {
+.mindmap-node {
+  margin-bottom: 32rpx;
+  position: relative;
+}
+
+.mindmap-branch {
+  width: 4rpx;
+  height: 24rpx;
+  background: linear-gradient(to bottom, #FF80AB, #B39DDB);
+  margin-bottom: 8rpx;
+  border-radius: 2rpx;
+}
+
+.mindmap-subtitle {
+  font-size: 26rpx;
+  font-weight: bold;
+  color: #6D4C41;
+  display: block;
+  margin-bottom: 16rpx;
+  padding-left: 16rpx;
+}
+
+.mindmap-step {
   display: flex;
   align-items: center;
   gap: 16rpx;
-  padding: 16rpx;
-  border-radius: 24rpx;
-  border: 2rpx solid #FFF176;
+  padding: 16rpx 16rpx 16rpx 32rpx;
+  margin-left: 16rpx;
+  border-left: 4rpx solid #FFF176;
+  border-radius: 0 24rpx 24rpx 0;
   background: #FFFDE7;
+  margin-bottom: 12rpx;
   font-size: 24rpx;
-  font-weight: bold;
 }
 
-.step-item.completed {
+.mindmap-step.completed {
   background: #F5F5F5;
-  opacity: 0.5;
+  opacity: 0.6;
   text-decoration: line-through;
   font-style: italic;
-  border-color: transparent;
+  border-left-color: #C8E6C9;
 }
 
-.step-text {
-  color: #3E2723;
+.mindmap-connector {
+  width: 12rpx;
+  height: 12rpx;
+  border-radius: 50%;
+  background: #FF80AB;
+  flex-shrink: 0;
+}
+
+.mindmap-step .step-text {
   flex: 1;
+  min-width: 0;
+  word-break: break-all;
+  overflow-wrap: break-word;
+  color: #3E2723;
 }
 
 .next-step-item {
@@ -263,10 +432,15 @@
   display: flex;
   align-items: center;
   gap: 24rpx;
+  min-width: 0;
+  overflow: hidden;
 }
 
 .next-step-content {
   flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  padding-right: 8rpx;
 }
 
 .next-step-label {
@@ -282,10 +456,17 @@
   color: #3E2723;
   font-weight: bold;
   display: block;
+  min-width: 0;
+  word-break: break-all;
+  overflow-wrap: break-word;
+}
+
+.goal-info .progress-bar {
+  margin-top: 20rpx;
+  margin-bottom: 4rpx;
 }
 
 .progress-bar {
-  margin-top: 32rpx;
   height: 12rpx;
   background: rgba(255, 255, 255, 0.5);
   border-radius: 12rpx;

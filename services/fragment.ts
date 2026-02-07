@@ -31,25 +31,50 @@ export const fragmentService = {
   },
 
   // 添加碎片
-  addEntry(text: string, type: CookieType): DayFolder[] {
+  // options: { startTime?, endTime?, date?, images?, voicePath? }
+  addEntry(text: string, type: CookieType, options: { startTime?: string; endTime?: string; date?: string; images?: string[]; voicePath?: string } = {}): DayFolder[] {
     const folders = this.getFolders();
-    const todayStr = dateUtils.getTodayString();
+    const targetDate = options.date || dateUtils.getTodayString();
     
     const newEntry: CookieEntry = {
       id: Math.random().toString(36).substr(2, 9),
-      text,
+      text: text || '',
       type,
       timestamp: Date.now()
     };
 
-    const existingFolderIndex = folders.findIndex(f => f.date === todayStr);
+    if (options.startTime && options.endTime) {
+      newEntry.startTime = options.startTime;
+      newEntry.endTime = options.endTime;
+    }
+    if (options.images && options.images.length > 0) {
+      newEntry.images = options.images;
+    }
+    if (options.voicePath) {
+      newEntry.voicePath = options.voicePath;
+    }
+
+    const existingFolderIndex = folders.findIndex(f => f.date === targetDate);
     
     if (existingFolderIndex > -1) {
       folders[existingFolderIndex].entries.unshift(newEntry);
     } else {
-      folders.unshift({ date: todayStr, entries: [newEntry] });
+      folders.unshift({ date: targetDate, entries: [newEntry] });
     }
 
+    this.saveFolders(folders);
+    return folders;
+  },
+
+  // 更新条目的时间范围
+  updateEntryTime(date: string, entryId: string, startTime: string, endTime: string): DayFolder[] {
+    const folders = this.getFolders();
+    const folder = folders.find(f => f.date === date);
+    if (!folder) return folders;
+    const entry = folder.entries.find(e => e.id === entryId);
+    if (!entry) return folders;
+    entry.startTime = startTime;
+    entry.endTime = endTime;
     this.saveFolders(folders);
     return folders;
   },

@@ -76,20 +76,20 @@
   line-height: 1;
 }
 
-/* 中间的加号按钮 */
+/* 中间的加号按钮（放大两倍） */
 .tab-bar-add-button {
   position: absolute;
   left: 50%;
   top: 0;
   transform: translateX(-50%);
-  width: 120rpx;
-  height: 120rpx;
+  width: 240rpx;
+  height: 240rpx;
   z-index: 10001;
   display: flex;
   align-items: center;
   justify-content: center;
   /* 让按钮一半在tabBar上，一半在内容区域，视觉上在导航栏中间 */
-  margin-top: -50rpx;
+  margin-top: -100rpx;
   pointer-events: auto;
 }
 
@@ -116,4 +116,16 @@
   color: white;
   font-weight: 300;
   line-height: 1;
+}
+
+/* 完整按钮图片：整圆替换，无额外装饰（放大两倍） */
+.add-btn-full-image {
+  width: 240rpx;
+  height: 240rpx;
+  display: block;
+  transition: transform 0.3s;
+}
+
+.tab-bar-add-button:active .add-btn-full-image {
+  transform: scale(0.9);
 }

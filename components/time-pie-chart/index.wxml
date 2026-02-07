@@ -1,0 +1,21 @@
+<!-- 24 小时环图：已记录=彩色，未记录=浅巧克力色 -->
+<view class="time-chart-container">
+  <view wx:if="{{hasData}}" class="chart-wrap">
+    <view class="pie-wrapper">
+      <canvas canvas-id="timePieCanvas" class="pie-canvas"></canvas>
+      <view class="pie-center">
+        <text class="pie-center-value">{{totalRecordedText}}</text>
+        <text class="pie-center-label">已记录</text>
+      </view>
+    </view>
+  </view>
+  <view wx:else class="empty-chart">
+    <text class="empty-text">今日暂无记录</text>
+  </view>
+  <view wx:if="{{hasData}}" class="legend">
+    <view wx:for="{{slices}}" wx:key="type" class="legend-item">
+      <view class="legend-dot" style="background: {{item.color}}"></view>
+      <text class="legend-label">{{item.label}} {{item.durationText}}</text>
+    </view>
+  </view>
+</view>

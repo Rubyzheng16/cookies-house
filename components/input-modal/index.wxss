@@ -17,19 +17,24 @@
   max-width: 700rpx;
   max-height: 80vh;
   overflow-y: auto;
+  overflow-x: hidden;
+  box-sizing: border-box;
 }
 
 .card {
   background: white;
   border-radius: 40rpx;
-  padding: 32rpx;
+  padding: 24rpx;
   box-shadow: 0 16rpx 64rpx rgba(0, 0, 0, 0.3);
+  box-sizing: border-box;
+  overflow: hidden;
 }
 
 .workbench {
   position: relative;
-  overflow: visible;
+  overflow-x: hidden;
   box-sizing: border-box;
+  width: 100%;
 }
 
 .workbench-top {
@@ -84,14 +89,74 @@
 
 .input-textarea {
   width: 100%;
-  min-height: 224rpx;
+  min-height: 180rpx;
   background: transparent;
   border: none;
   color: #3E2723;
-  font-size: 36rpx;
+  font-size: 32rpx;
   padding: 16rpx;
   line-height: 1.6;
   text-align: left;
+  box-sizing: border-box;
+}
+
+.image-preview-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12rpx;
+  padding: 12rpx 16rpx;
+}
+
+.image-preview-item {
+  position: relative;
+  width: 100rpx;
+  height: 100rpx;
+}
+
+.preview-thumb {
+  width: 100%;
+  height: 100%;
+  border-radius: 12rpx;
+}
+
+.preview-remove {
+  position: absolute;
+  top: -8rpx;
+  right: -8rpx;
+  width: 36rpx;
+  height: 36rpx;
+  background: rgba(255, 0, 0, 0.8);
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24rpx;
+  line-height: 1;
+}
+
+.voice-preview {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12rpx 16rpx;
+  background: rgba(255, 255, 255, 0.6);
+  border-radius: 12rpx;
+  margin: 0 16rpx 12rpx;
+}
+
+.voice-label {
+  font-size: 28rpx;
+  color: #3E2723;
+}
+
+.voice-remove {
+  font-size: 26rpx;
+  color: #999;
+}
+
+.icon-btn.recording {
+  background: rgba(255, 80, 80, 0.3);
 }
 
 .input-icons {
@@ -277,60 +342,65 @@
   font-size: 18rpx;
 }
 
+/* 四象限按钮 - 2x2 网格布局，紧凑尺寸 */
 .quadrant-buttons {
-  display: flex;
-  flex-direction: row;
-  gap: 6rpx;
-  margin: 16rpx 0 24rpx;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  grid-template-rows: 1fr 1fr;
+  gap: 8rpx;
+  margin: 12rpx 0 20rpx;
   width: 100%;
-  max-width: 100%;
+  height: 150rpx;
   box-sizing: border-box;
-  padding: 0;
-  justify-content: space-between;
+  overflow: hidden;
 }
 
 .quadrant-btn {
-  flex: 1;
-  min-width: 0;
-  max-width: calc(25% - 4.5rpx);
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 12rpx 4rpx;
+  padding: 8rpx 4rpx;
+  margin: 0;
   border-radius: 16rpx;
   border: none;
   transition: all 0.3s;
-  opacity: 0.8;
+  opacity: 0.9;
   box-sizing: border-box;
   overflow: hidden;
+  min-width: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.quadrant-btn:active {
+  opacity: 0.95;
 }
 
 .quadrant-btn.selected {
   opacity: 1;
   transform: scale(1.02);
-  box-shadow: 0 0 0 4rpx white;
+  box-shadow: 0 0 0 3rpx white;
 }
 
 .quadrant-icon {
-  font-size: 32rpx;
-  margin-bottom: 4rpx;
+  font-size: 26rpx;
+  margin-bottom: 2rpx;
   flex-shrink: 0;
 }
 
 .quadrant-label {
-  font-size: 20rpx;
+  font-size: 18rpx;
   font-weight: bold;
   color: #3E2723;
   text-align: center;
   line-height: 1.2;
   word-break: keep-all;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
   width: 100%;
   max-width: 100%;
   padding: 0 2rpx;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .confirm-btn {

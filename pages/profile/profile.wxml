@@ -4,46 +4,15 @@
   <view class="card user-card">
     <view class="avatar-container">
       <image 
+        wx:if="{{userInfo.avatarUrl}}"
         class="avatar"
-        src="{{userInfo.avatarUrl || '/assets/images/default-avatar.png'}}"
+        src="{{userInfo.avatarUrl}}"
         mode="aspectFill"
       />
+      <view wx:else class="avatar avatar-placeholder">🍪</view>
     </view>
     <text class="user-name">{{userInfo.nickName || '首席烘焙师'}}</text>
     <text class="user-desc">让生活每一分钟都带有甜味</text>
-  </view>
-
-  <!-- 钱包卡片 -->
-  <view class="card wallet-card">
-    <view class="wallet-item">
-      <text class="wallet-icon">👛</text>
-      <view class="wallet-info">
-        <text class="wallet-label">钱包余额</text>
-        <text class="wallet-amount">{{balance}} 饼干币</text>
-      </view>
-    </view>
-    <button class="recharge-btn" bindtap="handleRecharge">
-      <text class="recharge-icon">🪙</text>
-      <view class="recharge-info">
-        <text class="recharge-label">充值中心</text>
-        <text class="recharge-text">微信支付</text>
-      </view>
-    </button>
-  </view>
-
-  <!-- 今日运势 -->
-  <view class="card fortune-card">
-    <view class="fortune-header">
-      <text class="fortune-icon">🔮</text>
-      <text class="fortune-title">今日运势饼干</text>
-    </view>
-    <view class="fortune-content">
-      <text class="fortune-text">"今日火候刚好，适合处理那些被你搁置许久的抹茶曲奇任务。好运在下午三点的阳光里。"</text>
-      <view class="fortune-footer">
-        <text class="fortune-date">2026.01.15</text>
-        <text class="fortune-stars">★★★★★</text>
-      </view>
-    </view>
   </view>
 
   <!-- 设置列表 -->
@@ -54,21 +23,33 @@
     </view>
     <view class="settings-list">
       <button 
-        wx:for="{{settingsItems}}" 
-        wx:key="*this"
-        class="settings-item"
-        data-item="{{item}}"
-        bindtap="handleSetting"
+        class="settings-item settings-item-link"
+        bindtap="goProfileEdit"
       >
-        {{item}}
+        <text>个人资料</text>
+        <text class="settings-arrow">›</text>
+      </button>
+
+      <button 
+        class="settings-item settings-item-link"
+        bindtap="goAiSettings"
+      >
+        <text>AI 助手密钥</text>
+        <text class="settings-arrow">›</text>
+      </button>
+
+      <button 
+        class="settings-item settings-item-row"
+        hover-class="none"
+      >
+        <text class="settings-row-label">通知开关</text>
+        <switch 
+          class="settings-switch"
+          checked="{{notificationOn}}" 
+          bindchange="onNotificationChange" 
+          color="#6D4C41"
+        />
       </button>
     </view>
   </view>
-
-  <!-- 输入弹窗 -->
-  <input-modal 
-    show="{{showInputModal}}"
-    bind:close="hideInputModal"
-    bind:confirm="handleInputConfirm"
-  />
 </view>
