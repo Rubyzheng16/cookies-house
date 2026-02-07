@@ -18,6 +18,7 @@ export interface CookieEntry {
   endTime?: string;
   image?: string; // 单张图片（兼容旧数据）
   images?: string[]; // 多张图片
+  voicePath?: string; // 语音文件本地路径
 }
 
 export interface DayFolder {

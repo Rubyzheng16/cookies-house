@@ -100,6 +100,65 @@
   box-sizing: border-box;
 }
 
+.image-preview-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12rpx;
+  padding: 12rpx 16rpx;
+}
+
+.image-preview-item {
+  position: relative;
+  width: 100rpx;
+  height: 100rpx;
+}
+
+.preview-thumb {
+  width: 100%;
+  height: 100%;
+  border-radius: 12rpx;
+}
+
+.preview-remove {
+  position: absolute;
+  top: -8rpx;
+  right: -8rpx;
+  width: 36rpx;
+  height: 36rpx;
+  background: rgba(255, 0, 0, 0.8);
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24rpx;
+  line-height: 1;
+}
+
+.voice-preview {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12rpx 16rpx;
+  background: rgba(255, 255, 255, 0.6);
+  border-radius: 12rpx;
+  margin: 0 16rpx 12rpx;
+}
+
+.voice-label {
+  font-size: 28rpx;
+  color: #3E2723;
+}
+
+.voice-remove {
+  font-size: 26rpx;
+  color: #999;
+}
+
+.icon-btn.recording {
+  background: rgba(255, 80, 80, 0.3);
+}
+
 .input-icons {
   position: absolute;
   bottom: 16rpx;

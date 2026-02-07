@@ -109,6 +109,11 @@
             </view>
             <!-- 单图显示（兼容旧数据） -->
             <image wx:elif="{{item.image}}" src="{{item.image}}" class="entry-image" mode="aspectFit" bindtap="previewImage" data-images="{{[item.image]}}" data-index="0"></image>
+            <!-- 语音播放 -->
+            <view wx:if="{{item.voicePath}}" class="voice-player" bindtap="playVoice" data-path="{{item.voicePath}}">
+              <text class="voice-icon">{{playingVoice === item.voicePath ? '⏸️' : '▶️'}}</text>
+              <text class="voice-text">{{playingVoice === item.voicePath ? '暂停' : '播放语音'}}</text>
+            </view>
           </view>
         </view>
       </view>
@@ -181,6 +186,11 @@
                     </view>
                     <!-- 单图显示（兼容旧数据） -->
                     <image wx:elif="{{entry.image}}" src="{{entry.image}}" class="entry-image" mode="aspectFit" bindtap="previewImage" data-images="{{[entry.image]}}" data-index="0"></image>
+                    <!-- 语音播放 -->
+                    <view wx:if="{{entry.voicePath}}" class="voice-player" bindtap="playVoice" data-path="{{entry.voicePath}}">
+                      <text class="voice-icon">{{playingVoice === entry.voicePath ? '⏸️' : '▶️'}}</text>
+                      <text class="voice-text">{{playingVoice === entry.voicePath ? '暂停' : '播放语音'}}</text>
+                    </view>
                   </view>
                 </view>
               </view>

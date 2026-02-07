@@ -13,15 +13,24 @@
         bindinput="onInputChange"
         maxlength="500"
       />
+        <!-- 已选图片预览 -->
+        <view wx:if="{{selectedImages && selectedImages.length > 0}}" class="image-preview-list">
+          <view wx:for="{{selectedImages}}" wx:key="*this" class="image-preview-item">
+            <image src="{{item}}" mode="aspectFill" class="preview-thumb" />
+            <view class="preview-remove" bindtap="removeImage" data-index="{{index}}"><text>×</text></view>
+          </view>
+        </view>
+        <!-- 语音预览 -->
+        <view wx:if="{{voicePath}}" class="voice-preview">
+          <text class="voice-label">🎙️ 已录语音</text>
+          <text class="voice-remove" bindtap="removeVoice">移除</text>
+        </view>
         <view class="input-icons">
           <view class="icon-btn" bindtap="chooseImage">
             <text class="icon">🖼️</text>
           </view>
-          <view class="icon-btn" bindtap="chooseFile">
-            <text class="icon">📄</text>
-          </view>
-          <view class="icon-btn" bindtap="startRecord">
-            <text class="icon">🎙️</text>
+          <view class="icon-btn {{isRecording ? 'recording' : ''}}" bindtap="startRecord">
+            <text class="icon">{{isRecording ? '⏹️' : '🎙️'}}</text>
           </view>
         </view>
       </view>

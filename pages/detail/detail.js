@@ -31,7 +31,8 @@ Page({
     endPickerValue: [0, 0],
     previewImages: [],
     previewIndex: 0,
-    showImagePreview: false
+    showImagePreview: false,
+    playingVoice: ''
   },
 
   onLoad(options) {
@@ -42,6 +43,13 @@ Page({
 
   onShow() {
     this.loadData();
+  },
+
+  onUnload() {
+    if (this._voiceContext) {
+      this._voiceContext.destroy();
+      this._voiceContext = null;
+    }
   },
 
   loadData() {
@@ -303,19 +311,20 @@ Page({
 
   // 处理输入确认
   handleInputConfirm(e) {
-    const { text, type } = e.detail;
+    const { text, type, images, voicePath } = e.detail;
+    const hasContent = (text && text.trim()) || (images && images.length > 0) || voicePath;
     
-    if (!text || !text.trim()) {
+    if (!hasContent) {
       wx.showToast({
-        title: '请输入内容',
+        title: '请输入内容、选择图片或录制语音',
         icon: 'none'
       });
       return;
     }
     
     try {
-      const options = { date: this.data.date };
-      const folders = fragmentService.addEntry(text.trim(), type, options);
+      const options = { date: this.data.date, images, voicePath };
+      const folders = fragmentService.addEntry((text || '').trim() || '[图片/语音]', type, options);
       
       // 关闭输入弹窗
       this.setData({ showInputModal: false });
@@ -362,5 +371,35 @@ Page({
       urls: images,
       current: images[index || 0]
     });
+  },
+
+  // 播放/暂停语音
+  playVoice(e) {
+    const path = e.currentTarget.dataset.path;
+    if (!path) return;
+
+    if (this._voiceContext && this.data.playingVoice === path) {
+      this._voiceContext.pause();
+      this.setData({ playingVoice: '' });
+      return;
+    }
+
+    if (this._voiceContext) {
+      this._voiceContext.stop();
+      this._voiceContext.destroy();
+    }
+
+    const ctx = wx.createInnerAudioContext();
+    ctx.src = path;
+    ctx.obeyMuteSwitch = false;
+    ctx.onPlay(() => this.setData({ playingVoice: path }));
+    ctx.onEnded(() => this.setData({ playingVoice: '' }));
+    ctx.onError(() => {
+      this.setData({ playingVoice: '' });
+      wx.showToast({ title: '播放失败', icon: 'none' });
+    });
+    ctx.play();
+    this._voiceContext = ctx;
+    this.setData({ playingVoice: path });
   }
 });

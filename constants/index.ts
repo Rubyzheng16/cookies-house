@@ -1,8 +1,8 @@
 // 常量定义
 import { CookieType } from '../types';
+import { CDN_FOLDER_IMAGES, CDN_ADD_BTN } from '../config/cdn';
 
-/** 文件夹图片路径（6款），按日期随机分配 */
-export const FOLDER_IMAGES = [
+const LOCAL_FOLDER_IMAGES = [
   '/assets/images/folders/folder-1.png',
   '/assets/images/folders/folder-2.png',
   '/assets/images/folders/folder-3.png',
@@ -11,14 +11,13 @@ export const FOLDER_IMAGES = [
   '/assets/images/folders/folder-6.png'
 ];
 
-/** 根据日期字符串获取文件夹样式索引（0-5），同一日期始终返回相同值 */
-export function getFolderStyleIndex(dateStr: string): number {
-  const t = new Date(dateStr).getTime();
-  return Math.abs(Math.floor(t / 86400000) % 6);
-}
+/** 文件夹图片路径（6款），优先用 CDN，否则用本地 */
+export const FOLDER_IMAGES = LOCAL_FOLDER_IMAGES.map((local, i) =>
+  (CDN_FOLDER_IMAGES[i] || '').trim() || local
+);
 
-/** 底部加号按钮图片路径 */
-export const ADD_BTN_IMAGE = '/assets/images/add-btn.png';
+/** 底部加号按钮图片路径，优先用 CDN */
+export const ADD_BTN_IMAGE = (CDN_ADD_BTN || '').trim() || '/assets/images/add-btn.png';
 
 export const COLORS = {
   base: '#FCE4EC',

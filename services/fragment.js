@@ -31,14 +31,14 @@ export const fragmentService = {
   },
 
   // 添加碎片
-  // options: { startTime?, endTime?, date? } 任务时间范围 HH:mm，date 指定添加到的日期
+  // options: { startTime?, endTime?, date?, images?, voicePath? }
   addEntry(text, type, options = {}) {
     const folders = this.getFolders();
     const targetDate = options.date || dateUtils.getTodayString();
     
     const newEntry = {
       id: Math.random().toString(36).substr(2, 9),
-      text,
+      text: text || '',
       type,
       timestamp: Date.now()
     };
@@ -46,6 +46,12 @@ export const fragmentService = {
     if (options.startTime && options.endTime) {
       newEntry.startTime = options.startTime;
       newEntry.endTime = options.endTime;
+    }
+    if (options.images && options.images.length > 0) {
+      newEntry.images = options.images;
+    }
+    if (options.voicePath) {
+      newEntry.voicePath = options.voicePath;
     }
 
     const existingFolderIndex = folders.findIndex(f => f.date === targetDate);

@@ -105,15 +105,14 @@ Page({
 
   // 处理输入确认
   handleInputConfirm(e: any) {
-    const { text, type } = e.detail;
-    fragmentService.addEntry(text, type);
-    
-    // 重新加载数据
+    const { text, type, images, voicePath } = e.detail;
+    const hasContent = (text && text.trim()) || (images && images.length > 0) || voicePath;
+    if (!hasContent) {
+      wx.showToast({ title: '请输入内容、选择图片或录制语音', icon: 'none' });
+      return;
+    }
+    fragmentService.addEntry((text || '').trim() || '[图片/语音]', type, { images, voicePath });
     this.loadData();
-    
-    wx.showToast({
-      title: '已记录',
-      icon: 'success'
-    });
+    wx.showToast({ title: '已记录', icon: 'success' });
   }
 });

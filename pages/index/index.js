@@ -6,7 +6,7 @@ import { fragmentService } from '../../services/fragment.js';
 import { dateUtils } from '../../utils/date.js';
 import { aiService } from '../../utils/ai.js';
 import { CookieType } from '../../types/index.js';
-import { FOLDER_IMAGES, getFolderStyleIndex } from '../../constants/index.js';
+import { FOLDER_IMAGES } from '../../constants/index.js';
 
 Page({
   data: {
@@ -90,9 +90,9 @@ Page({
   },
 
   _addFolderImages(rawFolders) {
-    return rawFolders.map((f) => ({
+    return rawFolders.map((f, index) => ({
       ...f,
-      folderImage: FOLDER_IMAGES[getFolderStyleIndex(f.date)]
+      folderImage: FOLDER_IMAGES[index % FOLDER_IMAGES.length]
     }));
   },
 
@@ -546,18 +546,20 @@ Page({
 
   // 处理输入确认
   handleInputConfirm(e) {
-    const { text, type } = e.detail;
+    const { text, type, images, voicePath } = e.detail;
+    const hasContent = (text && text.trim()) || (images && images.length > 0) || voicePath;
     
-    if (!text || !text.trim()) {
+    if (!hasContent) {
       wx.showToast({
-        title: '请输入内容',
+        title: '请输入内容、选择图片或录制语音',
         icon: 'none'
       });
       return;
     }
     
     try {
-      const rawFolders = fragmentService.addEntry(text.trim(), type);
+      const options = { images, voicePath };
+      const rawFolders = fragmentService.addEntry((text || '').trim() || '[图片/语音]', type, options);
       const folders = this._addFolderImages(rawFolders);
       
       // 关闭输入弹窗

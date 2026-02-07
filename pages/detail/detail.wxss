@@ -733,3 +733,23 @@ page {
 .detail-add-button:active .add-btn-full-image {
   transform: scale(0.9);
 }
+
+/* 语音播放器 */
+.voice-player {
+  display: flex;
+  align-items: center;
+  gap: 8rpx;
+  margin-top: 12rpx;
+  padding: 12rpx 16rpx;
+  background: rgba(255, 255, 255, 0.6);
+  border-radius: 12rpx;
+}
+
+.voice-icon {
+  font-size: 32rpx;
+}
+
+.voice-text {
+  font-size: 26rpx;
+  color: #666;
+}
