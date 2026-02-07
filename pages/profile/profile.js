@@ -8,7 +8,6 @@ const NOTIFICATION_KEY = 'profile_notification_on';
 
 Page({
   data: {
-    balance: 1280,
     userInfo: null,
     notificationOn: true,
   },
@@ -55,9 +54,5 @@ Page({
     wx.setStorageSync(NOTIFICATION_KEY, value);
     this.setData({ notificationOn: value });
     wx.showToast({ title: value ? '已开启通知' : '已关闭通知', icon: 'none' });
-  },
-
-  handleRecharge() {
-    wx.showToast({ title: '支付功能开发中', icon: 'none' });
   },
 });

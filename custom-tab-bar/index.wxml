@@ -20,9 +20,10 @@
     <text class="tab-bar-text">{{list[1].text}}</text>
   </view>
   
-  <!-- 中间的加号按钮 -->
+  <!-- 中间的加号按钮：整图替换或默认样式 -->
   <view class="tab-bar-add-button" bindtap="onAddClick">
-    <view class="add-button-inner">
+    <image wx:if="{{addBtnImage}}" class="add-btn-full-image" src="{{addBtnImage}}" mode="aspectFit" />
+    <view wx:else class="add-button-inner">
       <text class="add-icon">+</text>
     </view>
   </view>

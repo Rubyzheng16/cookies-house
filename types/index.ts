@@ -12,6 +12,10 @@ export interface CookieEntry {
   text: string;
   type: CookieType;
   timestamp: number;
+  /** 任务开始时间 HH:mm，仅任务类型可选填写 */
+  startTime?: string;
+  /** 任务结束时间 HH:mm，仅任务类型可选填写 */
+  endTime?: string;
   image?: string; // 单张图片（兼容旧数据）
   images?: string[]; // 多张图片
 }

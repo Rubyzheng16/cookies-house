@@ -1,0 +1,24 @@
+<!-- 丰荣板块详情 -->
+<view class="container">
+  <view wx:if="{{categoryInfo}}" class="header">
+    <text class="header-icon">{{categoryInfo.icon}}</text>
+    <text class="header-title">{{categoryInfo.name}}</text>
+    <text class="header-desc">共完成 {{history.length}} 次</text>
+  </view>
+
+  <view class="history-list">
+    <view 
+      wx:for="{{history}}" 
+      wx:key="date"
+      class="history-item"
+    >
+      <text class="history-date">{{item.date}}</text>
+      <text class="history-content">{{item.content}}</text>
+    </view>
+  </view>
+
+  <view wx:if="{{history.length === 0}}" class="empty">
+    <text class="empty-text">暂无完成记录</text>
+    <text class="empty-hint">完成今日幸运饼干中该板块的任务即可点亮</text>
+  </view>
+</view>

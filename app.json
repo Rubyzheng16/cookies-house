@@ -7,11 +7,11 @@
     "pages/future/future",
     "pages/profile/profile",
     "pages/profile/edit/edit",
-    "pages/profile/ai/ai"
+    "pages/profile/ai/ai","pages/enrichment-detail/enrichment-detail"
   ],
   "window": {
     "navigationBarTextStyle": "white",
-    "navigationBarTitleText": "情绪饼干屋",
+    "navigationBarTitleText": "饼干记",
     "navigationBarBackgroundColor": "#6D4C41",
     "backgroundColor": "#FCE4EC"
   },

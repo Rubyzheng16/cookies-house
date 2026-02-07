@@ -2,6 +2,7 @@
 // 密钥只保存在本机本地存储中，需要调用 AI 时才会读取并随请求发给你的后端 / AI 网关。
 
 import { API_BASE_URL } from '../config/index.js';
+import { storage } from '../utils/storage.js';
 
 const AI_KEY_STORAGE = 'ai_api_key';
 // 直接复用后端 API 地址，本地为 http://localhost:3000
@@ -94,6 +95,130 @@ export const aiService = {
           } else {
             resolve([]);
           }
+        },
+      });
+    });
+  },
+
+  // 生成日记（完整日记 + 要点 + 洞察与建议）
+  // 若有自定义指令则使用，否则用默认
+  async generateDiary(entries) {
+    const apiKey = getLocalApiKey();
+    if (!apiKey) {
+      return null;
+    }
+
+    const customPrompt = storage.getDiaryPrompt ? storage.getDiaryPrompt() : '';
+    const data = {
+      apiKey,
+      entries: entries.map(e => ({
+        text: e.text,
+        type: e.type,
+        timestamp: e.timestamp
+      }))
+    };
+    if (customPrompt && customPrompt.trim()) {
+      data.customPrompt = customPrompt.trim();
+    }
+
+    return new Promise((resolve) => {
+      wx.request({
+        url: `${AI_BASE_URL}/api/analysis/diary`,
+        method: 'POST',
+        data,
+        success: (response) => {
+          const data = response.data;
+          if (
+            response.statusCode === 200 &&
+            data &&
+            data.code === 0 &&
+            data.data
+          ) {
+            resolve(data.data);
+          } else {
+            resolve(null);
+          }
+        },
+        fail: (error) => {
+          console.error('日记生成失败', error);
+          resolve(null);
+        }
+      });
+    });
+  },
+
+  // 生成心理日记（根据所有输入数据，心理咨询师视角）
+  async generateCounselorDiary(folders) {
+    const apiKey = getLocalApiKey();
+    if (!apiKey) {
+      return null;
+    }
+
+    const foldersData = folders.map((f) => ({
+      date: f.date,
+      entries: (f.entries || []).map((e) => ({
+        text: e.text,
+        type: e.type,
+        timestamp: e.timestamp
+      }))
+    }));
+
+    return new Promise((resolve) => {
+      wx.request({
+        url: `${AI_BASE_URL}/api/analysis/counselor-diary`,
+        method: 'POST',
+        data: { apiKey, folders: foldersData },
+        success: (response) => {
+          const data = response.data;
+          if (
+            response.statusCode === 200 &&
+            data &&
+            data.code === 0 &&
+            data.data &&
+            data.data.diary
+          ) {
+            resolve(data.data.diary);
+          } else {
+            resolve(null);
+          }
+        },
+        fail: (error) => {
+          console.error('心理日记生成失败', error);
+          resolve(null);
+        }
+      });
+    });
+  },
+
+  // 生成幸运饼干（丰荣板块任务）
+  async generateFortune(category) {
+    const apiKey = getLocalApiKey();
+    if (!apiKey) {
+      return null;
+    }
+
+    return new Promise((resolve) => {
+      wx.request({
+        url: `${AI_BASE_URL}/api/fortune/generate`,
+        method: 'POST',
+        data: { apiKey, category: category || undefined },
+        success: (response) => {
+          const data = response.data;
+          if (
+            response.statusCode === 200 &&
+            data &&
+            data.code === 0 &&
+            data.data &&
+            data.data.content
+          ) {
+            resolve({ content: data.data.content, category: data.data.category });
+          } else {
+            resolve(null);
+          }
+        },
+        fail: (error) => {
+          console.error('幸运饼干生成失败', error);
+          resolve(null);
         },
       });
     });

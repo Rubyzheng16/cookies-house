@@ -6,6 +6,7 @@ import { fragmentService } from '../../services/fragment.js';
 import { dateUtils } from '../../utils/date.js';
 import { aiService } from '../../utils/ai.js';
 import { CookieType } from '../../types/index.js';
+import { FOLDER_IMAGES, getFolderStyleIndex } from '../../constants/index.js';
 
 Page({
   data: {
@@ -88,8 +89,16 @@ Page({
     this.loadFolders();
   },
 
+  _addFolderImages(rawFolders) {
+    return rawFolders.map((f) => ({
+      ...f,
+      folderImage: FOLDER_IMAGES[getFolderStyleIndex(f.date)]
+    }));
+  },
+
   loadFolders() {
-    const folders = fragmentService.getFolders();
+    const rawFolders = fragmentService.getFolders();
+    const folders = this._addFolderImages(rawFolders);
     this.setData({ folders });
     // 如果日历已打开，更新日历显示
     if (this.data.showCalendarModal) {
@@ -135,7 +144,8 @@ Page({
 
     setTimeout(() => {
       const type = this.data.selectedType || CookieType.MUMBLING;
-      const folders = fragmentService.addEntry(this.data.inputValue, type);
+      const rawFolders = fragmentService.addEntry(this.data.inputValue, type);
+      const folders = this._addFolderImages(rawFolders);
       
       this.setData({
         folders,
@@ -331,7 +341,8 @@ Page({
         isCurrentMonth: false,
         isToday: false,
         hasContent: entryCount > 0,
-        bgColor: this.getDateColor(entryCount)
+        bgColor: this.getDateColor(entryCount),
+        isDark: entryCount > 8
       });
     }
     
@@ -349,7 +360,8 @@ Page({
         isCurrentMonth: true,
         isToday: isToday,
         hasContent: entryCount > 0,
-        bgColor: this.getDateColor(entryCount)
+        bgColor: this.getDateColor(entryCount),
+        isDark: entryCount > 8
       });
     }
     
@@ -367,7 +379,8 @@ Page({
         isCurrentMonth: false,
         isToday: false,
         hasContent: entryCount > 0,
-        bgColor: this.getDateColor(entryCount)
+        bgColor: this.getDateColor(entryCount),
+        isDark: entryCount > 8
       });
     }
     
@@ -377,16 +390,22 @@ Page({
     });
   },
 
-  // 根据记录数量获取日期背景色
+  // 根据记录数量获取日期背景色，数量越多颜色越深
   getDateColor(entryCount) {
     if (entryCount === 0) {
-      return 'white';
+      return '#FFFFFF';
+    } else if (entryCount === 1) {
+      return '#FFE8F0'; // 极淡粉
     } else if (entryCount <= 3) {
-      return '#FFE1F0'; // 淡粉色
-    } else if (entryCount <= 6) {
-      return '#FFB3D9'; // 中粉色
+      return '#FFD1E3'; // 淡粉
+    } else if (entryCount <= 5) {
+      return '#FFB3D9'; // 中淡粉
+    } else if (entryCount <= 8) {
+      return '#FF94CF'; // 中粉
+    } else if (entryCount <= 12) {
+      return '#FF80AB'; // 深粉
     } else {
-      return '#FF80AB'; // 深粉色
+      return '#E91E63'; // 最深粉
     }
   },
 
@@ -461,7 +480,8 @@ Page({
 
     try {
       const analysis = await aiService.analyzeToday(folder.entries);
-      const folders = fragmentService.updateAnalysis(date, analysis);
+      const rawFolders = fragmentService.updateAnalysis(date, analysis);
+      const folders = this._addFolderImages(rawFolders);
       this.setData({ folders });
     } catch (error) {
       wx.showToast({
@@ -495,7 +515,8 @@ Page({
       success: (res) => {
         if (res.confirm) {
           try {
-            const folders = fragmentService.deleteFolder(date);
+            const rawFolders = fragmentService.deleteFolder(date);
+            const folders = this._addFolderImages(rawFolders);
             this.setData({ folders });
             wx.showToast({
               title: '已删除',
@@ -536,7 +557,8 @@ Page({
     }
     
     try {
-      const folders = fragmentService.addEntry(text.trim(), type);
+      const rawFolders = fragmentService.addEntry(text.trim(), type);
+      const folders = this._addFolderImages(rawFolders);
       
       // 关闭输入弹窗
       this.setData({ 

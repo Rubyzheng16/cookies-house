@@ -145,7 +145,6 @@ Component({
           canConfirm: false
         });
 
-        // 触发确认事件，传递数据给父组件
         this.triggerEvent('confirm', {
           text: inputValue,
           type: type

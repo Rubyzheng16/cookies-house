@@ -1,6 +1,25 @@
 // 常量定义
 import { CookieType } from '../types/index.js';
 
+/** 文件夹图片路径（6款），按日期随机分配 */
+export const FOLDER_IMAGES = [
+  '/assets/images/folders/folder-1.png',
+  '/assets/images/folders/folder-2.png',
+  '/assets/images/folders/folder-3.png',
+  '/assets/images/folders/folder-4.png',
+  '/assets/images/folders/folder-5.png',
+  '/assets/images/folders/folder-6.png'
+];
+
+/** 根据日期字符串获取文件夹样式索引（0-5），同一日期始终返回相同值 */
+export function getFolderStyleIndex(dateStr) {
+  const t = new Date(dateStr).getTime();
+  return Math.abs(Math.floor(t / 86400000) % 6);
+}
+
+/** 底部加号按钮图片路径 */
+export const ADD_BTN_IMAGE = '/assets/images/add-btn.png';
+
 export const COLORS = {
   base: '#FCE4EC',
   header: '#6D4C41',

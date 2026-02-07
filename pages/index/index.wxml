@@ -6,7 +6,7 @@
       <view class="calendar-btn" bindtap="showCalendar">
         <text class="calendar-icon">📅</text>
       </view>
-      <text class="header-title">情绪饼干屋</text>
+      <text class="header-title">饼干记</text>
       <view class="edit-btn {{isEditMode ? 'edit-active' : ''}}" bindtap="toggleEditMode">
         <text class="edit-btn-text">{{isEditMode ? '完成' : '编辑'}}</text>
       </view>
@@ -34,12 +34,13 @@
           <view 
             wx:for="{{calendarDays}}" 
             wx:key="index"
-            class="calendar-day {{item.isCurrentMonth ? '' : 'other-month'}} {{item.isToday ? 'today' : ''}} {{item.date === selectedDate ? 'selected' : ''}}"
+            class="calendar-day {{item.isCurrentMonth ? '' : 'other-month'}} {{item.isToday ? 'today' : ''}} {{item.date === selectedDate ? 'selected' : ''}} {{item.isDark ? 'day-dark' : ''}}"
+            style="background-color: {{item.bgColor}}"
             bindtap="selectCalendarDate"
             data-date="{{item.date}}"
           >
             <text class="day-number">{{item.day}}</text>
-            <view wx:if="{{item.hasContent}}" class="day-dot"></view>
+            <view wx:if="{{item.hasContent && !item.isDark}}" class="day-dot"></view>
           </view>
         </view>
       </view>
@@ -53,10 +54,14 @@
       wx:key="date"
       class="folder-card"
     >
-      <view class="folder-content" bindtap="openFolder" data-date="{{item.date}}">
-        <text class="folder-icon">📂</text>
-        <text class="folder-date-label">{{item.date}}</text>
+      <view class="folder-image-wrapper" bindtap="openFolder" data-date="{{item.date}}">
+        <image 
+          class="folder-image" 
+          src="{{item.folderImage}}" 
+          mode="widthFix"
+        />
       </view>
+      <text class="folder-date-label">{{item.date}}</text>
       <view wx:if="{{isEditMode}}" class="folder-delete-btn" catchtap="deleteFolder" data-date="{{item.date}}">
         <text class="delete-icon">×</text>
       </view>

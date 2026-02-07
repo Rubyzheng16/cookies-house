@@ -2,7 +2,7 @@
 <view class="login-container">
   <view class="logo-card">
     <view class="logo-circle">🍪</view>
-    <text class="logo-title">情绪饼干屋</text>
+    <text class="logo-title">饼干记</text>
     <text class="logo-subtitle">用一块小饼干，托住今天的情绪</text>
   </view>
 

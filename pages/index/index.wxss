@@ -430,47 +430,49 @@
 .folders-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 24rpx;
+  gap: 32rpx;
   margin-top: 40rpx;
   padding: 0;
   box-sizing: border-box;
 }
 
 .folder-card {
-  background: #BCAAA4;
-  border-radius: 24rpx;
-  padding: 0;
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
-  box-shadow: 0 8rpx 32rpx rgba(0, 0, 0, 0.15);
-  transition: all 0.3s;
-  min-height: 240rpx;
   position: relative;
-  overflow: hidden;
+  background: transparent;
 }
 
-.folder-content {
-  flex: 1;
+.folder-image-wrapper {
   width: 100%;
-  padding: 48rpx 32rpx;
   display: flex;
-  flex-direction: column;
-  align-items: center;
   justify-content: center;
-  position: relative;
-  z-index: 1;
+  transition: transform 0.3s;
 }
 
-.folder-card:active .folder-content {
+.folder-card:active .folder-image-wrapper {
   transform: scale(0.95);
+}
+
+.folder-image {
+  width: 100%;
+  display: block;
+  /* 完整显示抠图，透明区域透出背景 */
+}
+
+.folder-date-label {
+  color: #3E2723;
+  font-size: 28rpx;
+  font-weight: bold;
+  text-align: center;
+  margin-top: 12rpx;
 }
 
 .folder-delete-btn {
   position: absolute;
-  top: 12rpx;
-  right: 12rpx;
+  top: 0;
+  right: 0;
   width: 56rpx;
   height: 56rpx;
   background: rgba(255, 0, 0, 0.2);
@@ -493,18 +495,6 @@
   font-size: 44rpx;
   font-weight: bold;
   line-height: 1;
-}
-
-.folder-icon {
-  font-size: 80rpx;
-  margin-bottom: 24rpx;
-}
-
-.folder-date-label {
-  color: #3E2723;
-  font-size: 28rpx;
-  font-weight: bold;
-  text-align: center;
 }
 
 .baking-overlay {
@@ -716,6 +706,10 @@
 
 .calendar-day.other-month {
   opacity: 0.3;
+}
+
+.calendar-day.day-dark .day-number {
+  color: #FFFFFF;
 }
 
 .calendar-day.today {

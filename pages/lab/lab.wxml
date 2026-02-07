@@ -7,98 +7,137 @@
       data-tab="daily"
       bindtap="switchTab"
     >
-      今日新鲜出炉
+      当天分析
     </button>
     <button 
       class="tab-btn {{tab === 'trends' ? 'active' : ''}}"
       data-tab="trends"
       bindtap="switchTab"
     >
-      陈年秘方
+      长期分析
     </button>
   </view>
 
-  <!-- 今日分析 -->
+  <!-- 当天分析 -->
   <view class="tab-content" wx:if="{{tab === 'daily'}}">
-    <!-- 成分分析表 -->
+    <!-- 时间消耗 -->
     <view class="card chart-section">
-      <text class="section-title">今日成分分析表</text>
-      <view class="chart-container">
-        <cookie-chart entries="{{todayFolder.entries || []}}" />
+      <text class="section-title">今日时间</text>
+      <time-pie-chart entries="{{todayFolder.entries || []}}" />
+    </view>
+
+    <!-- 日记指令（可折叠，所有人可用） -->
+    <view class="card diary-prompt-card">
+      <view class="diary-prompt-header" bindtap="togglePromptCollapse">
+        <text class="diary-prompt-title">日记指令</text>
+        <text class="diary-prompt-toggle">{{promptCollapsed ? '展开 ▼' : '收起 ▲'}}</text>
       </view>
-      <view class="stats-grid">
-        <view 
-          wx:for="{{cookieTypes}}" 
-          wx:key="type"
-          class="stat-item"
-        >
-          <text class="stat-icon">{{item.icon}}</text>
-          <text class="stat-text">{{item.label}}: {{getCount(item.type)}}块</text>
+      <view class="diary-prompt-body" wx:if="{{!promptCollapsed}}">
+        <text class="diary-prompt-desc">
+          自定义 AI 生成日记时的指令提示词。留空则使用默认指令。
+        </text>
+        <view class="diary-prompt-field">
+          <text class="diary-prompt-label">自定义指令（选填）</text>
+          <textarea
+            class="diary-prompt-textarea"
+            placeholder="此处留空则使用默认指令。可在此输入你的日记风格与要求..."
+            value="{{promptInput}}"
+            bindinput="onPromptInput"
+          />
+        </view>
+        <view class="diary-prompt-actions">
+          <button class="diary-prompt-save" bindtap="saveDiaryPrompt">保存</button>
+          <button wx:if="{{promptInput}}" class="diary-prompt-clear" bindtap="clearDiaryPrompt">恢复默认</button>
         </view>
       </view>
     </view>
 
-    <!-- AI分析 -->
-    <view class="card analysis-section">
-      <view class="analysis-header">
-        <text class="analysis-icon">🖋️</text>
-        <text class="analysis-title">烘焙师的密语</text>
+    <!-- AI 日记 -->
+    <view class="card diary-section">
+      <view class="diary-header">
+        <text class="diary-icon">📔</text>
+        <text class="diary-title">今日日记</text>
       </view>
-      <view class="analysis-body">
-        <view wx:if="{{todayFolder && todayFolder.analysis}}">
-          <text class="analysis-content">{{todayFolder.analysis}}</text>
+      <view class="diary-body">
+        <view wx:if="{{todayFolder && todayFolder.diaryAnalysis}}">
+          <view class="diary-block">
+            <text class="diary-label">完整日记</text>
+            <text class="diary-content">{{todayFolder.diaryAnalysis.diary}}</text>
+          </view>
+          <view wx:if="{{todayFolder.diaryAnalysis.keyPoints}}" class="diary-block">
+            <text class="diary-label">关键要点</text>
+            <text class="diary-content">{{todayFolder.diaryAnalysis.keyPoints}}</text>
+          </view>
+          <view wx:if="{{todayFolder.diaryAnalysis.insights}}" class="diary-block">
+            <text class="diary-label">洞察与建议</text>
+            <text class="diary-content insight">{{todayFolder.diaryAnalysis.insights}}</text>
+          </view>
         </view>
-        <view wx:else class="analysis-empty">
-          <text class="empty-text">今天的配方还没总结呢...</text>
+        <view wx:else class="diary-empty">
+          <text class="empty-text">今天的日记还没写呢...</text>
+          <text class="empty-hint">添加碎碎念和任务后，AI 会帮你生成完整日记</text>
         </view>
-        <button class="analyze-btn" bindtap="analyzeToday">
-          {{todayFolder && todayFolder.analysis ? '重新品鉴 ✨' : '✨ 开启品鉴'}}
+        <button class="diary-btn" bindtap="generateDiary">
+          {{todayFolder && todayFolder.diaryAnalysis ? '✨ 重新生成' : '✨ 生成今日日记'}}
         </button>
       </view>
     </view>
   </view>
 
-  <!-- 趋势分析 -->
+  <!-- 长期分析 -->
   <view class="tab-content" wx:if="{{tab === 'trends'}}">
-    <!-- 趋势图 -->
-    <view class="card trends-section">
-      <text class="section-title">我的饼干架 (7日趋势)</text>
-      <view class="trends-chart">
+    <!-- 幸运饼干 -->
+    <view class="fortune-section">
+      <text class="fortune-title">幸运饼干时刻</text>
+      <fortune-cookie 
+        todayFortune="{{todayFortune}}"
+        loading="{{fortuneLoading}}"
+        bind:fetch="onFortuneFetch"
+        bind:complete="onFortuneComplete"
+      />
+    </view>
+
+    <!-- 丰荣板块 -->
+    <view class="enrichment-panels">
+      <text class="section-title">丰荣板块</text>
+      <view class="panels-grid">
         <view 
-          wx:for="{{folders}}" 
-          wx:key="date"
-          wx:for-item="folder"
-          wx:if="{{index < 7}}"
-          class="trend-bar"
+          wx:for="{{enrichmentPanels}}" 
+          wx:key="id"
+          class="panel-card {{item.lit ? 'lit' : ''}}"
+          data-category="{{item.id}}"
+          bindtap="goToPanelDetail"
         >
-          <view 
-            class="bar"
-            style="height: {{getBarHeight(folder)}}%; background: linear-gradient(to top, #6D4C41, #FF80AB);"
-          ></view>
-          <text class="bar-label">{{getShortDate(folder.date)}}</text>
+          <text class="panel-icon">{{item.icon}}</text>
+          <text class="panel-name">{{item.name}}</text>
+          <text class="panel-desc" wx:if="{{item.lit}}">已完成 {{item.count}} 次</text>
+          <text class="panel-desc dim" wx:else>完成该板块任务即可点亮</text>
         </view>
       </view>
     </view>
 
-    <!-- 勋章 -->
-    <view class="medals-grid">
-      <view class="medal-card">
-        <text class="medal-icon">🏆</text>
-        <text class="medal-title">效率之王</text>
-        <text class="medal-desc">本周完成了12个树莓目标</text>
+    <!-- 心理日记（与今日日记同款布局） -->
+    <view class="card diary-section counselor-diary-section">
+      <view class="diary-header">
+        <text class="diary-icon">📖</text>
+        <text class="diary-title">心理日记</text>
       </view>
-      <view class="medal-card">
-        <text class="medal-icon">👑</text>
-        <text class="medal-title">成长勋章</text>
-        <text class="medal-desc">抹茶成分增加了20%</text>
+      <view class="diary-body">
+        <view wx:if="{{counselorDiary}}">
+          <view class="diary-block">
+            <text class="diary-label">完整日记</text>
+            <text class="diary-content counselor-diary-content">{{counselorDiary}}</text>
+          </view>
+        </view>
+        <view wx:else class="diary-empty">
+          <text class="empty-text">心理日记还没生成...</text>
+          <text class="empty-hint">根据所有记录，以心理咨询师视角生成深度心理日记（约 1500 字）</text>
+        </view>
+        <button class="diary-btn" bindtap="generateCounselorDiary" disabled="{{counselorLoading}}">
+          {{counselorDiary ? '✨ 重新生成' : '✨ 生成心理日记'}}
+        </button>
       </view>
     </view>
-  </view>
-
-  <!-- 幸运饼干 -->
-  <view class="fortune-section">
-    <text class="fortune-title">幸运饼干时刻</text>
-    <fortune-cookie />
   </view>
 
   <!-- 输入弹窗 -->

@@ -1,7 +1,10 @@
 // 自定义tabBar
+import { ADD_BTN_IMAGE } from '../constants/index.js';
+
 Component({
   data: {
     selected: 0,
+    addBtnImage: ADD_BTN_IMAGE,
     list: [
       {
         pagePath: '/pages/index/index',

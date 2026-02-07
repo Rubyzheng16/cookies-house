@@ -1,16 +1,18 @@
 // 详情页面
 const { fragmentService } = require('../../services/fragment.js');
 const { dateUtils } = require('../../utils/date.js');
-const { COOKIE_METADATA } = require('../../constants/index.js');
+const { COOKIE_METADATA, ADD_BTN_IMAGE } = require('../../constants/index.js');
 const { CookieType } = require('../../types/index.js');
 
 Page({
   data: {
+    addBtnImage: ADD_BTN_IMAGE,
     date: '',
     dateLabel: '',
     currentTime: '',
     entries: [],
     allDayEntries: [],
+    taskBlocksWithMumblings: [],
     timelineEntries: [],
     timeSlots: [],
     minuteGroups: [],
@@ -19,6 +21,14 @@ Page({
     entryIcons: {},
     quadrantDots: [[], [], [], []],
     showInputModal: false,
+    showTimeModal: false,
+    editingEntryId: '',
+    editingStartTime: '',
+    editingEndTime: '',
+    hourList: ['00','01','02','03','04','05','06','07','08','09','10','11','12','13','14','15','16','17','18','19','20','21','22','23'],
+    minuteList: ['00','01','02','03','04','05','06','07','08','09','10','11','12','13','14','15','16','17','18','19','20','21','22','23','24','25','26','27','28','29','30','31','32','33','34','35','36','37','38','39','40','41','42','43','44','45','46','47','48','49','50','51','52','53','54','55','56','57','58','59'],
+    startPickerValue: [0, 0],
+    endPickerValue: [0, 0],
     previewImages: [],
     previewIndex: 0,
     showImagePreview: false
@@ -45,11 +55,13 @@ Page({
         currentTime: this.getCurrentTime(),
         entries: [],
         allDayEntries: [],
+        taskBlocksWithMumblings: [],
         timelineEntries: [],
         timeSlots: [],
         quadrantDots: [[], [], [], []],
         entryColors: {},
-        entryIcons: {}
+        entryIcons: {},
+        diaryAnalysis: null
       });
       return;
     }
@@ -104,22 +116,40 @@ Page({
       currentTime = this.getCurrentTime();
     }
 
-    // 分离全天事件和有时间的事件（目前全部按时间分组展示）
+    // 时间轴：所有条目按记录时间（timestamp）显示，不排除已添加完成时间的任务
     const allDayEntries = [];
     const timeEntries = [];
 
+    const formatTimeStr = (ts) => {
+      if (!ts) return '';
+      const d = new Date(ts);
+      return String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0');
+    };
+
+    const parseTimeToMinutes = (t) => {
+      if (!t) return 0;
+      const p = t.split(':').map(Number);
+      return (p[0] || 0) * 60 + (p[1] || 0);
+    };
+
+    const formatDurationHours = (startTime, endTime) => {
+      if (!startTime || !endTime) return '';
+      const s = parseTimeToMinutes(startTime);
+      const e = parseTimeToMinutes(endTime);
+      const mins = Math.max(0, e - s);
+      const hours = mins / 60;
+      if (hours < 1) return '用时 约0.5小时';
+      if (hours % 1 === 0) return '用时 ' + hours + '小时';
+      return '用时 ' + hours.toFixed(1) + '小时';
+    };
+
     folder.entries.forEach(entry => {
-      // 兼容旧数据：如果没有timestamp，使用当前时间
-      if (!entry.timestamp) {
-        entry.timestamp = Date.now();
-      }
+      if (!entry.timestamp) entry.timestamp = Date.now();
       timeEntries.push(entry);
     });
 
-    // 按时间排序（先后输入顺序由时间决定）
     timeEntries.sort((a, b) => (a.timestamp || 0) - (b.timestamp || 0));
 
-    // 按分钟分组：同一分钟内的事件放在同一个时间块中
     const minuteGroupMap = {};
     timeEntries.forEach(entry => {
       const timestamp = entry.timestamp || Date.now();
@@ -127,26 +157,24 @@ Page({
       const hourStr = String(dateObj.getHours()).padStart(2, '0');
       const minuteStr = String(dateObj.getMinutes()).padStart(2, '0');
       const key = hourStr + ':' + minuteStr;
+      const timeStr = formatTimeStr(timestamp);
+      const durationStr = entry.type !== CookieType.MUMBLING && entry.startTime && entry.endTime
+        ? formatDurationHours(entry.startTime, entry.endTime) : '';
 
-      if (!minuteGroupMap[key]) {
-        minuteGroupMap[key] = [];
-      }
-
-      // 避免使用对象展开语法，改用 Object.assign
-      const entryWithTime = Object.assign({}, entry, {
-        timestamp: timestamp
-      });
-      minuteGroupMap[key].push(entryWithTime);
+      if (!minuteGroupMap[key]) minuteGroupMap[key] = [];
+      minuteGroupMap[key].push(Object.assign({}, entry, {
+        timestamp: timestamp,
+        timeStr: timeStr,
+        durationStr: durationStr
+      }));
     });
 
-    // 将分组结果转换为有序数组，按时间从早到晚排列（分钟级）
     const sortedKeys = Object.keys(minuteGroupMap).sort();
     const minuteGroups = sortedKeys.map(timeLabel => ({
       timeLabel: timeLabel,
       entries: minuteGroupMap[timeLabel]
     }));
 
-    // 生成按小时分组的数据：每个小时下面挂该小时内的分钟块
     const hourGroups = [];
     for (let hour = 0; hour < 24; hour++) {
       const hourStr = String(hour).padStart(2, '0');
@@ -170,13 +198,15 @@ Page({
       currentTime: currentTime,
       entries: folder.entries,
       allDayEntries: allDayEntries,
+      taskBlocksWithMumblings: [],
       timelineEntries: [],
       timeSlots: [],
       minuteGroups: minuteGroups,
       hourGroups: hourGroups,
       quadrantDots: quadrantDots,
       entryColors: entryColors,
-      entryIcons: entryIcons
+      entryIcons: entryIcons,
+      diaryAnalysis: folder.diaryAnalysis || null
     });
   },
 
@@ -208,6 +238,69 @@ Page({
     this.setData({ showInputModal: false });
   },
 
+  showAddTimeModal(e) {
+    const id = e.currentTarget.dataset.id;
+    const now = new Date();
+    const startH = now.getHours();
+    const startM = now.getMinutes();
+    const defStart = String(startH).padStart(2, '0') + ':' + String(startM).padStart(2, '0');
+    const endH = (startH + 1) % 24;
+    const defEnd = String(endH).padStart(2, '0') + ':' + String(startM).padStart(2, '0');
+    this.setData({
+      showTimeModal: true,
+      editingEntryId: id,
+      editingStartTime: defStart,
+      editingEndTime: defEnd,
+      startPickerValue: [startH, startM],
+      endPickerValue: [endH, startM]
+    });
+  },
+
+  hideAddTimeModal() {
+    this.setData({
+      showTimeModal: false,
+      editingEntryId: '',
+      editingStartTime: '',
+      editingEndTime: ''
+    });
+  },
+
+  onStartPickerChange(e) {
+    const val = e.detail.value;
+    const h = this.data.hourList[val[0]];
+    const m = this.data.minuteList[val[1]];
+    this.setData({
+      startPickerValue: val,
+      editingStartTime: h + ':' + m
+    });
+  },
+
+  onEndPickerChange(e) {
+    const val = e.detail.value;
+    const h = this.data.hourList[val[0]];
+    const m = this.data.minuteList[val[1]];
+    this.setData({
+      endPickerValue: val,
+      editingEndTime: h + ':' + m
+    });
+  },
+
+  saveEntryTime() {
+    const { editingEntryId, editingStartTime, editingEndTime } = this.data;
+    if (!editingStartTime || !editingEndTime) {
+      wx.showToast({ title: '请选择开始和结束时间', icon: 'none' });
+      return;
+    }
+    try {
+      fragmentService.updateEntryTime(this.data.date, editingEntryId, editingStartTime, editingEndTime);
+      this.hideAddTimeModal();
+      this.loadData();
+      wx.showToast({ title: '已添加时间', icon: 'success' });
+    } catch (err) {
+      wx.showToast({ title: '保存失败', icon: 'none' });
+    }
+  },
+
   // 处理输入确认
   handleInputConfirm(e) {
     const { text, type } = e.detail;
@@ -221,7 +314,8 @@ Page({
     }
     
     try {
-      const folders = fragmentService.addEntry(text.trim(), type);
+      const options = { date: this.data.date };
+      const folders = fragmentService.addEntry(text.trim(), type, options);
       
       // 关闭输入弹窗
       this.setData({ showInputModal: false });
