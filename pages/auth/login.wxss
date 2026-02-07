@@ -1,6 +1,6 @@
 .login-container {
   min-height: 100vh;
-  background: linear-gradient(180deg, #fce4ec 0%, #ffe0b2 100%);
+  background: transparent;
   padding: 80rpx 48rpx 48rpx;
   box-sizing: border-box;
   display: flex;

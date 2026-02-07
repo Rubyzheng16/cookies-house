@@ -17,6 +17,7 @@ Page({
     hourGroups: [],
     entryColors: {},
     entryIcons: {},
+    quadrantDots: [[], [], [], []],
     showInputModal: false,
     previewImages: [],
     previewIndex: 0,
@@ -46,11 +47,29 @@ Page({
         allDayEntries: [],
         timelineEntries: [],
         timeSlots: [],
+        quadrantDots: [[], [], [], []],
         entryColors: {},
         entryIcons: {}
       });
       return;
     }
+
+    // 统计各象限的任务数量，用于显示圆点
+    // [0]=紧急重要, [1]=重要不紧急, [2]=紧急不重要, [3]=不重要不紧急
+    const quadrantCounts = [0, 0, 0, 0];
+    const typeToQuadrant = {
+      [CookieType.IMPORTANT_URGENT]: 0,
+      [CookieType.IMPORTANT_NOT_URGENT]: 1,
+      [CookieType.URGENT_NOT_IMPORTANT]: 2,
+      [CookieType.NOT_IMPORTANT_NOT_URGENT]: 3
+    };
+    folder.entries.forEach(entry => {
+      const idx = typeToQuadrant[entry.type];
+      if (idx !== undefined) {
+        quadrantCounts[idx]++;
+      }
+    });
+    const quadrantDots = quadrantCounts.map(count => Array(count).fill(1));
 
     // 格式化日期标签
     let dateLabel = '';
@@ -155,6 +174,7 @@ Page({
       timeSlots: [],
       minuteGroups: minuteGroups,
       hourGroups: hourGroups,
+      quadrantDots: quadrantDots,
       entryColors: entryColors,
       entryIcons: entryIcons
     });

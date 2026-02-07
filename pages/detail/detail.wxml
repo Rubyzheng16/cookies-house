@@ -10,8 +10,42 @@
         <text class="header-date">{{dateLabel}}</text>
         <text class="header-time">{{currentTime}}</text>
       </view>
-      <view class="calendar-btn" bindtap="showCalendar">
-        <text class="calendar-icon">📅</text>
+      <view class="header-spacer"></view>
+    </view>
+  </view>
+
+  <!-- 四象限图 -->
+  <view class="quadrant-section">
+    <view class="quadrant-chart">
+      <view class="quadrant-grid">
+        <!-- 左上：第二象限 重要不紧急 -->
+        <view class="quadrant-cell quadrant-2">
+          <view class="quadrant-label">重要不紧急</view>
+          <view class="quadrant-dots">
+            <view wx:for="{{quadrantDots[1]}}" wx:key="index" class="quadrant-dot" style="background-color: #81C784;"></view>
+          </view>
+        </view>
+        <!-- 右上：第一象限 紧急重要 -->
+        <view class="quadrant-cell quadrant-1">
+          <view class="quadrant-label">紧急重要</view>
+          <view class="quadrant-dots">
+            <view wx:for="{{quadrantDots[0]}}" wx:key="index" class="quadrant-dot" style="background-color: #FF80AB;"></view>
+          </view>
+        </view>
+        <!-- 左下：第四象限 不重要不紧急 -->
+        <view class="quadrant-cell quadrant-4">
+          <view class="quadrant-label">不重要不紧急</view>
+          <view class="quadrant-dots">
+            <view wx:for="{{quadrantDots[3]}}" wx:key="index" class="quadrant-dot" style="background-color: #B39DDB;"></view>
+          </view>
+        </view>
+        <!-- 右下：第三象限 紧急不重要 -->
+        <view class="quadrant-cell quadrant-3">
+          <view class="quadrant-label">紧急不重要</view>
+          <view class="quadrant-dots">
+            <view wx:for="{{quadrantDots[2]}}" wx:key="index" class="quadrant-dot" style="background-color: #FFF176;"></view>
+          </view>
+        </view>
       </view>
     </view>
   </view>

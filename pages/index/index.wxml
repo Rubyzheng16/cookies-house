@@ -1,5 +1,5 @@
 <!--碎片收纳主界面-->
-<view class="container">
+<view class="page-root container">
   <!-- 头部 -->
   <view class="header">
     <view class="header-content">
@@ -7,6 +7,9 @@
         <text class="calendar-icon">📅</text>
       </view>
       <text class="header-title">情绪饼干屋</text>
+      <view class="edit-btn {{isEditMode ? 'edit-active' : ''}}" bindtap="toggleEditMode">
+        <text class="edit-btn-text">{{isEditMode ? '完成' : '编辑'}}</text>
+      </view>
     </view>
   </view>
 
@@ -14,11 +17,16 @@
   <view class="calendar-modal" wx:if="{{showCalendarModal}}" bindtap="hideCalendar">
     <view class="calendar-content" catchtap="stopPropagation">
       <view class="calendar-header">
-        <text class="calendar-title">选择日期</text>
+        <view class="calendar-header-left">
+          <view class="calendar-nav-btn" bindtap="prevYear">‹‹</view>
+          <view class="calendar-nav-btn" bindtap="prevMonth">‹</view>
+          <text class="calendar-title">{{currentMonth}}</text>
+          <view class="calendar-nav-btn" bindtap="nextMonth">›</view>
+          <view class="calendar-nav-btn" bindtap="nextYear">››</view>
+        </view>
         <text class="calendar-close" bindtap="hideCalendar">✕</text>
       </view>
       <view class="calendar-grid">
-        <view class="calendar-month">{{currentMonth}}</view>
         <view class="calendar-weekdays">
           <text wx:for="{{['日','一','二','三','四','五','六']}}" wx:key="*this" class="weekday">{{item}}</text>
         </view>
@@ -49,7 +57,7 @@
         <text class="folder-icon">📂</text>
         <text class="folder-date-label">{{item.date}}</text>
       </view>
-      <view class="folder-delete-btn" catchtap="deleteFolder" data-date="{{item.date}}">
+      <view wx:if="{{isEditMode}}" class="folder-delete-btn" catchtap="deleteFolder" data-date="{{item.date}}">
         <text class="delete-icon">×</text>
       </view>
     </view>

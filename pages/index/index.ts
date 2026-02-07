@@ -11,7 +11,10 @@ Page({
     calendarDays: [] as any[],
     selectedDate: '',
     showInputModal: false,
-    animationData: {} as any
+    animationData: {} as any,
+    calendarYear: 0,
+    calendarMonth: 0,
+    isEditMode: false
   },
 
   onLoad() {
@@ -41,7 +44,9 @@ Page({
     const month = now.getMonth();
     this.setData({
       currentMonth: `${year}年${month + 1}月`,
-      selectedDate: dateUtils.getTodayString()
+      selectedDate: dateUtils.getTodayString(),
+      calendarYear: year,
+      calendarMonth: month
     });
     this.generateCalendarDays(year, month);
   },
@@ -107,7 +112,74 @@ Page({
 
   // 显示日历
   showCalendar() {
-    this.setData({ showCalendarModal: true });
+    const year = this.data.calendarYear || new Date().getFullYear();
+    const month = this.data.calendarMonth ?? new Date().getMonth();
+    this.generateCalendarDays(year, month);
+    this.setData({
+      showCalendarModal: true,
+      currentMonth: `${year}年${month + 1}月`
+    });
+  },
+
+  // 上个月
+  prevMonth() {
+    let { calendarYear, calendarMonth } = this.data;
+    if (calendarMonth === 0) {
+      calendarYear--;
+      calendarMonth = 11;
+    } else {
+      calendarMonth--;
+    }
+    this.setData({
+      calendarYear,
+      calendarMonth,
+      currentMonth: `${calendarYear}年${calendarMonth + 1}月`
+    });
+    this.generateCalendarDays(calendarYear, calendarMonth);
+  },
+
+  // 下个月
+  nextMonth() {
+    let { calendarYear, calendarMonth } = this.data;
+    if (calendarMonth === 11) {
+      calendarYear++;
+      calendarMonth = 0;
+    } else {
+      calendarMonth++;
+    }
+    this.setData({
+      calendarYear,
+      calendarMonth,
+      currentMonth: `${calendarYear}年${calendarMonth + 1}月`
+    });
+    this.generateCalendarDays(calendarYear, calendarMonth);
+  },
+
+  // 上一年
+  prevYear() {
+    const calendarYear = this.data.calendarYear - 1;
+    const calendarMonth = this.data.calendarMonth;
+    this.setData({
+      calendarYear,
+      currentMonth: `${calendarYear}年${calendarMonth + 1}月`
+    });
+    this.generateCalendarDays(calendarYear, calendarMonth);
+  },
+
+  // 下一年
+  nextYear() {
+    const calendarYear = this.data.calendarYear + 1;
+    const calendarMonth = this.data.calendarMonth;
+    this.setData({
+      calendarYear,
+      currentMonth: `${calendarYear}年${calendarMonth + 1}月`
+    });
+    this.generateCalendarDays(calendarYear, calendarMonth);
+  },
+
+  // 切换编辑模式
+  toggleEditMode() {
+    this.setData({ isEditMode: !this.data.isEditMode });
   },
 
   // 隐藏日历
@@ -133,6 +205,7 @@ Page({
 
   // 打开文件夹
   openFolder(e: any) {
+    if (this.data.isEditMode) return;
     const date = e.currentTarget.dataset.date;
     wx.navigateTo({
       url: `/pages/detail/detail?date=${date}`

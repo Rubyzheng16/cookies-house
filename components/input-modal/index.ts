@@ -36,11 +36,12 @@ Component({
     showRef: false,
     isBaking: false,
     canConfirm: false,
+    // 按象限布局排列：左上2、右上1、左下4、右下3
     quadrantTypes: [
-      { type: CookieType.IMPORTANT_URGENT, color: '#FF80AB', icon: '🍓', label: '重要紧急' },
       { type: CookieType.IMPORTANT_NOT_URGENT, color: '#81C784', icon: '🍵', label: '重要不紧急' },
-      { type: CookieType.URGENT_NOT_IMPORTANT, color: '#FFF176', icon: '🍋', label: '紧急不重要' },
-      { type: CookieType.NOT_IMPORTANT_NOT_URGENT, color: '#B39DDB', icon: '🫐', label: '不重要不紧急' }
+      { type: CookieType.IMPORTANT_URGENT, color: '#FF80AB', icon: '🍓', label: '紧急重要' },
+      { type: CookieType.NOT_IMPORTANT_NOT_URGENT, color: '#B39DDB', icon: '🫐', label: '不重要不紧急' },
+      { type: CookieType.URGENT_NOT_IMPORTANT, color: '#FFF176', icon: '🍋', label: '紧急不重要' }
     ]
   },
 

@@ -1,14 +1,19 @@
 /* 碎片收纳主界面样式 */
-page {
+.page-root {
+  width: 100%;
+  min-height: 100vh;
   background-color: #FCE4EC;
   background-image: radial-gradient(#F8BBD0 2.5px, transparent 2.5px);
   background-size: 45px 45px;
-  min-height: 100vh;
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
 }
 
-.container {
+.page-root.container {
   padding: 20rpx;
   padding-bottom: 200rpx;
+  box-sizing: border-box;
 }
 
 .header {
@@ -33,6 +38,19 @@ page {
   border-bottom: 16rpx solid #3E2723;
   box-shadow: 0 8rpx 32rpx rgba(0, 0, 0, 0.2);
   border-top: 3rpx solid rgba(255, 249, 196, 0.8);
+  box-sizing: border-box;
+}
+
+/* 左右按钮等宽，保证标题居中 */
+.header-content .calendar-btn {
+  flex: 0 0 96rpx;
+}
+.header-content .edit-btn {
+  flex: 0 0 96rpx;
+  min-width: 96rpx;
+  width: 96rpx;
+  padding: 12rpx 0;
+  font-size: 24rpx;
 }
 
 .header-title {
@@ -414,7 +432,8 @@ page {
   grid-template-columns: 1fr 1fr;
   gap: 24rpx;
   margin-top: 40rpx;
-  padding: 0 20rpx;
+  padding: 0;
+  box-sizing: border-box;
 }
 
 .folder-card {
@@ -537,6 +556,7 @@ page {
 .calendar-btn {
   width: 80rpx;
   height: 80rpx;
+  min-width: 80rpx;
   background: rgba(255, 255, 255, 0.2);
   border-radius: 50%;
   display: flex;
@@ -586,10 +606,55 @@ page {
   margin-bottom: 32rpx;
 }
 
+.calendar-header-left {
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+  flex: 1;
+}
+
+.calendar-nav-btn {
+  width: 56rpx;
+  height: 56rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(93, 64, 55, 0.15);
+  border-radius: 50%;
+  font-size: 32rpx;
+  color: #3E2723;
+  font-weight: bold;
+}
+
+.calendar-nav-btn:active {
+  background: rgba(93, 64, 55, 0.3);
+}
+
 .calendar-title {
   font-size: 36rpx;
   font-weight: bold;
   color: #3E2723;
+  flex: 1;
+  text-align: center;
+}
+
+.edit-btn {
+  padding: 12rpx 24rpx;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 32rpx;
+  font-size: 26rpx;
+  color: white;
+  min-width: 80rpx;
+  text-align: center;
+}
+
+.edit-btn.edit-active {
+  background: rgba(255, 249, 196, 0.9);
+  color: #3E2723;
+}
+
+.edit-btn:active {
+  transform: scale(0.95);
 }
 
 .calendar-close {

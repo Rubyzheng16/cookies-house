@@ -28,7 +28,7 @@
 
       <!-- 四象限按钮 -->
       <view class="quadrant-buttons">
-        <button 
+        <view 
           wx:for="{{quadrantTypes}}" 
           wx:key="type"
           wx:for-index="idx"
@@ -39,7 +39,7 @@
         >
           <text class="quadrant-icon">{{item.icon}}</text>
           <text class="quadrant-label">{{item.label}}</text>
-        </button>
+        </view>
       </view>
 
       <view class="ref-toggle">

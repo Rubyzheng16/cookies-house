@@ -17,6 +17,7 @@ Page({
     hourGroups: [] as any[],
     entryColors: {} as Record<CookieType, string>,
     entryIcons: {} as Record<CookieType, string>,
+    quadrantDots: [] as number[][],
     showInputModal: false,
     previewImages: [] as string[],
     previewIndex: 0,
@@ -52,11 +53,26 @@ Page({
         allDayEntries: [],
         timelineEntries: [],
         timeSlots: [],
+        quadrantDots: [[], [], [], []],
         entryColors: {},
         entryIcons: {}
       });
       return;
     }
+
+    // 统计各象限的任务数量，用于显示圆点
+    const typeToQuadrant: Record<string, number> = {
+      [CookieType.IMPORTANT_URGENT]: 0,
+      [CookieType.IMPORTANT_NOT_URGENT]: 1,
+      [CookieType.URGENT_NOT_IMPORTANT]: 2,
+      [CookieType.NOT_IMPORTANT_NOT_URGENT]: 3
+    };
+    const quadrantCounts = [0, 0, 0, 0];
+    folder.entries.forEach(entry => {
+      const idx = typeToQuadrant[entry.type];
+      if (idx !== undefined) quadrantCounts[idx]++;
+    });
+    const quadrantDots = quadrantCounts.map(count => Array(count).fill(1));
 
     // 格式化日期标签
     let dateLabel = '';
@@ -163,6 +179,7 @@ Page({
       timeSlots: [],
       minuteGroups,
       hourGroups,
+      quadrantDots,
       entryColors,
       entryIcons
     });
