@@ -1,11 +1,10 @@
 // 登录/注册：微信 code 登录、token 与用户信息存储（与后端 /api/auth 对接）
 // 说明：这是 JS 版本，保证在未正确配置 TypeScript 编译时，小程序也能正常运行。
+// 真机调试时需在 config/index.js 中把 localhost 改成电脑局域网 IP
+import { API_BASE_URL } from '../config/index.js';
 
 const TOKEN_KEY = 'auth_token';
 const USER_KEY = 'auth_user';
-
-// 与 config/index.ts 中的 API_BASE_URL 保持一致
-const API_BASE_URL = 'http://localhost:3000';
 
 // 使用 wx.login 得到的 code 登录/注册，返回用户信息并写入本地
 export function login(code) {
@@ -25,7 +24,11 @@ export function login(code) {
           reject(new Error(data.message || `登录失败: ${res.statusCode}`));
         }
       },
-      fail: (err) => reject(err),
+      fail: (err) => {
+        const msg = err?.errMsg || err?.message || String(err);
+        console.error('[auth] 登录请求失败:', msg);
+        reject(new Error(msg));
+      },
     });
   });
 }

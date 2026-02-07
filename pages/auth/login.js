@@ -36,8 +36,14 @@ Page({
             }
             this.goToProfile();
           })
-          .catch(() => {
-            wx.showToast({ title: '登录失败，请稍后再试', icon: 'none' });
+          .catch((e) => {
+            const msg = e?.message || '登录失败，请稍后再试';
+            console.error('[login]', msg);
+            wx.showModal({
+              title: '登录失败',
+              content: msg,
+              showCancel: false,
+            });
           })
           .finally(() => {
             this.setData({ loading: false });
