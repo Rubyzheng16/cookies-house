@@ -11,7 +11,9 @@ Page({
     isLoading: false,
     expandedGoals: [] as string[],
     showInputModal: false,
-    droppingGoalId: '' as string | null
+    droppingGoalId: '' as string | null,
+    droppingCandyOffset: 0,
+    droppingCandyColor: '#FF80AB'
   },
 
   onLoad() {
@@ -101,23 +103,39 @@ Page({
     }
   },
 
-  // 完成步骤
+  // 切换步骤完成状态（打勾=完成+糖果掉落，取消=还原+糖果消失）
   completeStep(e: any) {
     const { goalId, stepId } = e.currentTarget.dataset;
-    // 触发糖果掉落动画
-    this.setData({ droppingGoalId: goalId as string });
+    const goal = (this.data.goals || []).find((g: Goal) => g.id === goalId);
+    const step = goal && (goal.steps || []).find((s: { id: string; completed: boolean }) => s.id === stepId);
+    const isUncomplete = step && step.completed;
 
-    // 等掉落动画播完（约 700ms）再更新列表，这样能看到糖果从上往下落
-    setTimeout(() => {
-      const goals = goalService.completeStep(goalId, stepId);
+    if (isUncomplete) {
+      const goals = goalService.toggleStep(goalId, stepId);
       const goalsWithProgress = this.withUiFields(goals, this.data.expandedGoals || []);
-      this.setData({ goals: goalsWithProgress, droppingGoalId: null });
-      wx.showToast({
-        title: '完成一步！',
-        icon: 'success',
-        duration: 1000
+      this.setData({ goals: goalsWithProgress });
+      wx.showToast({ title: '已取消', icon: 'none', duration: 800 });
+    } else {
+      const colors = ['#FF80AB', '#81C784', '#FFF176', '#B39DDB'];
+      const nextCount = (goal ? (goal.candyCount || 0) + 1 : 1);
+      const color = colors[(nextCount - 1) % 4];
+      const offset = Math.round((Math.random() - 0.5) * 80);
+      this.setData({
+        droppingGoalId: goalId as string,
+        droppingCandyOffset: offset,
+        droppingCandyColor: color
       });
-    }, 720);
+      setTimeout(() => {
+        const goals = goalService.toggleStep(goalId, stepId);
+        const goalsWithProgress = this.withUiFields(goals, this.data.expandedGoals || []);
+        this.setData({
+          goals: goalsWithProgress,
+          droppingGoalId: null,
+          droppingCandyOffset: 0
+        });
+        wx.showToast({ title: '完成一步！', icon: 'success', duration: 1000 });
+      }, 920);
+    }
   },
 
   // 编辑步骤内容（长按步骤）

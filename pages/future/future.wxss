@@ -21,20 +21,25 @@
 
 .input-group {
   display: flex;
+  flex-direction: column;
   gap: 16rpx;
 }
 
 .goal-input {
-  flex: 1;
+  width: 100%;
+  box-sizing: border-box;
+  min-height: 88rpx;
   background: rgba(255, 249, 196, 0.5);
   border: 4rpx solid white;
   border-radius: 32rpx;
   padding: 24rpx;
   color: #3E2723;
   font-size: 28rpx;
+  line-height: 1.5;
 }
 
 .split-btn {
+  width: 100%;
   background: #6D4C41;
   color: white;
   padding: 24rpx 48rpx;
@@ -140,7 +145,7 @@
 .goal-delete-x {
   position: absolute;
   top: 0;
-  right: 0;
+  right: -100rpx;
   width: 72rpx;
   height: 72rpx;
   padding: 0;
@@ -220,7 +225,7 @@
   display: flex;
   flex-direction: row;
   flex-wrap: wrap;
-  gap: 8rpx;
+  gap: 4rpx;
   padding: 10rpx;
   align-items: flex-end;
   align-content: flex-end;
@@ -234,26 +239,39 @@
   flex-shrink: 0;
 }
 
-/* 掉落动画：从上往下落进罐底 */
+/* 堆叠糖果：轻微阴影增强层次感 */
+.candy-stack {
+  box-shadow: 0 2rpx 6rpx rgba(0, 0, 0, 0.15);
+}
+
+/* 掉落动画：从上方落下，带重力加速 + 落地碰撞 bounce */
 .candy-drop {
   position: absolute;
   bottom: 8rpx;
   left: 50%;
   transform: translateX(-50%);
-  animation: candy-fall 650ms cubic-bezier(0.25, 0.1, 0.5, 1) forwards;
+  box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.2);
+  animation: candy-fall 880ms cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
 }
 
 @keyframes candy-fall {
   0% {
-    transform: translate(-50%, -200rpx);
-    opacity: 0.4;
+    transform: translate(-50%, -220rpx) scale(0.8);
+    opacity: 0;
   }
-  25% {
-    transform: translate(-50%, -80rpx);
+  8% {
     opacity: 1;
   }
+  70% {
+    /* 重力加速：落至糖果层顶部，不超出罐底 */
+    transform: translate(-50%, 0) scale(1);
+  }
+  85% {
+    /* 碰撞 bounce：落地后反弹一点（向上） */
+    transform: translate(-50%, -16rpx) scale(1.05);
+  }
   100% {
-    transform: translate(-50%, 0);
+    transform: translate(-50%, 0) scale(1);
     opacity: 1;
   }
 }

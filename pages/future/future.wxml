@@ -48,14 +48,15 @@
               wx:key="*this"
               wx:for-item="candy"
               wx:for-index="candyIndex"
-              class="candy"
+              class="candy candy-stack"
               style="background-color: {{['#FF80AB', '#81C784', '#FFF176', '#B39DDB'][candyIndex % 4]}};"
             ></view>
           </view>
-          <!-- 掉落动画糖果（完成步骤时从上往下落） -->
+          <!-- 掉落动画糖果（完成步骤时从上往下落，带重力感和碰撞 bounce） -->
           <view 
             wx:if="{{droppingGoalId === item.id}}"
             class="candy candy-drop"
+            style="background-color: {{droppingCandyColor}}; left: calc(50% + {{droppingCandyOffset}}rpx);"
           ></view>
         </view>
 
@@ -106,7 +107,6 @@
             >
               <checkbox 
                 checked="{{item.nextStep.completed}}"
-                disabled="{{item.nextStep.completed}}"
                 data-goal-id="{{item.id}}"
                 data-step-id="{{item.nextStep.id}}"
                 bindtap="completeStep"
@@ -147,7 +147,6 @@
               <view class="mindmap-connector"></view>
               <checkbox 
                 checked="{{step.completed}}"
-                disabled="{{step.completed}}"
                 data-goal-id="{{item.id}}"
                 data-step-id="{{step.id}}"
                 bindtap="completeStep"
