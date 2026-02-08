@@ -1,4 +1,6 @@
-// 幸运饼干组件（丰荣板块 AI 生成）
+// 幸运饼干组件（丰荣板块 AI 生成，图片版）
+const { FORTUNE_COOKIE_WHOLE, FORTUNE_COOKIE_BROKEN } = require('../../constants/index.js');
+
 Component({
   properties: {
     todayFortune: { type: Object, value: null },
@@ -7,7 +9,9 @@ Component({
 
   data: {
     isBroken: false,
-    awaitingFetch: false
+    awaitingFetch: false,
+    imgWhole: FORTUNE_COOKIE_WHOLE,
+    imgBroken: FORTUNE_COOKIE_BROKEN
   },
 
   observers: {

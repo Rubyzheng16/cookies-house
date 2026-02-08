@@ -1,16 +1,25 @@
-<!--幸运饼干组件-->
+<!--幸运饼干组件：点击前用完整饼干图，点击后破开饼干图+字条文字-->
 <view class="fortune-container">
   <view 
     class="cookie-wrapper {{loading ? 'loading' : ''}}"
     bindtap="breakCookie"
   >
+    <!-- 点击前：完整饼干图片 -->
     <view wx:if="{{!isBroken}}" class="cookie-whole">
-      <text class="cookie-icon">🍪</text>
+      <image 
+        class="cookie-img whole" 
+        src="{{imgWhole}}" 
+        mode="aspectFit"
+      />
     </view>
+    <!-- 点击后：破开饼干图片 + 字条上的 AI 文字 -->
     <view wx:else class="cookie-broken">
-      <view class="cookie-half left"></view>
-      <view class="cookie-half right"></view>
-      <view class="fortune-paper">
+      <image 
+        class="cookie-img broken" 
+        src="{{imgBroken}}" 
+        mode="aspectFit"
+      />
+      <view class="fortune-slip-overlay">
         <text class="fortune-text">{{todayFortune.content}}</text>
       </view>
     </view>

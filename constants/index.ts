@@ -19,6 +19,12 @@ export const FOLDER_IMAGES = LOCAL_FOLDER_IMAGES.map((local, i) =>
 /** 底部加号按钮图片路径，优先用 CDN */
 export const ADD_BTN_IMAGE = (CDN_ADD_BTN || '').trim() || '/assets/images/add-btn.png';
 
+/** 幸运饼干图片：完整饼干（点击前） */
+export const FORTUNE_COOKIE_WHOLE = '/assets/images/fortune-cookie/fortune-cookie-whole.png';
+
+/** 幸运饼干图片：破开饼干（点击后，字条区域留白以叠加文字） */
+export const FORTUNE_COOKIE_BROKEN = '/assets/images/fortune-cookie/fortune-cookie-broken.png';
+
 export const COLORS = {
   base: '#FCE4EC',
   header: '#6D4C41',

@@ -156,7 +156,7 @@ Component({
 
     drawPie(slices) {
       const ctx = wx.createCanvasContext('timePieCanvas', this);
-      const size = 260;
+      const size = 180; // 对应 360rpx 画布
       const cx = size / 2;
       const cy = size / 2;
       const outerR = size / 2 - 8;

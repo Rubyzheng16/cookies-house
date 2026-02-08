@@ -1,4 +1,4 @@
-/* 幸运饼干组件样式 */
+/* 幸运饼干组件：图片版 */
 .fortune-container {
   display: flex;
   flex-direction: column;
@@ -7,8 +7,8 @@
 
 .cookie-wrapper {
   position: relative;
-  width: 320rpx;
-  height: 192rpx;
+  width: 400rpx;
+  height: 280rpx;
   transition: transform 0.3s;
 }
 
@@ -16,7 +16,8 @@
   animation: pulse 1s infinite;
 }
 
-.cookie-whole {
+.cookie-whole,
+.cookie-broken {
   width: 100%;
   height: 100%;
   display: flex;
@@ -24,58 +25,52 @@
   justify-content: center;
 }
 
-.cookie-icon {
-  font-size: 120rpx;
-}
-
-.cookie-broken {
-  position: relative;
+.cookie-img {
   width: 100%;
   height: 100%;
 }
 
-.cookie-half {
-  position: absolute;
-  width: 50%;
-  height: 100%;
-  background: #FFCC80;
-  border: 2rpx solid #E65100;
+.cookie-img.whole {
+  max-width: 320rpx;
+  max-height: 240rpx;
 }
 
-.cookie-half.left {
-  left: -40rpx;
-  top: 0;
-  border-radius: 0 0 0 32rpx;
-  transform: rotate(-15deg);
+.cookie-img.broken {
+  max-width: 400rpx;
+  max-height: 280rpx;
 }
 
-.cookie-half.right {
-  right: -40rpx;
-  top: 0;
-  border-radius: 0 0 32rpx 0;
-  transform: rotate(15deg);
+/* 破开饼干：字条区域 overlay，AI 文字叠在图片字条上 */
+.cookie-broken {
+  position: relative;
 }
 
-.fortune-paper {
+/* 字条 overlay：叠在破开饼干图片的字条区域，可据实际图片调整 top/left/width */
+.fortune-slip-overlay {
   position: absolute;
   top: 50%;
   left: 50%;
-  transform: translate(-50%, -50%) rotate(-2deg);
-  background: white;
-  padding: 24rpx 32rpx;
-  box-shadow: 0 8rpx 32rpx rgba(0, 0, 0, 0.2);
-  border: 2rpx solid #E3F2FD;
-  max-width: 85%;
-  z-index: 10;
+  transform: translate(-50%, -50%);
+  width: 70%;
+  max-width: 260rpx;
+  min-height: 120rpx;
+  padding: 20rpx 28rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  /* 若图片字条为透明/留白，可取消下面注释以显示纸质感 */
+  /* background: rgba(255, 255, 255, 0.92); */
+  /* box-shadow: 0 2rpx 12rpx rgba(0, 0, 0, 0.08); */
 }
 
 .fortune-text {
-  font-size: 24rpx;
+  font-size: 22rpx;
   color: #1565C0;
   font-family: serif;
-  line-height: 1.4;
+  line-height: 1.5;
   text-align: center;
-  display: block;
+  word-break: break-word;
 }
 
 .fortune-hint {
@@ -95,6 +90,10 @@
   border: 4rpx solid #6D4C41;
   border-radius: 48rpx;
   padding: 16rpx 48rpx;
+}
+
+.complete-btn::after {
+  border: none;
 }
 
 @keyframes pulse {
