@@ -1,4 +1,4 @@
-<!-- 丰荣板块详情 -->
+<!-- 丰容板块详情 -->
 <view class="container">
   <view wx:if="{{categoryInfo}}" class="header">
     <text class="header-icon">{{categoryInfo.icon}}</text>

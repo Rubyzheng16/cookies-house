@@ -2,6 +2,7 @@
 import { DayFolder } from '../../types';
 import { fragmentService } from '../../services/fragment';
 import { dateUtils } from '../../utils/date';
+import { FOLDER_IMAGES } from '../../constants';
 
 Page({
   data: {
@@ -33,8 +34,21 @@ Page({
   },
 
   loadFolders() {
-    const folders = fragmentService.getFolders();
+    const rawFolders = fragmentService.getFolders();
+    const withContent = rawFolders.filter(f => f.entries && f.entries.length > 0);
+    const folders = this.addFolderImages(withContent);
     this.setData({ folders });
+  },
+
+  // 按日期降序排序后分配图案，确保图案稳定（新日期用图案1，旧日期依次用2、3...）
+  addFolderImages(rawFolders: DayFolder[]): DayFolder[] {
+    const sorted = [...rawFolders].sort((a, b) => (b.date > a.date ? 1 : -1));
+    const dateToIndex = new Map<string, number>();
+    sorted.forEach((f, i) => dateToIndex.set(f.date, i));
+    return rawFolders.map(f => ({
+      ...f,
+      folderImage: FOLDER_IMAGES[(dateToIndex.get(f.date) ?? 0) % FOLDER_IMAGES.length]
+    }));
   },
 
   // 初始化日历
@@ -107,7 +121,7 @@ Page({
   hasContentForDate(date: string): boolean {
     const folders = fragmentService.getFolders();
     const folder = folders.find(f => f.date === date);
-    return folder ? folder.entries.length > 0 : false;
+    return !!(folder && folder.entries && folder.entries.length > 0);
   },
 
   // 显示日历
@@ -192,21 +206,34 @@ Page({
     // 空函数，用于阻止事件冒泡
   },
 
-  // 选择日历日期
+  // 选择日历日期（仅允许跳转到有记录的日期）
   selectCalendarDate(e: any) {
     const date = e.currentTarget.dataset.date;
+    if (!this.hasContentForDate(date)) {
+      wx.showToast({
+        title: '该日期暂无记录',
+        icon: 'none'
+      });
+      return;
+    }
     this.setData({ selectedDate: date });
     this.hideCalendar();
-    // 跳转到详情页
     wx.navigateTo({
       url: `/pages/detail/detail?date=${date}`
     });
   },
 
-  // 打开文件夹
+  // 打开文件夹（仅允许打开有记录的日期）
   openFolder(e: any) {
     if (this.data.isEditMode) return;
     const date = e.currentTarget.dataset.date;
+    if (!this.hasContentForDate(date)) {
+      wx.showToast({
+        title: '该日期暂无记录',
+        icon: 'none'
+      });
+      return;
+    }
     wx.navigateTo({
       url: `/pages/detail/detail?date=${date}`
     });

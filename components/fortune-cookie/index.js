@@ -1,4 +1,4 @@
-// 幸运饼干组件（丰荣板块 AI 生成，图片版）
+// 幸运饼干组件（丰容板块 AI 生成，图片版）
 const { FORTUNE_COOKIE_WHOLE, FORTUNE_COOKIE_BROKEN } = require('../../constants/index.js');
 
 Component({
@@ -42,6 +42,7 @@ Component({
     },
 
     onComplete() {
+      this.setData({ isBroken: false });
       this.triggerEvent('complete');
     }
   }

@@ -206,20 +206,26 @@ Page({
     this.setData({ showInputModal: false });
   },
 
-  // 处理输入确认
+  // 处理输入确认（保存到当前页面的日期）
   handleInputConfirm(e: any) {
-    const { text, type } = e.detail;
+    const { text, type, images, voicePath } = e.detail;
+    const hasContent = (text && text.trim()) || (images && images.length > 0) || voicePath;
     
-    if (!text || !text.trim()) {
+    if (!hasContent) {
       wx.showToast({
-        title: '请输入内容',
+        title: '请输入内容、选择图片或录制语音',
         icon: 'none'
       });
       return;
     }
     
     try {
-      const folders = fragmentService.addEntry(text.trim(), type);
+      const options = {
+        date: this.data.date,
+        images: images && images.length > 0 ? images : undefined,
+        voicePath: voicePath || undefined
+      };
+      const folders = fragmentService.addEntry((text || '').trim() || '[图片/语音]', type, options);
       
       // 关闭输入弹窗
       this.setData({ showInputModal: false });

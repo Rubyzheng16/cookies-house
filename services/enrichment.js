@@ -1,9 +1,9 @@
-// 丰荣板块服务
+// 丰容板块服务
 import { storage } from '../utils/storage.js';
 import { dateUtils } from '../utils/date.js';
-import { ENRICHMENT_CATEGORIES } from '../constants/enrichment.js';
+import { ENRICHMENT_CATEGORIES } from '../constants/index.js';
 
-const FORTUNES_PER_DAY = 3;
+const FORTUNES_PER_DAY = 5;
 
 function getTodayFortunesList(data) {
   const todayStr = dateUtils.getTodayString();

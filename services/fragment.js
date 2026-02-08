@@ -4,10 +4,10 @@ import { storage } from '../utils/storage.js';
 import { dateUtils } from '../utils/date.js';
 
 export const fragmentService = {
-  // 获取所有文件夹
+  // 获取所有文件夹（合并多个日期的数据，不会覆盖已有数据）
   getFolders() {
     const saved = storage.getCookies();
-    if (saved.length === 0) {
+    if (!Array.isArray(saved) || saved.length === 0) {
       return [{ date: dateUtils.getTodayString(), entries: [] }];
     }
     // 自动修复旧数据（避免使用对象展开语法，改用Object.assign）
@@ -30,7 +30,7 @@ export const fragmentService = {
     storage.saveCookies(folders);
   },
 
-  // 添加碎片
+  // 添加碎片（会合并到现有文件夹，不会覆盖其他日期的数据）
   // options: { startTime?, endTime?, date?, images?, voicePath? }
   addEntry(text, type, options = {}) {
     const folders = this.getFolders();

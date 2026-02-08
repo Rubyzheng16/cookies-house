@@ -19,11 +19,14 @@ export const storage = {
     }
   },
 
-  // 获取饼干数据
+  // 获取饼干数据（确保始终返回数组，兼容旧格式）
   getCookies() {
     try {
       const data = wx.getStorageSync(STORAGE_KEYS.COOKIES);
-      return data || [];
+      if (Array.isArray(data)) return data;
+      // 兼容旧格式：{ folders: [...] }
+      if (data && typeof data === 'object' && Array.isArray(data.folders)) return data.folders;
+      return [];
     } catch (e) {
       console.error('获取饼干数据失败', e);
       return [];
@@ -69,23 +72,23 @@ export const storage = {
     }
   },
 
-  // 获取丰荣数据
+  // 获取丰容数据
   getEnrichmentData() {
     try {
       const data = wx.getStorageSync(STORAGE_KEYS.ENRICHMENT);
       return data || { todayFortune: null, litPanels: {} };
     } catch (e) {
-      console.error('获取丰荣数据失败', e);
+      console.error('获取丰容数据失败', e);
       return { todayFortune: null, litPanels: {} };
     }
   },
 
-  // 保存丰荣数据
+  // 保存丰容数据
   saveEnrichmentData(data) {
     try {
       wx.setStorageSync(STORAGE_KEYS.ENRICHMENT, data);
     } catch (e) {
-      console.error('保存丰荣数据失败', e);
+      console.error('保存丰容数据失败', e);
     }
   },
 

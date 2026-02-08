@@ -39,6 +39,14 @@
       </button>
 
       <button 
+        class="settings-item settings-item-link"
+        bindtap="exportData"
+      >
+        <text>数据备份</text>
+        <text class="settings-arrow">›</text>
+      </button>
+
+      <button 
         class="settings-item settings-item-row"
         hover-class="none"
       >

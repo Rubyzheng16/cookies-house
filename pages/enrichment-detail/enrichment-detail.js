@@ -1,4 +1,4 @@
-// 丰荣板块详情页
+// 丰容板块详情页
 import { enrichmentService } from '../../services/enrichment.js';
 
 Page({

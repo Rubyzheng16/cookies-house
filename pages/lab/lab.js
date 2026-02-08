@@ -5,15 +5,6 @@ import { aiService } from '../../utils/ai.js';
 import { enrichmentService } from '../../services/enrichment.js';
 import { storage } from '../../utils/storage.js';
 
-// AI 失败时的降级任务列表
-const FALLBACK_TASKS = [
-  '数一数地板上有多少块瓷砖。',
-  '对着窗户发呆5分钟，寻找一朵像猫的云。',
-  '给家里的每一盆绿植取个名字。',
-  '尝试用非惯用手画一个完美的圆。',
-  '闭上眼，仔细分辨空气中可以闻到的三种味道。'
-];
-
 Page({
   data: {
     folders: [],
@@ -96,19 +87,20 @@ Page({
     }
   },
 
-  // 幸运饼干：用户点击抽取（每天最多 3 个）
+  // 幸运饼干：用户点击抽取（每天最多 5 个，内容由 AI 生成）
   async onFortuneFetch() {
     if (this.data.fortuneLoading) return;
     if (!enrichmentService.canFetchMoreFortune()) {
-      wx.showToast({ title: '今日已生成 3 个，明天再来吧', icon: 'none' });
+      wx.showToast({ title: '今日已生成 5 个，明天再来吧', icon: 'none' });
       return;
     }
     this.setData({ fortuneLoading: true });
 
-    let result = await aiService.generateFortune();
-    if (!result) {
-      const fallback = FALLBACK_TASKS[Math.floor(Math.random() * FALLBACK_TASKS.length)];
-      result = { content: fallback, category: 'selfCare' };
+    const result = await aiService.generateFortune();
+    if (!result || !result.content) {
+      wx.showToast({ title: '生成失败，请检查 AI 配置或稍后重试', icon: 'none' });
+      this.setData({ fortuneLoading: false });
+      return;
     }
 
     const todayStr = dateUtils.getTodayString();
@@ -161,7 +153,7 @@ Page({
     });
   },
 
-  // 心理日记：根据所有记录生成
+  // 心理日记（长期分析）：调取所有文件夹内容进行生成
   async generateCounselorDiary() {
     const folders = this.data.folders.filter(f => f.entries && f.entries.length > 0);
     if (folders.length === 0) {

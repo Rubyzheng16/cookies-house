@@ -81,3 +81,14 @@ export const COOKIE_METADATA: Record<CookieType, {
     description: '生活中的细碎火花，温暖而轻盈。'
   }
 };
+
+/** 丰容板块配置 */
+export const ENRICHMENT_CATEGORIES = [
+  { id: 'physical', name: '物理环境', icon: '🏠' },
+  { id: 'touch', name: '触感丰容', icon: '🪶' },
+  { id: 'social', name: '社会互动', icon: '👥' },
+  { id: 'cognitive', name: '认知丰容', icon: '🧠' },
+  { id: 'sensory', name: '感知丰容', icon: '🎨' },
+  { id: 'food', name: '食物丰容', icon: '🍽️' },
+  { id: 'selfCare', name: '老己', icon: '🌱' }
+];

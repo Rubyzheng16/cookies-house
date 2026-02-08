@@ -399,7 +399,7 @@
   font-weight: bold;
 }
 
-/* 丰荣板块 */
+/* 丰容板块 */
 .enrichment-panels {
   margin-top: 48rpx;
 }

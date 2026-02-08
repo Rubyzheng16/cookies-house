@@ -6,12 +6,12 @@
  * 推荐：微信云开发、腾讯云 COS、阿里云 OSS、七牛云 等
  */
 
-const USE_CDN = true;
+const USE_CDN = false;
 
 const GITHUB_USER = 'Rubyzheng16';
 const GITHUB_REPO = 'cookies-house';
-const GITHUB_BRANCH = 'master';
-const IMAGES_PATH = 'assets/images';
+const GITHUB_BRANCH = 'main';
+const IMAGES_PATH = 'miniprogram/assets/images';
 
 const CDN_BASE = `https://cdn.jsdelivr.net/gh/${GITHUB_USER}/${GITHUB_REPO}@${GITHUB_BRANCH}/${IMAGES_PATH}`;
 

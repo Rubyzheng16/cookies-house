@@ -190,7 +190,7 @@ export const aiService = {
     });
   },
 
-  // 生成幸运饼干（丰荣板块任务）
+  // 生成幸运饼干（丰容板块任务）
   async generateFortune(category) {
     const apiKey = getLocalApiKey();
     if (!apiKey) {

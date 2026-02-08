@@ -97,9 +97,9 @@
       />
     </view>
 
-    <!-- 丰荣板块 -->
+    <!-- 丰容板块 -->
     <view class="enrichment-panels">
-      <text class="section-title">丰荣板块</text>
+      <text class="section-title">丰容板块</text>
       <view class="panels-grid">
         <view 
           wx:for="{{enrichmentPanels}}" 

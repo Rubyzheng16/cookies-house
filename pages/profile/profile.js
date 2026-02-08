@@ -49,6 +49,80 @@ Page({
     wx.navigateTo({ url: '/pages/profile/ai/ai' });
   },
 
+  exportData() {
+    wx.showActionSheet({
+      itemList: ['导出为可读文本（适合查看）', '导出完整数据（适合恢复）'],
+      success: (res) => {
+        if (res.tapIndex === 0) {
+          this._exportReadable();
+        } else {
+          this._exportJson();
+        }
+      }
+    });
+  },
+
+  _exportReadable() {
+    const cookies = wx.getStorageSync('emotion_cookies') || [];
+    const typeNames = { IMPORTANT_URGENT: '重要且紧急', IMPORTANT_NOT_URGENT: '重要不紧急', URGENT_NOT_IMPORTANT: '紧急不重要', NOT_IMPORTANT_NOT_URGENT: '不重要不紧急', MUMBLING: '碎碎念' };
+    const lines = ['=== 饼干记 · 数据备份 ===', '', '导出时间：' + new Date().toLocaleString('zh-CN'), ''];
+    if (cookies.length === 0) {
+      lines.push('暂无记录');
+    } else {
+      cookies.forEach((folder) => {
+        lines.push('【' + folder.date + '】');
+        (folder.entries || []).forEach((e) => {
+          const typeLabel = typeNames[e.type] || e.type || '碎碎念';
+          const text = (e.text || '').trim() || '[无文字]';
+          const imgNote = (e.images && e.images.length) ? ' (含 ' + e.images.length + ' 张图片)' : '';
+          const voiceNote = e.voicePath ? ' (含语音)' : '';
+          lines.push('  • [' + typeLabel + '] ' + text + imgNote + voiceNote);
+        });
+        lines.push('');
+      });
+    }
+    lines.push('---', '说明：图片、语音为本地路径，备份仅保留文字。完整数据请选「导出完整数据」。');
+    const text = lines.join('\n');
+    this._copyToClipboard(text, '可读文本已复制，粘贴到记事本即可查看');
+  },
+
+  _exportJson() {
+    const cookies = wx.getStorageSync('emotion_cookies') || [];
+    const goals = wx.getStorageSync('cookie_goals') || [];
+    const backup = {
+      _exportTime: new Date().toISOString(),
+      _tip: '饼干记完整数据，含图片路径。图片路径为设备本地路径，换设备后图片不可用。',
+      emotion_cookies: cookies,
+      cookie_goals: goals
+    };
+    const json = JSON.stringify(backup, null, 2);
+    this._copyToClipboard(json, '完整数据已复制，请粘贴到 .txt 文件保存');
+  },
+
+  _copyToClipboard(data, successMsg) {
+    if (data.length > 800000) {
+      wx.showModal({
+        title: '内容过多',
+        content: '备份内容较大，建议分批导出或联系开发者。',
+        showCancel: false
+      });
+      return;
+    }
+    wx.setClipboardData({
+      data: data,
+      success: () => {
+        wx.showToast({ title: successMsg, icon: 'none', duration: 2500 });
+      },
+      fail: () => {
+        wx.showModal({
+          title: '复制失败',
+          content: '请尝试分时段导出，或使用电脑微信开发者工具控制台备份。',
+          showCancel: false
+        });
+      }
+    });
+  },
+
   onNotificationChange(e) {
     const value = e.detail.value;
     wx.setStorageSync(NOTIFICATION_KEY, value);

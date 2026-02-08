@@ -89,16 +89,26 @@ Page({
     this.loadFolders();
   },
 
+  hasContentForDate(date) {
+    const folders = fragmentService.getFolders();
+    const folder = folders.find(f => f.date === date);
+    return !!(folder && folder.entries && folder.entries.length > 0);
+  },
+
   _addFolderImages(rawFolders) {
-    return rawFolders.map((f, index) => ({
+    const sorted = [...rawFolders].sort((a, b) => (b.date > a.date ? 1 : -1));
+    const dateToIndex = new Map();
+    sorted.forEach((f, i) => dateToIndex.set(f.date, i));
+    return rawFolders.map(f => ({
       ...f,
-      folderImage: FOLDER_IMAGES[index % FOLDER_IMAGES.length]
+      folderImage: FOLDER_IMAGES[(dateToIndex.get(f.date) ?? 0) % FOLDER_IMAGES.length]
     }));
   },
 
   loadFolders() {
     const rawFolders = fragmentService.getFolders();
-    const folders = this._addFolderImages(rawFolders);
+    const withContent = rawFolders.filter(f => f.entries && f.entries.length > 0);
+    const folders = this._addFolderImages(withContent);
     this.setData({ folders });
     // 如果日历已打开，更新日历显示
     if (this.data.showCalendarModal) {
@@ -409,9 +419,16 @@ Page({
     }
   },
 
-  // 选择日历日期 - 直接进入详情页
+  // 选择日历日期 - 仅允许跳转到有记录的日期
   selectCalendarDate(e) {
     const date = e.currentTarget.dataset.date;
+    if (!this.hasContentForDate(date)) {
+      wx.showToast({
+        title: '该日期暂无记录',
+        icon: 'none'
+      });
+      return;
+    }
     this.setData({ selectedDate: date });
     this.hideCalendar();
     wx.navigateTo({
@@ -493,10 +510,17 @@ Page({
     }
   },
 
-  // 打开文件夹
+  // 打开文件夹 - 仅允许打开有记录的日期
   openFolder(e) {
     if (this.data.isEditMode) return;
     const date = e.currentTarget.dataset.date;
+    if (!this.hasContentForDate(date)) {
+      wx.showToast({
+        title: '该日期暂无记录',
+        icon: 'none'
+      });
+      return;
+    }
     wx.navigateTo({
       url: `/pages/detail/detail?date=${date}`
     });

@@ -1,20 +1,20 @@
 /**
  * CDN 图片配置
  *
- * 排查 404：在浏览器打开下面的 URL，能打开则路径正确
- * https://cdn.jsdelivr.net/gh/Rubyzheng16/cookies-house@main/路径/add-btn.png
- *
- * 常见路径：miniprogram/assets/images （仓库根目录含 miniprogram 文件夹）
- *          assets/images （仓库根目录就是 miniprogram 的内容）
+ * 排查 404：在浏览器打开下面的 URL 能打开则路径正确
+ * 若 404，请检查：1) 分支名（main/master）2) 图片是否已 push 到远程 3) 路径是否与仓库结构一致
  */
 
-const USE_CDN = true;
+// 置为 false 时使用本地图片（需确保 assets/images 被 pack 包含）；CDN 404 时可先改为 false
+const USE_CDN = false;
 
-// 仓库信息（路径为 assets/images，分支为 master）
+// 仓库信息
 const GITHUB_USER = 'Rubyzheng16';
 const GITHUB_REPO = 'cookies-house';
-const GITHUB_BRANCH = 'master';
-const IMAGES_PATH = 'assets/images';
+// 分支：新仓库通常为 main，旧仓库可能为 master，请与 GitHub 实际分支一致
+const GITHUB_BRANCH = 'main';
+// 路径：仓库根含 miniprogram 用 miniprogram/assets/images；根即 miniprogram 用 assets/images
+const IMAGES_PATH = 'miniprogram/assets/images';
 
 const CDN_BASE = `https://cdn.jsdelivr.net/gh/${GITHUB_USER}/${GITHUB_REPO}@${GITHUB_BRANCH}/${IMAGES_PATH}`;
 
