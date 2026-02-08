@@ -10,7 +10,7 @@
     <text class="login-title">欢迎回到你的情绪烘焙坊</text>
     <text class="login-desc">
       · 使用微信一键登录，创建你的专属烘焙师账号
-      · 默认仅在本机保存数据，后续可开通云端 VIP 同步
+      · 默认仅在本机保存数据
     </text>
 
     <button

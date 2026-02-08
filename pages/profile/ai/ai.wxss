@@ -39,10 +39,12 @@
 
 .field-input {
   width: 100%;
-  padding: 24rpx;
+  min-height: 88rpx;
+  padding: 28rpx 32rpx;
   border-radius: 16rpx;
   border: 2rpx solid #FFF9C4;
-  font-size: 28rpx;
+  font-size: 32rpx;
+  line-height: 1.5;
   box-sizing: border-box;
   background: rgba(255, 255, 255, 0.9);
 }

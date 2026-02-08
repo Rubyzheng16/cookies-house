@@ -1,23 +1,36 @@
 /**
  * CDN 图片配置
- * 将超过 200KB 的图片上传到 CDN 后，在此填入 URL
- * 留空则使用本地路径（需保证本地文件 < 200KB）
  *
- * 推荐：微信云开发、腾讯云 COS、阿里云 OSS、七牛云 等
+ * 排查 404：在浏览器打开下面的 URL，能打开则路径正确
+ * https://cdn.jsdelivr.net/gh/Rubyzheng16/cookies-house@main/路径/add-btn.png
  *
- * 使用 CDN 时需在微信公众平台 → 开发 → 开发管理 → 开发设置
- * 的「downloadFile 合法域名」中添加 CDN 域名
+ * 常见路径：miniprogram/assets/images （仓库根目录含 miniprogram 文件夹）
+ *          assets/images （仓库根目录就是 miniprogram 的内容）
  */
 
-// 文件夹图片（6 款），按顺序对应 folder-1 ~ folder-6
-export const CDN_FOLDER_IMAGES = [
-  '', // folder-1.png
-  '', // folder-2.png
-  '', // folder-3.png
-  '', // folder-4.png
-  '', // folder-5.png
-  ''  // folder-6.png
+const USE_CDN = true;
+
+// 仓库信息（路径为 assets/images，分支为 master）
+const GITHUB_USER = 'Rubyzheng16';
+const GITHUB_REPO = 'cookies-house';
+const GITHUB_BRANCH = 'master';
+const IMAGES_PATH = 'assets/images';
+
+const CDN_BASE = `https://cdn.jsdelivr.net/gh/${GITHUB_USER}/${GITHUB_REPO}@${GITHUB_BRANCH}/${IMAGES_PATH}`;
+
+const CDN_FOLDERS = [
+  `${CDN_BASE}/folders/folder-1.png`,
+  `${CDN_BASE}/folders/folder-2.png`,
+  `${CDN_BASE}/folders/folder-3.png`,
+  `${CDN_BASE}/folders/folder-4.png`,
+  `${CDN_BASE}/folders/folder-5.png`,
+  `${CDN_BASE}/folders/folder-6.png`
 ];
 
-// 底部加号按钮
-export const CDN_ADD_BTN = '';
+// 幸运饼干图片（需上传到 git 的 assets/images/fortune-cookie/）
+export const CDN_FORTUNE_COOKIE_WHOLE = USE_CDN ? `${CDN_BASE}/fortune-cookie/fortune-cookie-whole.png` : '';
+export const CDN_FORTUNE_COOKIE_BROKEN = USE_CDN ? `${CDN_BASE}/fortune-cookie/fortune-cookie-broken.png` : '';
+
+// 不启用 CDN 时返回空，constants 会回退到本地路径
+export const CDN_FOLDER_IMAGES = USE_CDN ? CDN_FOLDERS : ['', '', '', '', '', ''];
+export const CDN_ADD_BTN = USE_CDN ? `${CDN_BASE}/add-btn.png` : '';

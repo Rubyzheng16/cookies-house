@@ -1,5 +1,12 @@
-// 后端 API 地址（开发时可用本地，正式需配置为 HTTPS 且在小程序后台加入 request 合法域名）
-     // 开发阶段先用本机端口
-     export const API_BASE_URL = 'http://localhost:3000';
-// 本地开发示例：在微信开发者工具中勾选「不校验合法域名」后可改为
-// export const API_BASE_URL = 'http://localhost:3000';
+// 后端 API 地址配置
+//
+// 【切换版本】修改 USE_LOCAL_DEV 即可：
+// - true   = 真机调试版（局域网 IP）
+// - false  = 正式/体验版（用域名）
+
+const USE_LOCAL_DEV = true;
+
+const LOCAL_DEV_URL = 'http://192.168.88.95:3000';
+const PROD_URL = 'https://api.your-domain.com';
+
+export const API_BASE_URL = USE_LOCAL_DEV ? LOCAL_DEV_URL : PROD_URL;

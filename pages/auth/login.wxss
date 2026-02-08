@@ -62,9 +62,11 @@
 
 .login-button {
   margin-top: 8rpx;
+  width: 100%;
+  min-width: 520rpx;
   background: #6d4c41;
   border-radius: 999rpx;
-  padding: 24rpx 32rpx;
+  padding: 24rpx 48rpx;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -73,6 +75,11 @@
   font-weight: bold;
   font-size: 30rpx;
   box-shadow: 0 12rpx 32rpx rgba(0, 0, 0, 0.18);
+  white-space: nowrap;
+}
+
+.login-button-text {
+  white-space: nowrap;
 }
 
 .login-button[disabled] {
