@@ -24,5 +24,9 @@ const CDN_FOLDERS = [
   `${CDN_BASE}/folders/folder-6.png`
 ];
 
+// 幸运饼干图片（需上传到 git 的 assets/images/fortune-cookie/）
+export const CDN_FORTUNE_COOKIE_WHOLE = USE_CDN ? `${CDN_BASE}/fortune-cookie/fortune-cookie-whole.png` : '';
+export const CDN_FORTUNE_COOKIE_BROKEN = USE_CDN ? `${CDN_BASE}/fortune-cookie/fortune-cookie-broken.png` : '';
+
 export const CDN_FOLDER_IMAGES = USE_CDN ? CDN_FOLDERS : ['', '', '', '', '', ''];
 export const CDN_ADD_BTN = USE_CDN ? `${CDN_BASE}/add-btn.png` : '';

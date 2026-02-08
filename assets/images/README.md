@@ -32,4 +32,6 @@
 - `fortune-cookie-whole.png`：点击前的完整饼干图片
 - `fortune-cookie-broken.png`：点击后破开的饼干图片，露出字条区域
 
+**需上传到 git**：项目通过 CDN（jsdelivr）加载图片，`assets/images` 被排除在打包外。请将这两张图片放入 `fortune-cookie/` 后提交到 git 并推送到远程仓库，模拟器/真机即可从 CDN 拉取。
+
 AI 生成的文字会叠加在破开饼干图片的字条区域中央。若字条位置与图片不一致，可在 `miniprogram/components/fortune-cookie/index.wxss` 中调整 `.fortune-slip-overlay` 的 `top`、`left`、`width` 等。

@@ -1,6 +1,6 @@
 // 常量定义
 import { CookieType } from '../types/index.js';
-import { CDN_FOLDER_IMAGES, CDN_ADD_BTN } from '../config/cdn.js';
+import { CDN_FOLDER_IMAGES, CDN_ADD_BTN, CDN_FORTUNE_COOKIE_WHOLE, CDN_FORTUNE_COOKIE_BROKEN } from '../config/cdn.js';
 
 const LOCAL_FOLDER_IMAGES = [
   '/assets/images/folders/folder-1.png',
@@ -19,11 +19,11 @@ export const FOLDER_IMAGES = LOCAL_FOLDER_IMAGES.map((local, i) =>
 /** 底部加号按钮图片路径，优先用 CDN */
 export const ADD_BTN_IMAGE = (CDN_ADD_BTN || '').trim() || '/assets/images/add-btn.png';
 
-/** 幸运饼干图片：完整饼干（点击前） */
-export const FORTUNE_COOKIE_WHOLE = '/assets/images/fortune-cookie/fortune-cookie-whole.png';
+/** 幸运饼干图片：完整饼干（点击前），优先 CDN，需上传到 git */
+export const FORTUNE_COOKIE_WHOLE = (CDN_FORTUNE_COOKIE_WHOLE || '').trim() || '/assets/images/fortune-cookie/fortune-cookie-whole.png';
 
-/** 幸运饼干图片：破开饼干（点击后，字条区域留白以叠加文字） */
-export const FORTUNE_COOKIE_BROKEN = '/assets/images/fortune-cookie/fortune-cookie-broken.png';
+/** 幸运饼干图片：破开饼干（点击后），优先 CDN，需上传到 git */
+export const FORTUNE_COOKIE_BROKEN = (CDN_FORTUNE_COOKIE_BROKEN || '').trim() || '/assets/images/fortune-cookie/fortune-cookie-broken.png';
 
 export const COLORS = {
   base: '#FCE4EC',
