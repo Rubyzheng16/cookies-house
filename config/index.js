@@ -7,8 +7,8 @@
 
 const USE_LOCAL_DEV = true;
 
-// 真机调试：电脑的局域网 IP，用 ipconfig 查看
-const LOCAL_DEV_URL = 'http://192.168.88.95:3000';
+// 真机调试：本地开发用 localhost（需电脑上启动后端）
+const LOCAL_DEV_URL = 'http://localhost:3000';
 // 正式/体验版：替换为你的实际后端域名
 const PROD_URL = 'https://api.your-domain.com';
 

@@ -25,6 +25,10 @@ export interface DayFolder {
   date: string; // YYYY/MM/DD
   entries: CookieEntry[];
   analysis?: string;
+  /** 文件夹封面图索引（用于保证每一天的样式稳定不变） */
+  folderImageIndex?: number;
+  /** 运行时使用的实际封面图片路径 */
+  folderImage?: string;
 }
 
 export interface GoalStep {

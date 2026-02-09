@@ -96,13 +96,13 @@ Page({
   },
 
   _addFolderImages(rawFolders) {
-    const sorted = [...rawFolders].sort((a, b) => (b.date > a.date ? 1 : -1));
-    const dateToIndex = new Map();
-    sorted.forEach((f, i) => dateToIndex.set(f.date, i));
-    return rawFolders.map(f => ({
-      ...f,
-      folderImage: FOLDER_IMAGES[(dateToIndex.get(f.date) ?? 0) % FOLDER_IMAGES.length]
-    }));
+    return rawFolders.map(f => {
+      const index = typeof f.folderImageIndex === 'number' ? f.folderImageIndex : 0;
+      return {
+        ...f,
+        folderImage: FOLDER_IMAGES[index % FOLDER_IMAGES.length]
+      };
+    });
   },
 
   loadFolders() {

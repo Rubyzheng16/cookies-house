@@ -98,5 +98,51 @@ export const aiService = {
       });
     });
   },
+
+  // 长期分析（结合日记 / 丰容 / 技能树）
+  async generateLongTermAnalysis(payload: {
+    range?: { from?: string; to?: string };
+    folders: any[];
+    enrichment: any;
+    skillTree: any;
+  }): Promise<any | null> {
+    const apiKey = getLocalApiKey();
+    if (!apiKey) {
+      return null;
+    }
+
+    return new Promise((resolve) => {
+      wx.request({
+        url: `${AI_BASE_URL}/api/analysis/long-term`,
+        method: 'POST',
+        data: {
+          apiKey,
+          ...payload,
+        },
+        success: (response) => {
+          const data = response.data as any;
+          if (
+            response.statusCode === 200 &&
+            data &&
+            data.code === 0 &&
+            data.data
+          ) {
+            resolve(data.data);
+          } else {
+            wx.showToast({
+              title: data?.message || '长期分析失败',
+              icon: 'none',
+            });
+            resolve(null);
+          }
+        },
+        fail: (error) => {
+          console.error('长期分析请求失败', error);
+          wx.showToast({ title: '长期分析失败', icon: 'none' });
+          resolve(null);
+        },
+      });
+    });
+  },
 };
 

@@ -10,9 +10,29 @@ export const fragmentService = {
     if (!Array.isArray(saved) || saved.length === 0) {
       return [{ date: dateUtils.getTodayString(), entries: [] }];
     }
-    // 自动修复旧数据（避免使用对象展开语法，改用Object.assign）
+
+    // 统计已有的封面索引，给旧数据补充稳定的 folderImageIndex
+    let maxIndex = -1;
+    saved.forEach((folder) => {
+      if (folder && typeof folder.folderImageIndex === 'number') {
+        if (folder.folderImageIndex > maxIndex) {
+          maxIndex = folder.folderImageIndex;
+        }
+      }
+    });
+    let nextIndex = maxIndex + 1;
+    let hasNewIndex = false;
+
+    // 自动修复旧数据（timestamp 与 folderImageIndex，避免使用对象展开语法，改用Object.assign）
     const folders = saved.map((folder) => {
       const fixedFolder = Object.assign({}, folder);
+
+      // 旧数据没有封面索引时，按当前顺序依次补上，之后就不再变化
+      if (typeof fixedFolder.folderImageIndex !== 'number') {
+        fixedFolder.folderImageIndex = nextIndex++;
+        hasNewIndex = true;
+      }
+
       fixedFolder.entries = (folder.entries || []).map((entry) => {
         const fixedEntry = Object.assign({}, entry);
         if (!fixedEntry.timestamp) {
@@ -22,12 +42,31 @@ export const fragmentService = {
       });
       return fixedFolder;
     });
+
+    // 若为旧数据补充了 folderImageIndex，则写回存储，保证之后始终稳定
+    if (hasNewIndex) {
+      this.saveFolders(folders);
+    }
+
     return folders;
   },
 
   // 保存文件夹
   saveFolders(folders) {
     storage.saveCookies(folders);
+  },
+
+  // 内部工具：获取下一个可用的封面索引
+  _getNextFolderImageIndex(folders) {
+    let maxIndex = -1;
+    folders.forEach((folder) => {
+      if (folder && typeof folder.folderImageIndex === 'number') {
+        if (folder.folderImageIndex > maxIndex) {
+          maxIndex = folder.folderImageIndex;
+        }
+      }
+    });
+    return maxIndex + 1;
   },
 
   // 添加碎片（会合并到现有文件夹，不会覆盖其他日期的数据）
@@ -59,7 +98,12 @@ export const fragmentService = {
     if (existingFolderIndex > -1) {
       folders[existingFolderIndex].entries.unshift(newEntry);
     } else {
-      folders.unshift({ date: targetDate, entries: [newEntry] });
+      const nextIndex = this._getNextFolderImageIndex(folders);
+      folders.unshift({
+        date: targetDate,
+        entries: [newEntry],
+        folderImageIndex: nextIndex
+      });
     }
 
     this.saveFolders(folders);

@@ -6,7 +6,8 @@
 
 const USE_LOCAL_DEV = true;
 
-const LOCAL_DEV_URL = 'http://192.168.88.95:3000';
+// 本地开发默认使用 localhost:3000（需在本机启动后端）
+const LOCAL_DEV_URL = 'http://localhost:3000';
 const PROD_URL = 'https://api.your-domain.com';
 
 export const API_BASE_URL = USE_LOCAL_DEV ? LOCAL_DEV_URL : PROD_URL;

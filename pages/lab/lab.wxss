@@ -192,6 +192,11 @@
   color: #5D4037;
 }
 
+/* 高亮显示日记中的关键要点 / 洞察 */
+.diary-highlight {
+  font-weight: 600;
+}
+
 .diary-empty {
   text-align: center;
   padding: 32rpx 0;
@@ -207,6 +212,22 @@
   color: rgba(62, 39, 35, 0.5);
   display: block;
   margin-bottom: 32rpx;
+}
+
+.longterm-section {
+  margin-top: 32rpx;
+}
+
+.longterm-actions {
+  margin-top: 24rpx;
+  display: flex;
+  flex-direction: column;
+  gap: 16rpx;
+}
+
+.export-btn {
+  background: #6D4C41;
+  color: #FFF;
 }
 
 /* 日记指令（可折叠，所有人可用） */

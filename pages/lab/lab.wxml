@@ -66,11 +66,11 @@
           </view>
           <view wx:if="{{todayFolder.diaryAnalysis.keyPoints}}" class="diary-block">
             <text class="diary-label">关键要点</text>
-            <text class="diary-content">{{todayFolder.diaryAnalysis.keyPoints}}</text>
+            <text class="diary-content diary-highlight">{{todayFolder.diaryAnalysis.keyPoints}}</text>
           </view>
           <view wx:if="{{todayFolder.diaryAnalysis.insights}}" class="diary-block">
             <text class="diary-label">洞察与建议</text>
-            <text class="diary-content insight">{{todayFolder.diaryAnalysis.insights}}</text>
+            <text class="diary-content insight diary-highlight">{{todayFolder.diaryAnalysis.insights}}</text>
           </view>
         </view>
         <view wx:else class="diary-empty">
@@ -116,27 +116,57 @@
       </view>
     </view>
 
-    <!-- 心理日记（与今日日记同款布局） -->
-    <view class="card diary-section counselor-diary-section">
+    <!-- 长期综合分析 -->
+    <view class="card longterm-section">
       <view class="diary-header">
-        <text class="diary-icon">📖</text>
-        <text class="diary-title">心理日记</text>
+        <text class="diary-icon">📊</text>
+        <text class="diary-title">长期分析报告</text>
       </view>
       <view class="diary-body">
-        <view wx:if="{{counselorDiary}}">
+        <view wx:if="{{longTermAnalysis}}">
           <view class="diary-block">
-            <text class="diary-label">完整日记</text>
-            <text class="diary-content counselor-diary-content">{{counselorDiary}}</text>
+            <text class="diary-label">关键要点</text>
+            <view>
+              <text
+                wx:for="{{longTermAnalysis.summary.keyPoints}}"
+                wx:key="*this"
+                class="diary-content"
+              >• {{item}}</text>
+            </view>
+          </view>
+          <view class="diary-block">
+            <text class="diary-label">心理视角的洞察</text>
+            <text class="diary-content counselor-diary-content">
+              {{longTermAnalysis.psychologicalInsight.letter}}
+            </text>
           </view>
         </view>
         <view wx:else class="diary-empty">
-          <text class="empty-text">心理日记还没生成...</text>
-          <text class="empty-hint">根据所有记录，以心理咨询师视角生成深度心理日记（约 1500 字）</text>
+          <text class="empty-text">长期分析还没生成...</text>
+          <text class="empty-hint">会结合所有记录、丰容和技能树，给出一份整体报告</text>
         </view>
-        <button class="diary-btn" bindtap="generateCounselorDiary" disabled="{{counselorLoading}}">
-          {{counselorDiary ? '✨ 重新生成' : '✨ 生成心理日记'}}
-        </button>
+        <view class="longterm-actions">
+          <button
+            class="diary-btn"
+            bindtap="generateLongTermAnalysis"
+            disabled="{{longTermLoading}}"
+          >
+            {{longTermAnalysis ? '✨ 重新生成长期分析' : '✨ 生成长期分析'}}
+          </button>
+          <button
+            class="diary-btn export-btn"
+            bindtap="exportLongTermImage"
+            disabled="{{!longTermAnalysis}}"
+          >
+            🖼 导出为图片
+          </button>
+        </view>
       </view>
+      <!-- 用于导出图片的隐藏画布（使用传统 canvas-id API） -->
+      <canvas
+        canvas-id="longTermCanvas"
+        style="width: 600rpx; height: 1000rpx; position: absolute; left: -9999rpx; top: -9999rpx;"
+      />
     </view>
   </view>
 

@@ -98,6 +98,32 @@ export const enrichmentService = {
     return (data.litPanels && data.litPanels[category]) || [];
   },
 
+  // 为某个丰容板块新增一条记录（手动或 AI 生成），直接记入历史列表
+  addPanelRecord(category, content) {
+    const data = storage.getEnrichmentData();
+    const todayStr = dateUtils.getTodayString();
+    if (!data.litPanels) data.litPanels = {};
+    if (!data.litPanels[category]) data.litPanels[category] = [];
+    data.litPanels[category].unshift({
+      date: todayStr,
+      content,
+      completed: true
+    });
+    storage.saveEnrichmentData(data);
+    return data.litPanels[category];
+  },
+
+  // 删除某板块的一条记录（按索引）
+  deletePanelRecord(category, index) {
+    const data = storage.getEnrichmentData();
+    if (!data.litPanels || !data.litPanels[category]) return [];
+    const list = data.litPanels[category];
+    if (index < 0 || index >= list.length) return list;
+    list.splice(index, 1);
+    storage.saveEnrichmentData(data);
+    return list;
+  },
+
   // 根据 id 获取板块信息
   getCategoryById(id) {
     return ENRICHMENT_CATEGORIES.find((c) => c.id === id) || null;

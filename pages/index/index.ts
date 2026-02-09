@@ -42,13 +42,13 @@ Page({
 
   // 按日期降序排序后分配图案，确保图案稳定（新日期用图案1，旧日期依次用2、3...）
   addFolderImages(rawFolders: DayFolder[]): DayFolder[] {
-    const sorted = [...rawFolders].sort((a, b) => (b.date > a.date ? 1 : -1));
-    const dateToIndex = new Map<string, number>();
-    sorted.forEach((f, i) => dateToIndex.set(f.date, i));
-    return rawFolders.map(f => ({
-      ...f,
-      folderImage: FOLDER_IMAGES[(dateToIndex.get(f.date) ?? 0) % FOLDER_IMAGES.length]
-    }));
+    return rawFolders.map(f => {
+      const index = typeof f.folderImageIndex === 'number' ? f.folderImageIndex : 0;
+      return {
+        ...f,
+        folderImage: FOLDER_IMAGES[index % FOLDER_IMAGES.length]
+      };
+    });
   },
 
   // 初始化日历

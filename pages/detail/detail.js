@@ -370,17 +370,19 @@ Page({
     }
     
     try {
-      const options = { date: this.data.date, images, voicePath };
-      const folders = fragmentService.addEntry((text || '').trim() || '[图片/语音]', type, options);
+      // 始终把新内容记录到「今天」这一天的时间线上
+      const today = dateUtils.getTodayString();
+      const options = { date: today, images, voicePath };
+      fragmentService.addEntry((text || '').trim() || '[图片/语音]', type, options);
       
-      // 关闭输入弹窗
-      this.setData({ showInputModal: false });
+      // 关闭输入弹窗，并跳转视图到今天
+      this.setData({ showInputModal: false, date: today });
       
-      // 重新加载数据
+      // 重新加载今天的数据
       this.loadData();
       
       wx.showToast({
-        title: '已记录',
+        title: '已记录到今天',
         icon: 'success'
       });
     } catch (error) {

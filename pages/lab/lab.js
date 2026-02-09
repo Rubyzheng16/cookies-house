@@ -16,7 +16,9 @@ Page({
     promptInput: '',
     promptCollapsed: true,
     counselorDiary: '',
-    counselorLoading: false
+    counselorLoading: false,
+    longTermAnalysis: null,
+    longTermLoading: false
   },
 
   onLoad() {
@@ -189,15 +191,155 @@ Page({
   goToPanelDetail(e) {
     const category = e.currentTarget.dataset.category;
     if (!category) return;
-    const panels = this.data.enrichmentPanels;
-    const panel = panels.find(p => p.id === category);
-    if (!panel) return;
-    if (!panel.lit) {
-      wx.showToast({ title: '完成今日幸运饼干任务即可点亮', icon: 'none' });
-      return;
-    }
     wx.navigateTo({
       url: `/pages/enrichment-detail/enrichment-detail?category=${category}`
+    });
+  },
+
+  // 生成长期分析（结合全部记录 / 丰容 / 技能树）
+  async generateLongTermAnalysis() {
+    if (this.data.longTermLoading) return;
+    const folders = this.data.folders.filter(
+      (f) => f.entries && f.entries.length > 0
+    );
+    const enrichment = storage.getEnrichmentData
+      ? storage.getEnrichmentData()
+      : {};
+    const skillTree = storage.getSkillTreeData
+      ? storage.getSkillTreeData()
+      : { items: [] };
+
+    if (
+      folders.length === 0 &&
+      (!enrichment || !enrichment.litPanels) &&
+      (!skillTree || !skillTree.items || skillTree.items.length === 0)
+    ) {
+      wx.showToast({ title: '暂无足够数据可生成长期分析', icon: 'none' });
+      return;
+    }
+
+    this.setData({ longTermLoading: true });
+    wx.showLoading({ title: '生成长期分析中...' });
+    try {
+      const result = await aiService.generateLongTermAnalysis({
+        folders,
+        enrichment,
+        skillTree
+      });
+      if (result) {
+        this.setData({ longTermAnalysis: result });
+        wx.showToast({ title: '长期分析已生成 ✨', icon: 'success' });
+      }
+    } finally {
+      this.setData({ longTermLoading: false });
+      wx.hideLoading();
+    }
+  },
+
+  // 导出长期分析为图片（长图）
+  exportLongTermImage() {
+    const analysis = this.data.longTermAnalysis;
+    if (!analysis) {
+      wx.showToast({ title: '请先生成长期分析', icon: 'none' });
+      return;
+    }
+    const ctx = wx.createCanvasContext('longTermCanvas', this);
+
+    const width = 600;  // rpx 对应到画布时不严格按像素算，这里用一个固定宽度即可
+    const height = 1000;
+
+    // 背景
+    ctx.setFillStyle('#FFF9C4');
+    ctx.fillRect(0, 0, width, height);
+
+    ctx.setFillStyle('#3E2723');
+    ctx.setFontSize(20);
+    ctx.setTextAlign('left');
+    ctx.fillText('情绪饼干屋 · 长期分析', 20, 40);
+
+    let y = 80;
+    const lineHeight = 24;
+
+    function wrapText(text, maxCharsPerLine) {
+      const lines = [];
+      let line = '';
+      for (const ch of text) {
+        if (line.length >= maxCharsPerLine) {
+          lines.push(line);
+          line = ch;
+        } else {
+          line += ch;
+        }
+      }
+      if (line) lines.push(line);
+      return lines;
+    }
+
+    // 关键要点
+    ctx.setFontSize(18);
+    ctx.fillText('一、关键要点', 20, y);
+    y += lineHeight;
+    ctx.setFontSize(16);
+    (analysis.summary && analysis.summary.keyPoints
+      ? analysis.summary.keyPoints
+      : []
+    )
+      .slice(0, 4)
+      .forEach((kp) => {
+        const lines = wrapText('• ' + kp, 20);
+        lines.forEach((ln) => {
+          ctx.fillText(ln, 20, y);
+          y += lineHeight;
+        });
+      });
+
+    y += lineHeight * 2;
+    ctx.setFontSize(18);
+    ctx.fillText('二、重点主题', 20, y);
+    y += lineHeight;
+    ctx.setFontSize(16);
+    const themes =
+      (analysis.psychologicalInsight && analysis.psychologicalInsight.themes) ||
+      [];
+    (themes || []).slice(0, 4).forEach((th) => {
+      wrapText('• ' + th, 20).forEach((ln) => {
+        ctx.fillText(ln, 20, y);
+        y += lineHeight;
+      });
+    });
+
+    y += lineHeight * 2;
+    ctx.setFontSize(18);
+    ctx.fillText('三、行动建议', 20, y);
+    y += lineHeight;
+    ctx.setFontSize(16);
+    const blocks =
+      (analysis.lifeAdvice && analysis.lifeAdvice.adviceBlocks) || [];
+    blocks.slice(0, 3).forEach((block) => {
+      const title = block.title || '';
+      const content = (block.content || '').slice(0, 80);
+      wrapText('· ' + title + '：' + content, 18).forEach((ln) => {
+        ctx.fillText(ln, 20, y);
+        y += lineHeight;
+      });
+      y += lineHeight;
+    });
+
+    ctx.draw(false, () => {
+      wx.canvasToTempFilePath(
+        {
+          canvasId: 'longTermCanvas',
+          success: (res2) => {
+            const path = res2.tempFilePath;
+            wx.previewImage({ urls: [path] });
+          },
+          fail: (err) => {
+            console.error('导出图片失败', err);
+            wx.showToast({ title: '导出失败', icon: 'none' });
+          }
+        },
+        this
+      );
     });
   }
 });

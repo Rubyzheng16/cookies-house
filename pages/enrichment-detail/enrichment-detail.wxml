@@ -1,9 +1,15 @@
 <!-- 丰容板块详情 -->
 <view class="container">
   <view wx:if="{{categoryInfo}}" class="header">
-    <text class="header-icon">{{categoryInfo.icon}}</text>
-    <text class="header-title">{{categoryInfo.name}}</text>
-    <text class="header-desc">共完成 {{history.length}} 次</text>
+    <view class="header-main">
+      <text class="header-icon">{{categoryInfo.icon}}</text>
+      <text class="header-title">{{categoryInfo.name}}</text>
+      <text class="header-desc">共完成 {{history.length}} 次</text>
+      <view class="header-actions">
+        <button class="header-btn" bindtap="onAdd">+ 添加</button>
+        <button class="header-btn secondary" bindtap="onEdit">编辑</button>
+      </view>
+    </view>
   </view>
 
   <view class="history-list">
@@ -12,7 +18,15 @@
       wx:key="date"
       class="history-item"
     >
-      <text class="history-date">{{item.date}}</text>
+      <view class="history-item-header">
+        <text class="history-date">{{item.date}}</text>
+        <view 
+          wx:if="{{editMode}}" 
+          class="history-delete-btn" 
+          data-index="{{index}}" 
+          bindtap="onDeleteItem"
+        >×</view>
+      </view>
       <text class="history-content">{{item.content}}</text>
     </view>
   </view>

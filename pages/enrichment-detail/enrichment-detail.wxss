@@ -6,12 +6,15 @@
 }
 
 .header {
-  text-align: center;
-  padding: 48rpx 0;
+  padding: 32rpx 24rpx 28rpx;
   background: #FFF9C4;
   border-radius: 32rpx;
   margin-bottom: 32rpx;
   border: 4rpx solid #6D4C41;
+}
+
+.header-main {
+  text-align: center;
 }
 
 .header-icon {
@@ -34,6 +37,32 @@
   display: block;
 }
 
+.header-actions {
+  margin-top: 20rpx;
+  display: flex;
+  justify-content: center;
+  gap: 16rpx;
+}
+
+.header-btn {
+  padding: 6rpx 18rpx;
+  background: #6D4C41;
+  color: #FFF;
+  border-radius: 999rpx;
+  font-size: 22rpx;
+  font-weight: 500;
+  border: none;
+}
+
+.header-btn.secondary {
+  background: rgba(109, 76, 65, 0.15);
+  color: #6D4C41;
+}
+
+.header-btn::after {
+  border: none;
+}
+
 .history-list {
   display: flex;
   flex-direction: column;
@@ -48,11 +77,32 @@
   border-left: 8rpx solid #6D4C41;
 }
 
+.history-item-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12rpx;
+}
+
 .history-date {
   font-size: 22rpx;
   color: rgba(62, 39, 35, 0.5);
   display: block;
-  margin-bottom: 12rpx;
+}
+
+.history-delete-btn {
+  width: 40rpx;
+  height: 40rpx;
+  border-radius: 20rpx;
+  text-align: center;
+  line-height: 40rpx;
+  font-size: 30rpx;
+  color: #6D4C41;
+  background: rgba(109, 76, 65, 0.08);
+}
+
+.history-delete-btn::after {
+  border: none;
 }
 
 .history-content {

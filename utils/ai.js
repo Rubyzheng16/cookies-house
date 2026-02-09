@@ -223,5 +223,43 @@ export const aiService = {
       });
     });
   },
+
+  // 生成长期分析（结合日记 / 丰容 / 技能树）
+  async generateLongTermAnalysis(payload) {
+    const apiKey = getLocalApiKey();
+    if (!apiKey) {
+      return null;
+    }
+
+    return new Promise((resolve) => {
+      wx.request({
+        url: `${AI_BASE_URL}/api/analysis/long-term`,
+        method: 'POST',
+        data: Object.assign({ apiKey }, payload),
+        success: (response) => {
+          const data = response.data;
+          if (
+            response.statusCode === 200 &&
+            data &&
+            data.code === 0 &&
+            data.data
+          ) {
+            resolve(data.data);
+          } else {
+            wx.showToast({
+              title: (data && data.message) || '长期分析失败',
+              icon: 'none',
+            });
+            resolve(null);
+          }
+        },
+        fail: (error) => {
+          console.error('长期分析请求失败', error);
+          wx.showToast({ title: '长期分析失败', icon: 'none' });
+          resolve(null);
+        },
+      });
+    });
+  },
 };
 
