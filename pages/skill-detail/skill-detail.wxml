@@ -1,0 +1,77 @@
+<!-- 技能分类详情页 -->
+<view class="container">
+  <view wx:if="{{categoryInfo}}" class="header">
+    <view class="header-left">
+      <text class="header-icon">{{categoryInfo.icon}}</text>
+      <text class="header-title">{{categoryInfo.name}}</text>
+      <text class="header-desc">共 {{items.length}} 项</text>
+    </view>
+  </view>
+
+  <view class="add-row">
+    <button class="add-btn" bindtap="onAdd">+ 添加</button>
+  </view>
+
+  <!-- 技能列表 -->
+  <view class="skill-list">
+    <view 
+      wx:for="{{items}}" 
+      wx:for-item="skill"
+      wx:key="id"
+      class="skill-item"
+    >
+      <view class="skill-main">
+        <view class="skill-name-row">
+          <text class="skill-name">{{skill.name}}</text>
+          <view class="skill-actions">
+            <button 
+              class="edit-btn"
+              data-id="{{skill.id}}"
+              bindtap="onEdit"
+              aria-label="编辑"
+            >编辑</button>
+          </view>
+        </view>
+        <view class="skill-stars-row">
+          <view class="star-group">
+            <text class="star-label">喜爱</text>
+            <view class="stars">
+              <text 
+                wx:for="{{[1,2,3,4,5]}}" 
+                wx:for-item="v"
+                wx:key="*this"
+                class="star {{skill.loveStars >= v ? 'filled' : ''}}"
+                data-value="{{v}}"
+                data-id="{{skill.id}}"
+                data-type="love"
+                bindtap="onStarTap"
+              >★</text>
+            </view>
+          </view>
+          <text class="star-arrow">→</text>
+          <view class="star-group">
+            <text class="star-label">掌握</text>
+            <view class="stars">
+              <text 
+                wx:for="{{[1,2,3,4,5]}}" 
+                wx:for-item="v"
+                wx:key="*this"
+                class="star {{skill.masteryStars >= v ? 'filled' : ''}}"
+                data-value="{{v}}"
+                data-id="{{skill.id}}"
+                data-type="mastery"
+                bindtap="onStarTap"
+              >★</text>
+            </view>
+          </view>
+        </view>
+        <view wx:if="{{skill.note}}" class="skill-note">{{skill.note}}</view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 空状态 -->
+  <view wx:if="{{items.length === 0}}" class="empty">
+    <text class="empty-text">暂无技能，点击右上角添加</text>
+  </view>
+</view>

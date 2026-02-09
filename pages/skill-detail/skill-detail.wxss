@@ -1,0 +1,176 @@
+/* 技能分类详情页 */
+.container {
+  padding: 32rpx;
+  min-height: 100vh;
+  background: #FCE4EC;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 16rpx;
+  padding: 24rpx 0 8rpx;
+}
+
+.header-left {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8rpx;
+  text-align: center;
+}
+
+.header-icon {
+  font-size: 48rpx;
+  display: block;
+}
+
+.header-title {
+  font-size: 36rpx;
+  font-weight: bold;
+  color: #3E2723;
+}
+
+.header-desc {
+  font-size: 24rpx;
+  color: rgba(62, 39, 35, 0.7);
+}
+
+/* 标题下方、技能板块左上角的小号“添加”按钮 */
+.add-row {
+  display: flex;
+  justify-content: flex-start;
+  margin-bottom: 16rpx;
+}
+
+.add-btn {
+  padding: 6rpx 18rpx;
+  background: #6D4C41;
+  color: #FFF;
+  border-radius: 999rpx;
+  font-size: 22rpx;
+  font-weight: 500;
+  border: none;
+}
+
+.add-btn::after {
+  border: none;
+}
+
+.skill-list {
+  display: flex;
+  flex-direction: column;
+  gap: 24rpx;
+}
+
+.skill-item {
+  background: rgba(255, 255, 255, 0.6);
+  border: 4rpx solid rgba(109, 76, 65, 0.15);
+  border-radius: 32rpx;
+  padding: 32rpx;
+}
+
+.skill-main {
+  width: 100%;
+}
+
+.skill-name-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 24rpx;
+}
+
+.skill-name {
+  font-size: 30rpx;
+  font-weight: bold;
+  color: #3E2723;
+  flex: 1;
+  min-width: 0;
+}
+
+.skill-actions {
+  flex-shrink: 0;
+  margin-left: 16rpx;
+}
+
+/* 编辑按钮：小一点，不抢眼 */
+.edit-btn {
+  padding: 4rpx 12rpx;
+  background: rgba(109, 76, 65, 0.12);
+  color: #6D4C41;
+  border-radius: 24rpx;
+  font-size: 20rpx;
+  border: none;
+  line-height: 1.2;
+}
+
+.edit-btn::after {
+  border: none;
+}
+
+/* 星星板块：放大、更清晰 */
+.skill-stars-row {
+  display: flex;
+  align-items: center;
+  gap: 32rpx;
+  flex-wrap: wrap;
+  padding: 24rpx 32rpx;
+  background: rgba(255, 249, 196, 0.4);
+  border-radius: 24rpx;
+  border: 2rpx solid rgba(109, 76, 65, 0.1);
+}
+
+.star-group {
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+}
+
+.star-label {
+  font-size: 26rpx;
+  font-weight: 500;
+  color: #3E2723;
+  width: 56rpx;
+}
+
+.stars {
+  display: flex;
+  gap: 8rpx;
+}
+
+.star {
+  font-size: 48rpx;
+  color: #e0e0e0;
+  cursor: pointer;
+  line-height: 1;
+}
+
+.star.filled {
+  color: #FFD700;
+  text-shadow: 0 2rpx 4rpx rgba(255, 215, 0, 0.3);
+}
+
+.star-arrow {
+  font-size: 28rpx;
+  color: rgba(62, 39, 35, 0.5);
+  font-weight: 500;
+}
+
+.skill-note {
+  margin-top: 16rpx;
+  font-size: 26rpx;
+  color: #5D4037;
+  font-style: italic;
+}
+
+.empty {
+  text-align: center;
+  padding: 80rpx 0;
+}
+
+.empty-text {
+  font-size: 28rpx;
+  color: rgba(62, 39, 35, 0.5);
+}

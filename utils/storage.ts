@@ -2,7 +2,8 @@
 const STORAGE_KEYS = {
   COOKIES: 'emotion_cookies',
   GOALS: 'cookie_goals',
-  USER_INFO: 'user_info'
+  USER_INFO: 'user_info',
+  SKILL_TREE: 'skill_tree_data'
 };
 
 export const storage = {
@@ -62,6 +63,26 @@ export const storage = {
     } catch (e) {
       console.error('获取用户信息失败', e);
       return null;
+    }
+  },
+
+  // 获取技能树数据
+  getSkillTreeData(): { items: any[] } {
+    try {
+      const data = wx.getStorageSync(STORAGE_KEYS.SKILL_TREE);
+      return data || { items: [] };
+    } catch (e) {
+      console.error('获取技能树数据失败', e);
+      return { items: [] };
+    }
+  },
+
+  // 保存技能树数据
+  saveSkillTreeData(data: { items: any[] }) {
+    try {
+      wx.setStorageSync(STORAGE_KEYS.SKILL_TREE, data);
+    } catch (e) {
+      console.error('保存技能树数据失败', e);
     }
   }
 };

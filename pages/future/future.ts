@@ -3,9 +3,11 @@ import { Goal, GoalStep } from '../../types';
 import { goalService } from '../../services/goal';
 import { aiService } from '../../utils/ai';
 import { fragmentService } from '../../services/fragment';
+import { skillTreeService } from '../../services/skillTree';
 
 Page({
   data: {
+    tab: 'goal' as 'goal' | 'skill',
     goals: [] as Goal[],
     newGoal: '',
     isLoading: false,
@@ -13,15 +15,18 @@ Page({
     showInputModal: false,
     droppingGoalId: '' as string | null,
     droppingCandyOffset: 0,
-    droppingCandyColor: '#FF80AB'
+    droppingCandyColor: '#FF80AB',
+    skillCategories: [] as Array<{ id: string; name: string; icon: string; count: number }>
   },
 
   onLoad() {
     this.loadGoals();
+    this.loadSkillCategories();
   },
 
   onShow() {
     this.loadGoals();
+    this.loadSkillCategories();
     // 更新自定义tabBar选中状态
     if (typeof this.getTabBar === 'function' && this.getTabBar()) {
       this.getTabBar().setData({
@@ -228,6 +233,32 @@ Page({
         });
       }
     });
+  },
+
+  // 切换标签
+  switchTab(e: any) {
+    const tab = e.currentTarget.dataset.tab as 'goal' | 'skill';
+    this.setData({ tab });
+  },
+
+  // 加载技能树分类统计
+  loadSkillCategories() {
+    const categories = skillTreeService.getStatsByCategory();
+    this.setData({ skillCategories: categories });
+  },
+
+  // 进入技能分类详情
+  goToSkillDetail(e: any) {
+    const category = e.currentTarget.dataset.category;
+    if (!category) return;
+    wx.navigateTo({
+      url: `/pages/skill-detail/skill-detail?category=${category}`
+    });
+  },
+
+  // 进入技能分析页
+  goToSkillAnalysis() {
+    wx.navigateTo({ url: '/pages/skill-analysis/skill-analysis' });
   },
 
   // 加号按钮点击事件

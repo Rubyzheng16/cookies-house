@@ -1,0 +1,48 @@
+<!-- 技能分析页 -->
+<view class="container">
+  <view class="header">
+    <text class="header-title">技能分布与决策分析</text>
+  </view>
+
+  <!-- 总览 -->
+  <view class="card stats-card">
+    <text class="section-title">总览</text>
+    <view class="stats-row">
+      <view class="stat-item">
+        <text class="stat-value">{{analysis.total}}</text>
+        <text class="stat-label">总技能数</text>
+      </view>
+      <view class="stat-item">
+        <text class="stat-value">{{analysis.continueCount}}</text>
+        <text class="stat-label">继续</text>
+      </view>
+      <view class="stat-item">
+        <text class="stat-value">{{analysis.letGoCount}}</text>
+        <text class="stat-label">放手</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 分类分布 -->
+  <view class="card">
+    <text class="section-title">分类分布</text>
+    <view class="category-list">
+      <view 
+        wx:for="{{analysis.byCategory}}" 
+        wx:key="id"
+        class="category-item"
+      >
+        <text class="category-icon">{{item.icon}}</text>
+        <text class="category-name">{{item.name}}</text>
+        <text class="category-count">{{item.count}} 项</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 空状态 -->
+  <view wx:if="{{analysis.total === 0}}" class="empty">
+    <text class="empty-icon">📊</text>
+    <text class="empty-text">暂无技能数据</text>
+    <text class="empty-hint">在技能树中添加技能后即可查看分析</text>
+  </view>
+</view>

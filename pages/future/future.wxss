@@ -1,4 +1,298 @@
 /* 折叠式未来目标管理页面样式 */
+.tabs {
+  display: flex;
+  justify-content: center;
+  gap: 32rpx;
+  margin-bottom: 40rpx;
+}
+
+.tab-btn {
+  padding: 24rpx 48rpx;
+  border-radius: 50rpx;
+  font-weight: bold;
+  border: 8rpx solid transparent;
+  background: rgba(255, 255, 255, 0.4);
+  color: #6D4C41;
+  font-size: 28rpx;
+  transform: scale(0.9);
+  transition: all 0.3s;
+}
+
+.tab-btn.active {
+  background: #FFF9C4;
+  border-color: #6D4C41;
+  color: #3E2723;
+  transform: scale(1);
+}
+
+.tab-btn::after {
+  border: none;
+}
+
+.tab-content {
+  width: 100%;
+}
+
+/* 技能树板块（参考品鉴室丰容板块样式） */
+.skill-tree-panels {
+  margin-top: 24rpx;
+}
+
+.skill-tree-panels .section-title,
+.skill-analysis-entry .section-title {
+  font-size: 32rpx;
+  margin-bottom: 24rpx;
+  color: #3E2723;
+}
+
+.panels-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 24rpx;
+}
+
+.panel-card {
+  padding: 32rpx;
+  border-radius: 32rpx;
+  text-align: center;
+  background: rgba(255, 255, 255, 0.3);
+  border: 4rpx solid rgba(109, 76, 65, 0.2);
+  transition: all 0.3s;
+}
+
+.panel-card:active {
+  background: #FFF9C4;
+  border-color: #6D4C41;
+}
+
+.panel-icon {
+  font-size: 48rpx;
+  display: block;
+  margin-bottom: 12rpx;
+}
+
+.panel-name {
+  font-size: 28rpx;
+  font-weight: bold;
+  color: #3E2723;
+  display: block;
+}
+
+.panel-desc {
+  font-size: 20rpx;
+  color: rgba(62, 39, 35, 0.7);
+  margin-top: 8rpx;
+  display: block;
+}
+
+/* 分析入口（参考品鉴室卡片样式） */
+.skill-analysis-entry {
+  margin-top: 48rpx;
+}
+
+.analysis-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 32rpx;
+  background: rgba(255, 249, 196, 0.9);
+  border: 4rpx solid rgba(161, 136, 127, 0.3);
+  border-radius: 32rpx;
+  box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.08);
+}
+
+.analysis-hint {
+  font-size: 28rpx;
+  color: #3E2723;
+}
+
+.analysis-arrow {
+  font-size: 32rpx;
+  color: #6D4C41;
+}
+
+/* 拆解板块（缩小） */
+.goal-split-section {
+  padding: 24rpx 28rpx 28rpx;
+}
+
+.goal-split-title {
+  font-size: 32rpx;
+  font-weight: bold;
+  color: #3E2723;
+  display: block;
+  margin-bottom: 8rpx;
+}
+
+.goal-split-subtitle {
+  font-size: 22rpx;
+  color: #6D4C41;
+  opacity: 0.9;
+  display: block;
+  margin-bottom: 20rpx;
+}
+
+.goal-split-row {
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+}
+
+.goal-split-input {
+  flex: 1;
+  min-height: 64rpx;
+  background: rgba(255, 249, 196, 0.6);
+  border: 2rpx solid rgba(255, 255, 255, 0.8);
+  border-radius: 24rpx;
+  padding: 14rpx 20rpx;
+  color: #3E2723;
+  font-size: 26rpx;
+}
+
+.goal-split-btn {
+  flex-shrink: 0;
+  padding: 14rpx 28rpx;
+  background: #6D4C41;
+  color: #fff;
+  border-radius: 24rpx;
+  font-size: 26rpx;
+  font-weight: bold;
+  border: none;
+}
+
+.goal-split-btn::after {
+  border: none;
+}
+
+.goal-split-btn[disabled] {
+  opacity: 0.5;
+}
+
+/* 长期目标板块：tag 展示 */
+.long-term-section {
+  margin-top: 24rpx;
+  background: rgba(255, 255, 255, 0.5);
+  border-radius: 32rpx;
+  padding: 24rpx;
+  border: 4rpx solid rgba(109, 76, 65, 0.12);
+}
+
+.long-term-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20rpx;
+}
+
+.long-term-title {
+  font-size: 30rpx;
+  font-weight: bold;
+  color: #3E2723;
+}
+
+.long-term-add-btn {
+  padding: 4rpx 16rpx;
+  background: #6D4C41;
+  color: #fff;
+  border-radius: 999rpx;
+  font-size: 22rpx;
+  font-weight: 500;
+  border: none;
+}
+
+.long-term-add-btn::after {
+  border: none;
+}
+
+.goal-tags-wrap {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12rpx;
+}
+
+.goal-tag-row {
+  margin: 0;
+}
+
+.goal-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 12rpx;
+  padding: 12rpx 20rpx;
+  background: #FF80AB;
+  color: #fff;
+  border-radius: 999rpx;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+.goal-tag.expanded {
+  border-radius: 24rpx 24rpx 0 0;
+}
+
+.goal-tag-text {
+  flex: 1;
+  min-width: 0;
+  font-size: 26rpx;
+  font-weight: 500;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.goal-tag-close {
+  flex-shrink: 0;
+  width: 36rpx;
+  height: 36rpx;
+  line-height: 36rpx;
+  text-align: center;
+  font-size: 32rpx;
+  opacity: 0.9;
+}
+
+.goal-tag-detail {
+  background: rgba(255, 249, 196, 0.5);
+  border: 2rpx solid rgba(109, 76, 65, 0.1);
+  border-top: none;
+  border-radius: 0 0 24rpx 24rpx;
+  padding: 16rpx 20rpx 20rpx;
+}
+
+.goal-tag-step {
+  display: flex;
+  align-items: center;
+  gap: 12rpx;
+  padding: 10rpx 0;
+  font-size: 24rpx;
+  color: #3E2723;
+}
+
+.goal-tag-step.completed {
+  opacity: 0.6;
+  text-decoration: line-through;
+}
+
+.goal-tag-step-text {
+  flex: 1;
+  min-width: 0;
+}
+
+.goal-tag-empty-steps {
+  font-size: 24rpx;
+  color: rgba(62, 39, 35, 0.5);
+  padding: 12rpx 0;
+}
+
+.long-term-empty {
+  text-align: center;
+  padding: 32rpx 0;
+}
+
+.long-term-empty-text {
+  font-size: 26rpx;
+  color: rgba(62, 39, 35, 0.5);
+}
+
 .input-section {
   text-align: center;
 }

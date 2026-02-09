@@ -82,6 +82,22 @@ export const COOKIE_METADATA: Record<CookieType, {
   }
 };
 
+/** 技能树分类 */
+export const SKILL_TREE_CATEGORIES = [
+  { id: 'sports', name: '体育', icon: '🏃' },
+  { id: 'leisure', name: '休闲', icon: '🧘' },
+  { id: 'interest', name: '兴趣', icon: '🎨' },
+  { id: 'skill', name: '技能', icon: '💼' }
+];
+
+/** 技能类子分类 */
+export const SKILL_SUB_CATEGORIES = [
+  { id: 'language', name: '语言能力' },
+  { id: 'tech', name: '技术技能' },
+  { id: 'soft', name: '软技能' },
+  { id: 'other', name: '其他技能' }
+];
+
 /** 丰容板块配置 */
 export const ENRICHMENT_CATEGORIES = [
   { id: 'physical', name: '物理环境', icon: '🏠' },

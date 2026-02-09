@@ -20,6 +20,7 @@ Page({
     entryColors: {},
     entryIcons: {},
     quadrantDots: [[], [], [], []],
+    isEditMode: false,
     showInputModal: false,
     showTimeModal: false,
     editingEntryId: '',
@@ -183,12 +184,16 @@ Page({
       entries: minuteGroupMap[timeLabel]
     }));
 
+    // 全天 0:00–24:00；无事件的时段不显示白色方框
     const hourGroups = [];
     for (let hour = 0; hour < 24; hour++) {
       const hourStr = String(hour).padStart(2, '0');
+      const minutesInHour = minuteGroups.filter(group => group.timeLabel.startsWith(hourStr + ':'));
+      const hasEntries = minutesInHour.length > 0;
       hourGroups.push({
         hourLabel: hourStr + ':00',
-        minutes: minuteGroups.filter(group => group.timeLabel.startsWith(hourStr + ':'))
+        minutes: hasEntries ? minutesInHour : [],
+        hasEntries: hasEntries
       });
     }
 
@@ -246,22 +251,44 @@ Page({
     this.setData({ showInputModal: false });
   },
 
-  showAddTimeModal(e) {
+  // 长按打开时间弹窗（添加/修改时间）
+  showTimeModalByLongPress(e) {
     const id = e.currentTarget.dataset.id;
+    if (!id || id.indexOf('empty-') === 0) return;
+    const entry = (this.data.entries || []).find(ent => ent.id === id);
     const now = new Date();
-    const startH = now.getHours();
-    const startM = now.getMinutes();
-    const defStart = String(startH).padStart(2, '0') + ':' + String(startM).padStart(2, '0');
-    const endH = (startH + 1) % 24;
-    const defEnd = String(endH).padStart(2, '0') + ':' + String(startM).padStart(2, '0');
+    let startH = now.getHours();
+    let startM = now.getMinutes();
+    let endH = (startH + 1) % 24;
+    let endM = startM;
+    if (entry && entry.startTime && entry.endTime) {
+      const [sh, sm] = entry.startTime.split(':').map(Number);
+      const [eh, em] = entry.endTime.split(':').map(Number);
+      startH = sh;
+      startM = sm;
+      endH = eh;
+      endM = em;
+    }
+    const hourList = this.data.hourList;
+    const minuteList = this.data.minuteList;
+    const startPickerValue = [hourList.indexOf(String(startH).padStart(2, '0')), minuteList.indexOf(String(startM).padStart(2, '0'))];
+    const endPickerValue = [hourList.indexOf(String(endH).padStart(2, '0')), minuteList.indexOf(String(endM).padStart(2, '0'))];
+    const editingStartTime = String(startH).padStart(2, '0') + ':' + String(startM).padStart(2, '0');
+    const editingEndTime = String(endH).padStart(2, '0') + ':' + String(endM).padStart(2, '0');
     this.setData({
       showTimeModal: true,
       editingEntryId: id,
-      editingStartTime: defStart,
-      editingEndTime: defEnd,
-      startPickerValue: [startH, startM],
-      endPickerValue: [endH, startM]
+      editingStartTime: editingStartTime,
+      editingEndTime: editingEndTime,
+      startPickerValue: startPickerValue.map(v => Math.max(0, v)),
+      endPickerValue: endPickerValue.map(v => Math.max(0, v))
     });
+  },
+
+  showAddTimeModal(e) {
+    const id = e.currentTarget.dataset.id;
+    if (!id) return;
+    this.showTimeModalByLongPress(e);
   },
 
   hideAddTimeModal() {
@@ -303,10 +330,30 @@ Page({
       fragmentService.updateEntryTime(this.data.date, editingEntryId, editingStartTime, editingEndTime);
       this.hideAddTimeModal();
       this.loadData();
-      wx.showToast({ title: '已添加时间', icon: 'success' });
+      wx.showToast({ title: '已保存时间', icon: 'success' });
     } catch (err) {
       wx.showToast({ title: '保存失败', icon: 'none' });
     }
+  },
+
+  toggleEditMode() {
+    this.setData({ isEditMode: !this.data.isEditMode });
+  },
+
+  deleteEntry(e) {
+    const id = e.currentTarget.dataset.id;
+    if (!id) return;
+    wx.showModal({
+      title: '删除',
+      content: '确定删除这条记录吗？',
+      success: (res) => {
+        if (res.confirm) {
+          fragmentService.deleteEntry(this.data.date, id);
+          this.loadData();
+          wx.showToast({ title: '已删除', icon: 'none' });
+        }
+      }
+    });
   },
 
   // 处理输入确认

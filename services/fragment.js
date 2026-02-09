@@ -66,6 +66,16 @@ export const fragmentService = {
     return folders;
   },
 
+  // 删除单条碎碎念/任务
+  deleteEntry(date, entryId) {
+    const folders = this.getFolders();
+    const folder = folders.find(f => f.date === date);
+    if (!folder) return folders;
+    folder.entries = folder.entries.filter(e => e.id !== entryId);
+    this.saveFolders(folders);
+    return folders;
+  },
+
   // 更新条目的时间范围
   updateEntryTime(date, entryId, startTime, endTime) {
     const folders = this.getFolders();

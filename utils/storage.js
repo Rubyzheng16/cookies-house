@@ -4,6 +4,7 @@ const STORAGE_KEYS = {
   GOALS: 'cookie_goals',
   USER_INFO: 'user_info',
   ENRICHMENT: 'enrichment_data',
+  SKILL_TREE: 'skill_tree_data',
   DIARY_PROMPT: 'diary_prompt_custom',
   USER_VIP: 'user_vip',
   COUNSELOR_DIARY: 'counselor_diary'
@@ -80,6 +81,26 @@ export const storage = {
     } catch (e) {
       console.error('获取丰容数据失败', e);
       return { todayFortune: null, litPanels: {} };
+    }
+  },
+
+  // 获取技能树数据
+  getSkillTreeData() {
+    try {
+      const data = wx.getStorageSync(STORAGE_KEYS.SKILL_TREE);
+      return data || { items: [] };
+    } catch (e) {
+      console.error('获取技能树数据失败', e);
+      return { items: [] };
+    }
+  },
+
+  // 保存技能树数据
+  saveSkillTreeData(data) {
+    try {
+      wx.setStorageSync(STORAGE_KEYS.SKILL_TREE, data);
+    } catch (e) {
+      console.error('保存技能树数据失败', e);
     }
   },
 

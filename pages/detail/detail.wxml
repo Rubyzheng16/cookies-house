@@ -10,7 +10,9 @@
         <text class="header-date">{{dateLabel}}</text>
         <text class="header-time">{{currentTime}}</text>
       </view>
-      <view class="header-spacer"></view>
+      <view class="header-edit-btn" bindtap="toggleEditMode">
+        <text>{{isEditMode ? '完成' : '编辑'}}</text>
+      </view>
     </view>
   </view>
 
@@ -57,7 +59,7 @@
       <view 
         wx:for="{{hourGroups}}" 
         wx:key="hourLabel"
-        wx:if="{{item.minutes && item.minutes.length > 0}}"
+        wx:for-index="hourIndex"
         class="hour-group"
       >
         <!-- 最左侧整点刻度 -->
@@ -71,10 +73,10 @@
         <view class="hour-content">
           <view class="hour-line"></view>
 
-          <!-- 右侧内容区域 -->
-          <view class="content-area">
-      <!-- 全天事件 -->
-      <view class="all-day-section" wx:if="{{allDayEntries.length > 0}}">
+          <!-- 右侧内容区域（仅在有事件或全天事件时显示，无事件时段不显示白色方框） -->
+          <view class="content-area" wx:if="{{item.hasEntries || (hourIndex === 0 && allDayEntries.length > 0)}}">
+      <!-- 全天事件（仅在第一小时处显示一次） -->
+      <view class="all-day-section" wx:if="{{hourIndex === 0 && allDayEntries.length > 0}}">
         <view class="all-day-label">全天</view>
         <view class="all-day-entries">
           <view 
@@ -118,8 +120,8 @@
         </view>
       </view>
 
-          <!-- 按分钟分组的时间块（该小时内） -->
-          <view class="minute-groups">
+          <!-- 按分钟分组的时间块（该小时内，仅当有事件时渲染） -->
+          <view class="minute-groups" wx:if="{{item.hasEntries}}">
             <view 
               wx:for="{{item.minutes}}" 
               wx:for-item="minute"
@@ -133,7 +135,7 @@
                 </view>
               </view>
 
-              <!-- 右侧该分钟内的所有事件 -->
+              <!-- 右侧该分钟内的所有事件：无内容时为扁平时段 -->
               <view class="minute-group-entries">
                 <view 
                   wx:for="{{minute.entries}}" 
@@ -141,10 +143,14 @@
                   wx:key="id"
                   class="timeline-item"
                 >
+                  <!-- 有内容的事件块：可长按修改时间，编辑模式下显示 × -->
                   <view 
                     class="entry-card"
                     style="background-color: {{entryColors[entry.type] || '#E0E0E080'}}"
+                    bindlongpress="showTimeModalByLongPress"
+                    data-id="{{entry.id}}"
                   >
+                    <view wx:if="{{isEditMode}}" class="entry-delete-btn" catchtap="deleteEntry" data-id="{{entry.id}}">×</view>
                     <view class="entry-header">
                       <text class="entry-icon">{{entryIcons[entry.type] || '💭'}}</text>
                       <view class="entry-content">
@@ -154,13 +160,11 @@
                           <text class="entry-completion-time">{{entry.startTime}} - {{entry.endTime}}</text>
                           <text class="entry-duration">{{entry.durationStr}}</text>
                         </view>
-                        <view 
-                          wx:if="{{entry.type !== 'MUMBLING' && !entry.startTime}}" 
-                          class="add-time-btn"
-                          bindtap="showAddTimeModal"
-                          data-id="{{entry.id}}"
-                        >
-                          <text class="add-time-text">+ 添加时间</text>
+                        <view wx:if="{{entry.type !== 'MUMBLING' && !entry.startTime}}" class="add-time-hint">
+                          <text class="add-time-text">长按修改时间</text>
+                        </view>
+                        <view wx:elif="{{entry.startTime && entry.endTime}}" class="add-time-hint">
+                          <text class="add-time-text">长按修改时间</text>
                         </view>
                       </view>
                     </view>

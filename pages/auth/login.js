@@ -9,9 +9,9 @@ Page({
   },
 
   onLoad() {
-    // 如果已经有 token，直接跳转到首页/个人中心
+    // 如果已经有 token，直接跳转到饼干屋（文件夹页）
     if (auth.isLoggedIn()) {
-      this.goToProfile();
+      this.goToIndex();
     }
   },
 
@@ -34,7 +34,7 @@ Page({
             if (app && app.globalData) {
               app.globalData.userInfo = user;
             }
-            this.goToProfile();
+            this.goToIndex();
           })
           .catch((e) => {
             const msg = e?.message || '登录失败，请稍后再试';
@@ -56,8 +56,8 @@ Page({
     });
   },
 
-  goToProfile() {
+  goToIndex() {
     // 登录完成后进入 tabBar 的“我的”页
-    wx.switchTab({ url: '/pages/profile/profile' });
+    wx.switchTab({ url: '/pages/index/index' });
   },
 });

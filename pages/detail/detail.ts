@@ -18,6 +18,7 @@ Page({
     entryColors: {} as Record<CookieType, string>,
     entryIcons: {} as Record<CookieType, string>,
     quadrantDots: [] as number[][],
+    isEditMode: false,
     showInputModal: false,
     previewImages: [] as string[],
     previewIndex: 0,
@@ -124,6 +125,24 @@ Page({
     // 按时间排序（先后输入顺序由时间决定）
     timeEntries.sort((a, b) => (a.timestamp || 0) - (b.timestamp || 0));
 
+    const formatTimeStr = (ts: number) => {
+      const d = new Date(ts);
+      return `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
+    };
+    const parseTimeToMinutes = (t: string) => {
+      if (!t) return 0;
+      const p = t.split(':').map(Number);
+      return (p[0] || 0) * 60 + (p[1] || 0);
+    };
+    const formatDurationHours = (startTime: string, endTime: string) => {
+      if (!startTime || !endTime) return '';
+      const mins = Math.max(0, parseTimeToMinutes(endTime) - parseTimeToMinutes(startTime));
+      const hours = mins / 60;
+      if (hours < 1) return '用时 约0.5小时';
+      if (hours % 1 === 0) return `用时 ${hours}小时`;
+      return `用时 ${hours.toFixed(1)}小时`;
+    };
+
     // 按分钟分组：同一分钟内的事件放在同一个时间块中
     const minuteGroupMap: { [key: string]: any[] } = {};
     timeEntries.forEach(entry => {
@@ -137,10 +156,10 @@ Page({
         minuteGroupMap[key] = [];
       }
 
-      // 避免使用对象展开语法，改用 Object.assign
-      const entryWithTime = Object.assign({}, entry, {
-        timestamp
-      });
+      const timeStr = formatTimeStr(timestamp);
+      const durationStr = entry.type !== CookieType.MUMBLING && entry.startTime && entry.endTime
+        ? formatDurationHours(entry.startTime, entry.endTime) : '';
+      const entryWithTime = Object.assign({}, entry, { timestamp, timeStr, durationStr });
       minuteGroupMap[key].push(entryWithTime);
     });
 
@@ -151,13 +170,16 @@ Page({
       entries: minuteGroupMap[timeLabel]
     }));
 
-    // 生成按小时分组的数据：每个小时下面挂该小时内的分钟块
-    const hourGroups = [];
+    // 全天 0:00–24:00；无事件的时段不显示白色方框
+    const hourGroups: any[] = [];
     for (let hour = 0; hour < 24; hour++) {
-      const hourStr = `${String(hour).padStart(2, '0')}`;
+      const hourStr = String(hour).padStart(2, '0');
+      const minutesInHour = minuteGroups.filter((g: any) => g.timeLabel.startsWith(`${hourStr}:`));
+      const hasEntries = minutesInHour.length > 0;
       hourGroups.push({
         hourLabel: `${hourStr}:00`,
-        minutes: minuteGroups.filter(group => group.timeLabel.startsWith(`${hourStr}:`))
+        minutes: hasEntries ? minutesInHour : [],
+        hasEntries
       });
     }
 

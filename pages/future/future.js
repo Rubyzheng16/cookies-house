@@ -1,24 +1,87 @@
 // 折叠式未来目标管理页面
 import { goalService } from '../../services/goal.js';
 import { aiService } from '../../utils/ai.js';
+import { fragmentService } from '../../services/fragment.js';
+import { skillTreeService } from '../../services/skillTree.js';
 
 Page({
   data: {
+    tab: 'goal', // 默认以目标拆解为主
     goals: [],
     newGoal: '',
     isLoading: false,
     expandedGoals: [],
-    droppingGoalId: '',      // 正在掉落动画的目标 id
-    droppingCandyOffset: 0, // 掉落糖果的随机水平偏移 (rpx)
+    showInputModal: false,
+    droppingGoalId: '',
+    droppingCandyOffset: 0,
     droppingCandyColor: '#FF80AB',
+    skillCategories: []
   },
 
   onLoad() {
     this.loadGoals();
+    this.loadSkillCategories();
   },
 
   onShow() {
     this.loadGoals();
+    this.loadSkillCategories();
+    if (typeof this.getTabBar === 'function' && this.getTabBar()) {
+      this.getTabBar().setData({ selected: 2 });
+    }
+  },
+
+  // 切换标签
+  switchTab(e) {
+    const tab = e.currentTarget.dataset.tab;
+    this.setData({ tab });
+  },
+
+  // 加载技能树分类统计
+  loadSkillCategories() {
+    const categories = skillTreeService.getStatsByCategory();
+    this.setData({ skillCategories: categories });
+  },
+
+  // 进入技能分类详情
+  goToSkillDetail(e) {
+    const category = e.currentTarget.dataset.category;
+    if (!category) return;
+    wx.navigateTo({ url: `/pages/skill-detail/skill-detail?category=${category}` });
+  },
+
+  // 进入技能分析页
+  goToSkillAnalysis() {
+    wx.navigateTo({ url: '/pages/skill-analysis/skill-analysis' });
+  },
+
+  // 长期目标板块右上角「添加」：新增一个长期目标（仅标题，可稍后拆解）
+  onAddLongTermGoal() {
+    wx.showModal({
+      title: '添加长期目标',
+      editable: true,
+      placeholderText: '输入目标名称',
+      success: (res) => {
+        if (!res.confirm) return;
+        const title = (res.content || '').trim();
+        if (!title) {
+          wx.showToast({ title: '请输入目标名称', icon: 'none' });
+          return;
+        }
+        const goal = {
+          id: Math.random().toString(36).substr(2, 9),
+          title,
+          steps: [],
+          candyCount: 0,
+          isCompleted: false,
+          type: null
+        };
+        const goals = goalService.addGoal(goal);
+        const goalsWithProgress = this.withUiFields(goals, this.data.expandedGoals || []);
+        this.setData({ goals: goalsWithProgress });
+        wx.showToast({ title: '已添加', icon: 'success' });
+      }
+    });
   },
 
   loadGoals() {
@@ -193,6 +256,26 @@ Page({
     }
     const goals = this.withUiFields(this.data.goals || [], expanded);
     this.setData({ expandedGoals: expanded, goals });
+  },
+
+  // 加号按钮点击（全局输入弹窗）
+  onAddButtonClick() {
+    this.setData({ showInputModal: true });
+  },
+
+  hideInputModal() {
+    this.setData({ showInputModal: false });
+  },
+
+  handleInputConfirm(e) {
+    const { text, type, images, voicePath } = e.detail;
+    const hasContent = (text && text.trim()) || (images && images.length > 0) || voicePath;
+    if (!hasContent) {
+      wx.showToast({ title: '请输入内容、选择图片或录制语音', icon: 'none' });
+      return;
+    }
+    fragmentService.addEntry((text || '').trim() || '[图片/语音]', type, { images, voicePath });
+    wx.showToast({ title: '已记录', icon: 'success' });
   },
 
   // 删除目标
