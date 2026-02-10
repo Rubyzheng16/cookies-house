@@ -1,13 +1,17 @@
-// 后端 API 地址配置
-//
-// 【切换版本】修改 USE_LOCAL_DEV 即可：
-// - true   = 真机调试版（局域网 IP）
-// - false  = 正式/体验版（用域名）
+// 与 TypeScript 版本保持一致的 JS 配置
+// 供纯 JS 文件（如 utils/ai.js）在运行时使用
 
-const USE_LOCAL_DEV = true;
+// 【切换版本】修改下面这一行即可：
+// - true   = 真机调试版（局域网 IP，手机和电脑需同一 WiFi）
+// - false  = 正式/体验版（用域名，需部署后端到公网并配置 HTTPS）
 
-// 本地开发默认使用 localhost:3000（需在本机启动后端）
+// 这里先改成 false，让所有请求都走线上服务器
+const USE_LOCAL_DEV = false;
+
+// 真机调试：本地开发用 localhost（需电脑上启动后端）
 const LOCAL_DEV_URL = 'http://localhost:3000';
-const PROD_URL = 'https://api.your-domain.com';
+
+// 正式/体验版：目前先用服务器 IP，等有域名+HTTPS 再换成 https://api.xxx.com
+const PROD_URL = 'http://43.139.6.179';
 
 export const API_BASE_URL = USE_LOCAL_DEV ? LOCAL_DEV_URL : PROD_URL;

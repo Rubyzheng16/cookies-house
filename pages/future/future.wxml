@@ -55,11 +55,7 @@
           wx:key="id"
           class="goal-tag-row"
         >
-          <view 
-            class="goal-tag {{item.isExpanded ? 'expanded' : ''}}"
-            data-goal-id="{{item.id}}"
-            bindtap="toggleExpand"
-          >
+          <view class="goal-tag">
             <text class="goal-tag-text">{{item.title}}</text>
             <view 
               class="goal-tag-close"
@@ -68,34 +64,155 @@
               aria-label="删除"
             >×</view>
           </view>
-          <!-- 展开时显示步骤 -->
-          <view wx:if="{{item.isExpanded}}" class="goal-tag-detail">
-            <view 
-              wx:for="{{item.steps}}" 
-              wx:for-item="step"
-              wx:key="id"
-              class="goal-tag-step {{step.completed ? 'completed' : ''}}"
-              data-goal-id="{{item.id}}"
-              data-step-id="{{step.id}}"
-              data-text="{{step.text}}"
-              bindlongpress="editStep"
-            >
-              <checkbox 
-                checked="{{step.completed}}"
-                data-goal-id="{{item.id}}"
-                data-step-id="{{step.id}}"
-                bindtap="completeStep"
-              />
-              <text class="goal-tag-step-text">{{step.text}}</text>
-            </view>
-            <view wx:if="{{!item.steps || item.steps.length === 0}}" class="goal-tag-empty-steps">点击上方拆解板块，输入目标后点「拆解」生成步骤</view>
-          </view>
         </view>
       </view>
       <view wx:if="{{goals.length === 0}}" class="long-term-empty">
         <text class="long-term-empty-text">暂无长期目标，点击右上角添加</text>
       </view>
     </view>
+
+    <!-- 目标列表：糖果罐卡片（原样恢复） -->
+    <view class="goals-list">
+      <view 
+        wx:for="{{goals}}" 
+        wx:key="id"
+        class="goal-card"
+      >
+        <!-- 板块右上角删除：小× -->
+        <button 
+          class="goal-delete-x"
+          data-goal-id="{{item.id}}"
+          bindtap="deleteGoal"
+          aria-label="删除目标"
+        >×</button>
+
+        <view class="goal-content">
+          <!-- 糖果罐 -->
+          <view class="candy-jar">
+            <view class="jar-top"></view>
+            <view class="jar-body">
+              <view 
+                wx:for="{{item.candyCount}}" 
+                wx:key="*this"
+                wx:for-item="candy"
+                wx:for-index="candyIndex"
+                class="candy candy-stack"
+                style="background-color: {{['#FF80AB', '#81C784', '#FFF176', '#B39DDB'][candyIndex % 4]}};"
+              ></view>
+            </view>
+            <!-- 掉落动画糖果（完成步骤时从上往下落，带重力感和碰撞 bounce） -->
+            <view 
+              wx:if="{{droppingGoalId === item.id}}"
+              class="candy candy-drop"
+              style="background-color: {{droppingCandyColor}}; left: calc(50% + {{droppingCandyOffset}}rpx);"
+            ></view>
+          </view>
+
+          <!-- 目标信息：标题横排 -> 进度条 -> 展开 -> 步骤竖排 -->
+          <view class="goal-info">
+            <view class="goal-header">
+              <view class="goal-title-wrapper">
+                <view 
+                  wx:if="{{item.type}}"
+                  class="goal-type-dot"
+                  style="background-color: {{item.typeColor || '#FF80AB'}};"
+                ></view>
+                <text class="goal-title">{{item.title}}</text>
+              </view>
+            </view>
+
+            <!-- 进度条 -->
+            <view class="progress-bar">
+              <view 
+                class="progress-fill"
+                style="width: {{item.progress}}%;"
+              ></view>
+            </view>
+
+            <!-- 展开查看全貌 -->
+            <view class="expand-section">
+              <button 
+                class="expand-btn"
+                data-goal-id="{{item.id}}"
+                bindtap="toggleExpand"
+              >
+                {{item.isExpanded ? '收起详情 ▲' : '展开查看全貌 ▼'}}
+              </button>
+            </view>
+
+            <!-- 已完成 -->
+            <view wx:if="{{item.isCompleted}}" class="completed-badge">已封装满载 🍬</view>
+
+            <!-- 未完成：下一步预览（折叠时） -->
+            <view wx:else class="next-step-preview">
+              <view 
+                wx:if="{{item.nextStep}}"
+                class="next-step-item"
+                data-goal-id="{{item.id}}"
+                data-step-id="{{item.nextStep.id}}"
+                data-text="{{item.nextStep.text}}"
+                bindlongpress="editStep"
+              >
+                <checkbox 
+                  checked="{{item.nextStep.completed}}"
+                  data-goal-id="{{item.id}}"
+                  data-step-id="{{item.nextStep.id}}"
+                  bindtap="completeStep"
+                />
+                <view class="next-step-content">
+                  <text class="next-step-label">下一步：</text>
+                  <text class="next-step-text">{{item.nextStep.text}}</text>
+                </view>
+              </view>
+              <view wx:else class="next-step-item">
+                <view class="next-step-content">
+                  <text class="next-step-label">下一步：</text>
+                  <text class="next-step-text">所有步骤都完成啦 🎉</text>
+                </view>
+              </view>
+            </view>
+          </view>
+        </view>
+
+        <!-- 展开状态：展示全部步骤（含已完成，像历史记录）已完成目标也可展开查看 -->
+        <view wx:if="{{item.isExpanded}}" class="mindmap-section">
+          <!-- 已有完成步骤时，顶部显示历史记录说明 -->
+          <view wx:if="{{item.progress > 0}}" class="history-label">已完成 · 历史记录</view>
+          <block wx:for="{{item.stepGroups}}" wx:key="title" wx:for-item="group">
+            <view class="mindmap-node">
+              <view class="mindmap-branch"></view>
+              <text class="mindmap-subtitle">{{group.title}}</text>
+              <view 
+                wx:for="{{group.steps}}" 
+                wx:for-item="step"
+                wx:key="id"
+                class="mindmap-step {{step.completed ? 'completed' : ''}}"
+                data-goal-id="{{item.id}}"
+                data-step-id="{{step.id}}"
+                data-text="{{step.text}}"
+                bindlongpress="editStep"
+              >
+                <view class="mindmap-connector"></view>
+                <checkbox 
+                  checked="{{step.completed}}"
+                  data-goal-id="{{item.id}}"
+                  data-step-id="{{step.id}}"
+                  bindtap="completeStep"
+                />
+                <text class="step-text">{{step.text}}</text>
+              </view>
+            </view>
+          </block>
+        </view>
+      </view>
+
+      <!-- 空状态 -->
+      <view wx:if="{{goals.length === 0}}" class="empty-state">
+        <text class="empty-icon">🏺</text>
+        <text class="empty-text">糖果罐空空的，输入一个目标来填满它吧</text>
+      </view>
+    </view>
+
   </view>
 
   <!-- Tab 2: 技能树和长期目标 -->
