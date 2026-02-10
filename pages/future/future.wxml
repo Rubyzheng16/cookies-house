@@ -43,7 +43,7 @@
       </view>
     </view>
 
-    <!-- 长期目标板块：tag 展示，右上角添加 -->
+    <!-- 长期目标板块：tag 展示，右上角添加（所有目标都可作为标签展示） -->
     <view class="long-term-section">
       <view class="long-term-header">
         <text class="long-term-title">长期目标</text>
@@ -71,10 +71,10 @@
       </view>
     </view>
 
-    <!-- 目标列表：糖果罐卡片（原样恢复） -->
+    <!-- 目标列表：糖果罐卡片（仅展示有拆解步骤的目标） -->
     <view class="goals-list">
       <view 
-        wx:for="{{goals}}" 
+        wx:for="{{cardGoals}}" 
         wx:key="id"
         class="goal-card"
       >
@@ -206,8 +206,8 @@
         </view>
       </view>
 
-      <!-- 空状态 -->
-      <view wx:if="{{goals.length === 0}}" class="empty-state">
+      <!-- 空状态：仅在没有任何带步骤的目标时提示 -->
+      <view wx:if="{{cardGoals.length === 0}}" class="empty-state">
         <text class="empty-icon">🏺</text>
         <text class="empty-text">糖果罐空空的，输入一个目标来填满它吧</text>
       </view>

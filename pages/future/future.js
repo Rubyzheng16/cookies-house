@@ -8,6 +8,7 @@ Page({
   data: {
     tab: 'goal', // 默认以目标拆解为主
     goals: [],
+    cardGoals: [], // 仅用于糖果罐展示的目标（必须有拆解步骤）
     newGoal: '',
     isLoading: false,
     expandedGoals: [],
@@ -78,7 +79,8 @@ Page({
         };
         const goals = goalService.addGoal(goal);
         const goalsWithProgress = this.withUiFields(goals, this.data.expandedGoals || []);
-        this.setData({ goals: goalsWithProgress });
+        const cardGoals = goalsWithProgress.filter(g => (g.steps || []).length > 0);
+        this.setData({ goals: goalsWithProgress, cardGoals });
         wx.showToast({ title: '已添加', icon: 'success' });
       }
     });
@@ -88,7 +90,8 @@ Page({
     const goals = goalService.getGoals();
     const expanded = this.data.expandedGoals || [];
     const goalsWithUi = this.withUiFields(goals, expanded);
-    this.setData({ goals: goalsWithUi });
+    const cardGoals = goalsWithUi.filter(g => (g.steps || []).length > 0);
+    this.setData({ goals: goalsWithUi, cardGoals });
   },
 
   // 输入框变化
@@ -130,8 +133,10 @@ Page({
 
         const goals = goalService.addGoal(goal);
         const goalsWithProgress = this.withUiFields(goals, this.data.expandedGoals || []);
+        const cardGoals = goalsWithProgress.filter(g => (g.steps || []).length > 0);
         this.setData({
           goals: goalsWithProgress,
+          cardGoals,
           newGoal: ''
         });
 
@@ -169,7 +174,8 @@ Page({
       // 取消勾选：直接更新，糖果消失
       const goals = goalService.toggleStep(goalId, stepId);
       const goalsWithProgress = this.withUiFields(goals, this.data.expandedGoals || []);
-      this.setData({ goals: goalsWithProgress });
+      const cardGoals = goalsWithProgress.filter(g => (g.steps || []).length > 0);
+      this.setData({ goals: goalsWithProgress, cardGoals });
       wx.showToast({ title: '已取消', icon: 'none', duration: 800 });
     } else {
       // 打勾完成：播糖果掉落动画后更新
@@ -187,6 +193,7 @@ Page({
         const goalsWithProgress = this.withUiFields(goals, this.data.expandedGoals || []);
         this.setData({
           goals: goalsWithProgress,
+          cardGoals: goalsWithProgress.filter(g => (g.steps || []).length > 0),
           droppingGoalId: '',
           droppingCandyOffset: 0
         });
@@ -209,7 +216,10 @@ Page({
         }
         const goals = goalService.updateStepText(goalId, stepId, newText.trim());
         const goalsWithProgress = this.withUiFields(goals, this.data.expandedGoals || []);
-        this.setData({ goals: goalsWithProgress });
+        this.setData({ 
+          goals: goalsWithProgress,
+          cardGoals: goalsWithProgress.filter(g => (g.steps || []).length > 0)
+        });
         wx.showToast({
           title: '已更新步骤',
           icon: 'success',
@@ -255,7 +265,8 @@ Page({
       expanded.push(goalId);
     }
     const goals = this.withUiFields(this.data.goals || [], expanded);
-    this.setData({ expandedGoals: expanded, goals });
+    const cardGoals = goals.filter(g => (g.steps || []).length > 0);
+    this.setData({ expandedGoals: expanded, goals, cardGoals });
   },
 
   // 加号按钮点击（全局输入弹窗）
@@ -289,7 +300,11 @@ Page({
         const goals = goalService.deleteGoal(goalId);
         const expanded = this.data.expandedGoals.filter(id => id !== goalId);
         const goalsWithProgress = this.withUiFields(goals, expanded);
-        this.setData({ goals: goalsWithProgress, expandedGoals: expanded });
+        this.setData({ 
+          goals: goalsWithProgress, 
+          expandedGoals: expanded,
+          cardGoals: goalsWithProgress.filter(g => (g.steps || []).length > 0)
+        });
         wx.showToast({ title: '已删除', icon: 'none' });
       }
     });
