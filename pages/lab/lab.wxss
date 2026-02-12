@@ -422,7 +422,7 @@
 
 /* 丰容板块 */
 .enrichment-panels {
-  margin-top: 48rpx;
+  margin-top: 8rpx;
 }
 
 .enrichment-panels .section-title {

@@ -3,7 +3,8 @@ import { storage } from '../utils/storage.js';
 import { dateUtils } from '../utils/date.js';
 import { ENRICHMENT_CATEGORIES } from '../constants/index.js';
 
-const FORTUNES_PER_DAY = 5;
+// 每天通过幸运饼干 / 丰容详情 AI 生成的总次数上限
+const FORTUNES_PER_DAY = 8;
 
 function getTodayFortunesList(data) {
   const todayStr = dateUtils.getTodayString();
@@ -90,6 +91,26 @@ export const enrichmentService = {
         count: records.length
       };
     });
+  },
+
+  // 为幸运饼干选择一个「下一次要抽取」的丰容板块
+  // 规则：
+  // - 优先从今天还没出现过的板块里随机挑一个；
+  // - 如果今天 7 个板块都出现过了，再在全部板块中等概率随机。
+  getNextRandomCategory() {
+    const data = storage.getEnrichmentData();
+    const todayList = getTodayFortunesList(data);
+    const used = new Set(
+      (todayList || [])
+        .map((f) => f.category)
+        .filter((c) => !!c)
+    );
+    const allIds = ENRICHMENT_CATEGORIES.map((c) => c.id);
+    const unused = allIds.filter((id) => !used.has(id));
+    const pool = unused.length > 0 ? unused : allIds;
+    if (pool.length === 0) return null;
+    const idx = Math.floor(Math.random() * pool.length);
+    return pool[idx];
   },
 
   // 获取某板块的历史完成记录

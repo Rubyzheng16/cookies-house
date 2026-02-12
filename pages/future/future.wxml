@@ -14,7 +14,7 @@
       data-tab="skill"
       bindtap="switchTab"
     >
-      技能树
+      关于我
     </button>
   </view>
 
@@ -215,10 +215,13 @@
 
   </view>
 
-  <!-- Tab 2: 技能树和长期目标 -->
+  <!-- Tab 2: 关于我（原技能树可折叠，置顶） -->
   <view class="tab-content" wx:if="{{tab === 'skill'}}">
-    <!-- 技能树板块 -->
-    <view class="skill-tree-panels">
+    <!-- 原技能树：折叠入口（放在顶上） -->
+    <view class="skill-tree-fold-bar" bindtap="toggleSkillTreeFold">
+      <text class="fold-bar-text">{{skillTreeFolded ? '展开技能树 ▼' : '收起技能树 ▲'}}</text>
+    </view>
+    <view class="skill-tree-panels" wx:if="{{!skillTreeFolded}}">
       <text class="section-title">技能树</text>
       <view class="panels-grid">
         <view 
@@ -234,14 +237,47 @@
         </view>
       </view>
     </view>
-
-    <!-- 分析板块 -->
-    <view class="skill-analysis-entry" bindtap="goToSkillAnalysis">
+    <view wx:if="{{!skillTreeFolded}}" class="skill-analysis-entry" bindtap="goToSkillAnalysis">
       <text class="section-title">分析</text>
       <view class="analysis-card">
         <text class="analysis-hint">查看技能分布与决策分析</text>
         <text class="analysis-arrow">→</text>
       </view>
+    </view>
+
+    <!-- 关于我：中央图片 + 漂浮词语泡泡，添加词语在照片下方 -->
+    <view class="about-me-section">
+      <text class="section-title">关于我</text>
+      <view class="about-me-bubbles-wrap">
+        <!-- 中央图片上传区 -->
+        <view 
+          class="about-me-center {{aboutMeImage ? 'has-image' : ''}}"
+          bindtap="chooseAboutMeImage"
+        >
+          <image 
+            wx:if="{{aboutMeImage}}" 
+            class="about-me-image" 
+            src="{{aboutMeImage}}" 
+            mode="aspectFill"
+          />
+          <view wx:else class="about-me-upload-placeholder">
+            <text class="upload-icon">📷</text>
+            <text class="upload-text">点击上传图片</text>
+          </view>
+        </view>
+        <!-- 漂浮词语泡泡（围绕中心分布） -->
+        <view 
+          wx:for="{{aboutMeWords}}" 
+          wx:key="index"
+          class="bubble bubble-float"
+          style="left: {{item.left}}%; top: {{item.top}}%; font-size: {{item.size || 24}}rpx;"
+          data-index="{{index}}"
+          bindlongpress="removeAboutMeWord"
+        >
+          <text class="bubble-text">{{item.text}}</text>
+        </view>
+      </view>
+      <button class="add-word-btn" bindtap="addAboutMeWord">+ 添加词语</button>
     </view>
   </view>
 

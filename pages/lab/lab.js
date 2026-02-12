@@ -18,7 +18,8 @@ Page({
     counselorDiary: '',
     counselorLoading: false,
     longTermAnalysis: null,
-    longTermLoading: false
+    longTermLoading: false,
+    longTermLetterHtml: ''  // 用于 rich-text 渲染加粗（**xxx** -> <b>xxx</b>）
   },
 
   onLoad() {
@@ -89,16 +90,20 @@ Page({
     }
   },
 
-  // 幸运饼干：用户点击抽取（每天最多 5 个，内容由 AI 生成）
+  // 幸运饼干：用户点击抽取（每天最多 8 个，内容由 AI 生成）
   async onFortuneFetch() {
     if (this.data.fortuneLoading) return;
     if (!enrichmentService.canFetchMoreFortune()) {
-      wx.showToast({ title: '今日已生成 5 个，明天再来吧', icon: 'none' });
+      wx.showToast({ title: '今日已生成 8 个，明天再来吧', icon: 'none' });
       return;
     }
     this.setData({ fortuneLoading: true });
 
-    const result = await aiService.generateFortune();
+    // 为了让每个丰容板块的出现概率更均等：
+    // - 优先抽取今天还没出现过的板块；
+    // - 如果 7 个板块都出现过了，再在全部板块中随机。
+    const category = enrichmentService.getNextRandomCategory();
+    const result = await aiService.generateFortune(category);
     if (!result || !result.content) {
       wx.showToast({ title: '生成失败，请检查 AI 配置或稍后重试', icon: 'none' });
       this.setData({ fortuneLoading: false });
@@ -106,9 +111,10 @@ Page({
     }
 
     const todayStr = dateUtils.getTodayString();
+    const finalCategory = result.category || category || '';
     const todayFortune = {
       date: todayStr,
-      category: result.category,
+      category: finalCategory,
       content: result.content,
       completed: false,
       completedAt: null
@@ -227,7 +233,14 @@ Page({
         skillTree
       });
       if (result) {
-        this.setData({ longTermAnalysis: result });
+        const letter = (result.psychologicalInsight && result.psychologicalInsight.letter) || '';
+        const longTermLetterHtml = letter
+          .replace(/\n/g, '<br/>')
+          .replace(/\*\*([^*]+)\*\*/g, '<b>$1</b>');
+        this.setData({
+          longTermAnalysis: result,
+          longTermLetterHtml
+        });
         wx.showToast({ title: '长期分析已生成 ✨', icon: 'success' });
       }
     } finally {

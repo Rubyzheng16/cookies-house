@@ -40,9 +40,9 @@
 
       <button 
         class="settings-item settings-item-link"
-        bindtap="exportData"
+        bindtap="openDataBackupMenu"
       >
-        <text>数据备份</text>
+        <text>数据与备份</text>
         <text class="settings-arrow">›</text>
       </button>
 

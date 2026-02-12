@@ -65,7 +65,7 @@ Page({
 
   async addAiRecord(category) {
     if (!enrichmentService.canFetchMoreFortune()) {
-      wx.showToast({ title: '今日已生成 5 个，明天再来吧', icon: 'none' });
+      wx.showToast({ title: '今日已生成 8 个，明天再来吧', icon: 'none' });
       return;
     }
 
@@ -78,7 +78,7 @@ Page({
       return;
     }
 
-    // 计入今日 AI 生成次数（共用幸运饼干每日 5 次的限制）
+    // 计入今日 AI 生成次数（共用幸运饼干每日 8 次的限制）
     enrichmentService.saveTodayFortune({
       category,
       content: result.content,

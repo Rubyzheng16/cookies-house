@@ -5,6 +5,7 @@ const STORAGE_KEYS = {
   USER_INFO: 'user_info',
   ENRICHMENT: 'enrichment_data',
   SKILL_TREE: 'skill_tree_data',
+  ABOUT_ME: 'about_me_data',
   DIARY_PROMPT: 'diary_prompt_custom',
   USER_VIP: 'user_vip',
   COUNSELOR_DIARY: 'counselor_diary'
@@ -101,6 +102,26 @@ export const storage = {
       wx.setStorageSync(STORAGE_KEYS.SKILL_TREE, data);
     } catch (e) {
       console.error('保存技能树数据失败', e);
+    }
+  },
+
+  // 获取关于我数据（头像 + 词语泡泡）
+  getAboutMe() {
+    try {
+      const data = wx.getStorageSync(STORAGE_KEYS.ABOUT_ME);
+      return data || { imagePath: null, words: [] };
+    } catch (e) {
+      console.error('获取关于我数据失败', e);
+      return { imagePath: null, words: [] };
+    }
+  },
+
+  // 保存关于我数据
+  saveAboutMe(data) {
+    try {
+      wx.setStorageSync(STORAGE_KEYS.ABOUT_ME, data);
+    } catch (e) {
+      console.error('保存关于我数据失败', e);
     }
   },
 

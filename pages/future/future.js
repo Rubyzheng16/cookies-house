@@ -3,6 +3,16 @@ import { goalService } from '../../services/goal.js';
 import { aiService } from '../../utils/ai.js';
 import { fragmentService } from '../../services/fragment.js';
 import { skillTreeService } from '../../services/skillTree.js';
+import { storage } from '../../utils/storage.js';
+import { saveTempFile } from '../../utils/file.js';
+
+// 泡泡预设位置（围绕中心 50% 分布，避免压住中间图片）
+const BUBBLE_POSITIONS = [
+  { left: 8, top: 12 }, { left: 88, top: 10 }, { left: 5, top: 35 }, { left: 92, top: 32 },
+  { left: 12, top: 58 }, { left: 85, top: 55 }, { left: 6, top: 78 }, { left: 90, top: 82 },
+  { left: 28, top: 8 }, { left: 68, top: 18 }, { left: 25, top: 88 }, { left: 72, top: 75 },
+  { left: 18, top: 48 }, { left: 78, top: 42 }, { left: 35, top: 25 }, { left: 58, top: 68 }
+];
 
 Page({
   data: {
@@ -16,20 +26,115 @@ Page({
     droppingGoalId: '',
     droppingCandyOffset: 0,
     droppingCandyColor: '#FF80AB',
-    skillCategories: []
+    skillCategories: [],
+    // 关于我
+    aboutMeImage: '',
+    aboutMeWords: [], // [{ text, left, top, size }]
+    skillTreeFolded: true // 原技能树默认折叠
   },
 
   onLoad() {
     this.loadGoals();
     this.loadSkillCategories();
+    this.loadAboutMe();
   },
 
   onShow() {
     this.loadGoals();
     this.loadSkillCategories();
+    this.loadAboutMe();
     if (typeof this.getTabBar === 'function' && this.getTabBar()) {
       this.getTabBar().setData({ selected: 2 });
     }
+  },
+
+  // 加载关于我数据
+  loadAboutMe() {
+    const raw = storage.getAboutMe();
+    const words = (raw.words || []).map((text, i) => ({
+      text,
+      left: BUBBLE_POSITIONS[i % BUBBLE_POSITIONS.length].left,
+      top: BUBBLE_POSITIONS[i % BUBBLE_POSITIONS.length].top,
+      size: 22 + Math.floor(Math.random() * 10)
+    }));
+    this.setData({
+      aboutMeImage: raw.imagePath || '',
+      aboutMeWords: words
+    });
+  },
+
+  // 保存关于我数据
+  saveAboutMe() {
+    storage.saveAboutMe({
+      imagePath: this.data.aboutMeImage || null,
+      words: this.data.aboutMeWords.map(w => w.text)
+    });
+  },
+
+  // 选择关于我头像
+  chooseAboutMeImage() {
+    wx.chooseImage({
+      count: 1,
+      sizeType: ['compressed'],
+      sourceType: ['album', 'camera'],
+      success: async (res) => {
+        const tempPath = (res.tempFilePaths || [])[0];
+        if (!tempPath) return;
+        wx.showLoading({ title: '保存中...' });
+        try {
+          const ext = (tempPath || '').toLowerCase().includes('.png') ? '.png' : '.jpg';
+          const savedPath = await saveTempFile(tempPath, 'about_me', ext);
+          this.setData({ aboutMeImage: savedPath });
+          this.saveAboutMe();
+          wx.showToast({ title: '已保存', icon: 'success' });
+        } catch (e) {
+          wx.showToast({ title: '保存失败', icon: 'none' });
+        }
+      }
+    });
+  },
+
+  // 添加关于我词语
+  addAboutMeWord() {
+    wx.showModal({
+      title: '添加词语',
+      editable: true,
+      placeholderText: '输入关于你的词语，如：游泳、画画、善良…',
+      success: (res) => {
+        if (!res.confirm) return;
+        const text = (res.content || '').trim();
+        if (!text) {
+          wx.showToast({ title: '请输入词语', icon: 'none' });
+          return;
+        }
+        const words = this.data.aboutMeWords.slice();
+        const idx = words.length % BUBBLE_POSITIONS.length;
+        words.push({
+          text,
+          left: BUBBLE_POSITIONS[idx].left,
+          top: BUBBLE_POSITIONS[idx].top,
+          size: 22 + Math.floor(Math.random() * 10)
+        });
+        this.setData({ aboutMeWords: words });
+        this.saveAboutMe();
+        wx.showToast({ title: '已添加', icon: 'success' });
+      }
+    });
+  },
+
+  // 长按删除词语
+  removeAboutMeWord(e) {
+    const index = e.currentTarget.dataset.index;
+    const words = this.data.aboutMeWords.slice();
+    words.splice(index, 1);
+    this.setData({ aboutMeWords: words });
+    this.saveAboutMe();
+    wx.showToast({ title: '已删除', icon: 'none' });
+  },
+
+  // 折叠/展开原技能树
+  toggleSkillTreeFold() {
+    this.setData({ skillTreeFolded: !this.data.skillTreeFolded });
   },
 
   // 切换标签

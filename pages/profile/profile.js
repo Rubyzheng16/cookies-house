@@ -1,5 +1,6 @@
 // 个人中心页面
 const auth = require('../../services/auth.js');
+const sync = require('../../services/sync.js');
 
 // 本地存储的昵称、头像 key（后端用户无昵称头像时使用）
 const PROFILE_NICKNAME = 'profile_nickname';
@@ -47,6 +48,54 @@ Page({
 
   goAiSettings() {
     wx.navigateTo({ url: '/pages/profile/ai/ai' });
+  },
+
+  openDataBackupMenu() {
+    wx.showActionSheet({
+      itemList: ['备份到云端', '从云端恢复', '导出到本机'],
+      success: (res) => {
+        if (res.tapIndex === 0) this.backupToCloud();
+        else if (res.tapIndex === 1) this.restoreFromCloud();
+        else this.exportData();
+      }
+    });
+  },
+
+  backupToCloud() {
+    wx.showLoading({ title: '上传中…' });
+    sync.uploadSnapshot()
+      .then(() => {
+        wx.hideLoading();
+        wx.showToast({ title: '已备份到云端', icon: 'success' });
+      })
+      .catch((err) => {
+        wx.hideLoading();
+        wx.showToast({ title: err.message || '备份失败', icon: 'none' });
+      });
+  },
+
+  restoreFromCloud() {
+    wx.showModal({
+      title: '从云端恢复',
+      content: '将用云端数据覆盖当前本机数据，是否继续？',
+      success: (res) => {
+        if (!res.confirm) return;
+        wx.showLoading({ title: '恢复中…' });
+        sync.downloadAndRestore()
+          .then((result) => {
+            wx.hideLoading();
+            if (result && result.hasData) {
+              wx.showToast({ title: '已从云端恢复', icon: 'success' });
+            } else {
+              wx.showToast({ title: '云端暂无数据', icon: 'none' });
+            }
+          })
+          .catch((err) => {
+            wx.hideLoading();
+            wx.showToast({ title: err.message || '恢复失败', icon: 'none' });
+          });
+      }
+    });
   },
 
   exportData() {

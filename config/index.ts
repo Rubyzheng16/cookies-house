@@ -11,7 +11,7 @@ const USE_LOCAL_DEV = false;
 // 真机调试：本地开发用 localhost（需电脑上启动后端）
 const LOCAL_DEV_URL = 'http://localhost:3000';
 
-// 正式/体验版：目前先用服务器 IP，等有域名+HTTPS 再换成 https://api.xxx.com
-const PROD_URL = 'http://43.139.6.179';
+// 正式/体验版：HTTPS 域名，需在小程序后台配置为 request 合法域名
+const PROD_URL = 'https://api.cookiediary.cn';
 
 export const API_BASE_URL = USE_LOCAL_DEV ? LOCAL_DEV_URL : PROD_URL;

@@ -136,9 +136,10 @@
           </view>
           <view class="diary-block">
             <text class="diary-label">心理视角的洞察</text>
-            <text class="diary-content counselor-diary-content">
-              {{longTermAnalysis.psychologicalInsight.letter}}
-            </text>
+            <rich-text
+              class="diary-content counselor-diary-content"
+              nodes="{{longTermLetterHtml}}"
+            />
           </view>
         </view>
         <view wx:else class="diary-empty">

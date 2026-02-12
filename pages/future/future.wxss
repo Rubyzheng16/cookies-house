@@ -33,6 +33,146 @@
   width: 100%;
 }
 
+/* ========== 关于我板块（技能树在顶上，关于我在下，添加词语在照片下方） ========== */
+.about-me-section {
+  margin-top: 16rpx;
+  position: relative;
+}
+
+.about-me-section .section-title {
+  font-size: 36rpx;
+  margin-bottom: 32rpx;
+}
+
+.about-me-bubbles-wrap {
+  position: relative;
+  min-height: 520rpx;
+  padding: 24rpx;
+}
+
+/* 中央图片区域（圆角矩形，像草图里的中心区） */
+.about-me-center {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: 240rpx;
+  height: 280rpx;
+  border-radius: 32rpx;
+  border: 4rpx solid rgba(129, 199, 132, 0.8);
+  background: rgba(255, 255, 255, 0.9);
+  overflow: hidden;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.about-me-center.has-image {
+  border-color: rgba(109, 76, 65, 0.25);
+  box-shadow: 0 8rpx 24rpx rgba(0, 0, 0, 0.08);
+}
+
+.about-me-image {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.about-me-upload-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: #6D4C41;
+  opacity: 0.7;
+}
+
+.upload-icon {
+  font-size: 56rpx;
+  display: block;
+  margin-bottom: 12rpx;
+}
+
+.upload-text {
+  font-size: 22rpx;
+}
+
+/* 漂浮词语泡泡（绿色手绘感边框，参考图2/3） */
+.bubble {
+  position: absolute;
+  padding: 12rpx 20rpx;
+  border-radius: 24rpx;
+  border: 3rpx solid #81C784;
+  background: rgba(255, 255, 255, 0.92);
+  color: #3E2723;
+  max-width: 28%;
+  box-sizing: border-box;
+  z-index: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.bubble-float {
+  animation: bubble-float 4s ease-in-out infinite;
+}
+
+.bubble:nth-child(odd) {
+  animation-delay: 0.5s;
+}
+
+.bubble:nth-child(3n) {
+  animation-delay: 1s;
+}
+
+.bubble:nth-child(4n) {
+  animation-delay: 1.5s;
+}
+
+@keyframes bubble-float {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-8rpx);
+  }
+}
+
+.bubble-text {
+  font-size: inherit;
+}
+
+.add-word-btn {
+  margin-top: 32rpx;
+  padding: 20rpx 40rpx;
+  background: rgba(129, 199, 132, 0.4);
+  color: #2E7D32;
+  border: 2rpx solid #81C784;
+  border-radius: 50rpx;
+  font-size: 26rpx;
+  font-weight: 500;
+}
+
+.add-word-btn::after {
+  border: none;
+}
+
+/* 原技能树折叠栏（置顶） */
+.skill-tree-fold-bar {
+  margin-bottom: 24rpx;
+  padding: 24rpx;
+  text-align: center;
+  background: rgba(255, 255, 255, 0.5);
+  border: 2rpx dashed rgba(109, 76, 65, 0.2);
+  border-radius: 24rpx;
+}
+
+.fold-bar-text {
+  font-size: 26rpx;
+  color: #6D4C41;
+}
+
 /* 技能树板块（参考品鉴室丰容板块样式） */
 .skill-tree-panels {
   margin-top: 24rpx;

@@ -136,9 +136,12 @@ Page({
     };
     const formatDurationHours = (startTime: string, endTime: string) => {
       if (!startTime || !endTime) return '';
-      const mins = Math.max(0, parseTimeToMinutes(endTime) - parseTimeToMinutes(startTime));
+      const s = parseTimeToMinutes(startTime);
+      let e = parseTimeToMinutes(endTime);
+      if (e < s) e += 24 * 60; // 跨天：结束时间视为次日
+      const mins = Math.max(0, e - s);
       const hours = mins / 60;
-      if (hours < 1) return '用时 约0.5小时';
+      if (hours < 1) return `用时 约${mins < 60 ? '0.5' : (mins / 60).toFixed(1)}小时`;
       if (hours % 1 === 0) return `用时 ${hours}小时`;
       return `用时 ${hours.toFixed(1)}小时`;
     };
@@ -170,17 +173,21 @@ Page({
       entries: minuteGroupMap[timeLabel]
     }));
 
-    // 全天 0:00–24:00；无事件的时段不显示白色方框
+    // 只显示有事件的时段（不按24小时排序），竖线左侧整点、右侧具体时间
     const hourGroups: any[] = [];
     for (let hour = 0; hour < 24; hour++) {
       const hourStr = String(hour).padStart(2, '0');
       const minutesInHour = minuteGroups.filter((g: any) => g.timeLabel.startsWith(`${hourStr}:`));
-      const hasEntries = minutesInHour.length > 0;
-      hourGroups.push({
-        hourLabel: `${hourStr}:00`,
-        minutes: hasEntries ? minutesInHour : [],
-        hasEntries
-      });
+      if (minutesInHour.length > 0) {
+        hourGroups.push({
+          hourLabel: `${hourStr}:00`,
+          minutes: minutesInHour,
+          hasEntries: true
+        });
+      }
+    }
+    if (allDayEntries.length > 0 && hourGroups.length === 0) {
+      hourGroups.push({ hourLabel: '全天', minutes: [], hasEntries: false });
     }
 
     // 生成颜色和图标映射
